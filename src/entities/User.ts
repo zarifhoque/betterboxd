@@ -9,18 +9,18 @@ export enum UserRole {
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id!: number;
+  userId!: number;
 
-  @Column({ unique: true })
+  @Column({ unique: true, type: 'varchar', length: 50 })
   username!: string;
 
-  @Column()
+  @Column({type: 'varchar', length: 100})
   name!: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, type: 'varchar', length: 100 })
   email!: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp' })
   joinDate!: Date;
 
   @Column({
@@ -36,6 +36,6 @@ export class User {
   @OneToOne(() => Auth, (auth: Auth) => auth.user)
   auth!: Auth;
 
-  @DeleteDateColumn()
-    deletedAt?: Date;
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt!: Date | null;
 }

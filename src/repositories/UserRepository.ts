@@ -1,4 +1,4 @@
-import { AppDataSource } from "../data-source";
+import { AppDataSource } from "../database/DataSource";
 import { User } from "../entities/User";
 
 export class UserRepository {
@@ -8,8 +8,8 @@ export class UserRepository {
         return this.userRepository.find({ relations: ['auth'] });
     }
 
-    async getUserById(id: number): Promise<User | null> {
-        return this.userRepository.findOne({ where: { id }, relations: ['auth'] });
+    async getUserById(userId: number): Promise<User | null> {
+        return this.userRepository.findOne({ where: { userId }, relations: ['auth'] });
     }
 
     async createUser(userData: Partial<User>): Promise<User> {
@@ -17,8 +17,8 @@ export class UserRepository {
         return this.userRepository.save(user);
     }
 
-    async updateUser(id: number, userData: Partial<User>): Promise<User | null> {
-        const user = await this.userRepository.findOne({ where: { id } });
+    async updateUser(userId: number, userData: Partial<User>): Promise<User | null> {
+        const user = await this.userRepository.findOne({ where: { userId } });
         if (!user) {
             return null;
         }
@@ -33,6 +33,6 @@ export class UserRepository {
 
     async hardDeleteUser(id: number): Promise<boolean> {
         const result = await this.userRepository.delete(id);
-        return result.affected !== undefined && result.affected > 0;
+        return (result.affected ?? 0) > 0; // nullish coalescing operator to handle undefined  
     }   
 }
