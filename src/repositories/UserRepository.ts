@@ -4,35 +4,39 @@ import { User } from "../entities/User";
 export class UserRepository {
     private userRepository = AppDataSource.getRepository(User);
 
+    // Get all users
     async getAllUsers(): Promise<User[]> {
-        return this.userRepository.find({ relations: ['auth'] });
+        return this.userRepository.find(); 
     }
 
+    // Get user by ID
     async getUserById(userId: number): Promise<User | null> {
-        return this.userRepository.findOne({ where: { userId }, relations: ['auth'] });
+        return this.userRepository.findOne({ where: { userId } });
     }
 
+    // Create a new user
     async createUser(userData: Partial<User>): Promise<User> {
         const user = this.userRepository.create(userData);
         return this.userRepository.save(user);
     }
 
+    // Update user by ID
     async updateUser(userId: number, userData: Partial<User>): Promise<User | null> {
         const user = await this.userRepository.findOne({ where: { userId } });
-        if (!user) {
-            return null;
-        }
+        if (!user) return null;
         this.userRepository.merge(user, userData);
         return this.userRepository.save(user);
     }
 
-    async softDeleteUser(id: number): Promise<boolean> {
-        const result = await this.userRepository.softDelete(id);
-        return result.affected !== undefined && result.affected > 0;
+    // Soft delete user by ID
+    async softDeleteUser(userId: number): Promise<boolean> {
+        const result = await this.userRepository.softDelete(userId);
+        return (result.affected ?? 0) > 0; // safe nullish handling
     }
 
-    async hardDeleteUser(id: number): Promise<boolean> {
-        const result = await this.userRepository.delete(id);
-        return (result.affected ?? 0) > 0; // nullish coalescing operator to handle undefined  
-    }   
+    // Hard delete user by ID
+    async hardDeleteUser(userId: number): Promise<boolean> {
+        const result = await this.userRepository.delete(userId);
+        return (result.affected ?? 0) > 0; // safe nullish handling
+    }
 }
