@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne, DeleteDateColumn } from 'typeorm';
 import { Auth } from './Auth';
 
 export enum UserRole {
@@ -35,4 +35,7 @@ export class User {
 
   @OneToOne(() => Auth, (auth: Auth) => auth.user)
   auth!: Auth;
+
+  @DeleteDateColumn()
+    deletedAt?: Date;
 }
