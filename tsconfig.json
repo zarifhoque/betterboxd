@@ -10,6 +10,9 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "types": ["node"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
   }
 }
