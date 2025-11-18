@@ -1,5 +1,15 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import { AppDataSource } from './data-source';
+import userRoutes from './routes/UserRoutes';
+
+AppDataSource.initialize()
+  .then(() => {
+    console.log('Data Source has been initialized!');
+  }
+  ).catch((err) => {
+    console.error('Error during Data Source initialization:', err);
+  });
 
 const app = express();
 
@@ -10,6 +20,9 @@ if (isNaN(PORT)) {
 
 app.use(express.json());
 app.use(cors());
+
+
+app.use('/api', userRoutes);
 
 app.get('/', (req: Request, res: Response): void => {
   res.status(200).send('Movie Review API is running!');
