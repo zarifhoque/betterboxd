@@ -3,13 +3,26 @@ import { User } from './User';
 
 @Entity()
 export class Auth {
+
   @PrimaryGeneratedColumn()
   authId!: number;
 
-  @OneToOne(() => User)
-  @JoinColumn({name:'userId'}) // foreign key
-  user!: User;
+  @Column({ unique: true, type: 'varchar', length: 50 })
+  username!: string;
+
+  @Column({ unique: true, type: 'varchar', length: 100 })
+  email!: string
 
   @Column({ type: 'varchar', length: 255 })
-  hashedPassword!: string; // hashed
+  hashedPassword!: string;
+
+  @OneToOne(() => User)
+  @JoinColumn({ name: 'username', referencedColumnName: 'username' })
+  userByUsername !: User;
+
+  @OneToOne(() => User)
+  @JoinColumn({ name: 'email', referencedColumnName: 'email' })
+  userByEmail!: User;
+
+
 }

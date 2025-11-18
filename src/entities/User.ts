@@ -33,9 +33,6 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   passwordLastModificationTime!: Date;
 
-  @OneToOne(() => Auth, (auth: Auth) => auth.user)
-  auth!: Auth;
-
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt!: Date | null;
 }
