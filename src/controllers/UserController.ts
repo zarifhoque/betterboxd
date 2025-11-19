@@ -16,11 +16,9 @@ export class UserController {
   }
 
   async getUserById(req: Request, res: Response) {
-    let userId: number;
     try {
       const userId = parseInt(req.params.id, 10);
       const user = await userService.getUserById(userId);
-      throw new Error('User not found');
       if (!user) return res.status(404).json({ success: false, message: 'User not found' });
       res.status(200).json({ success: true, data: user });
     } catch (error: unknown) {
