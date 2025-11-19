@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToOne,
+  DeleteDateColumn,
+} from 'typeorm';
 import { Auth } from './Auth';
 
 export enum UserRole {
@@ -14,7 +21,7 @@ export class User {
   @Column({ unique: true, type: 'varchar', length: 50 })
   username!: string;
 
-  @Column({type: 'varchar', length: 100})
+  @Column({ type: 'varchar', length: 100 })
   name!: string;
 
   @Column({ unique: true, type: 'varchar', length: 100 })
