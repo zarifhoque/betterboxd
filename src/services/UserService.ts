@@ -8,23 +8,23 @@ export class UserService {
     return this.userRepository.getAllUsers();
   }
 
-  async getUserById(id: number): Promise<User | null> {
-    return this.userRepository.getUserById(id);
+  async getUserById(userId: number): Promise<User | null> {
+    return this.userRepository.getUserById(userId);
   }
 
   async createUser(userData: Partial<User>): Promise<User> {
     return this.userRepository.createUser(userData);
   }
 
-  async updateUser(id: number, userData: Partial<User>): Promise<User | null> {
-    return this.userRepository.updateUser(id, userData);
+  async updateUser(userId: number, userData: Partial<User>): Promise<boolean> {
+    return this.userRepository.updateUser(userId, userData);
   }
 
-  async softDeleteUser(id: number): Promise<boolean> {
-    return this.userRepository.softDeleteUser(id);
+  async softDeleteUser(userId: number): Promise<boolean> {
+    return this.userRepository.softDeleteUser(userId);
   }
 
-  async hardDeleteUser(id: number): Promise<boolean> {
-    return this.userRepository.hardDeleteUser(id);
+  async hardDeleteUser(userId: number): Promise<boolean> {
+    return this.userRepository.hardDeleteUser(userId);
   }
 }
