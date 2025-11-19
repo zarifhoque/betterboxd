@@ -4,10 +4,10 @@ import { User } from '../entities/User';
 export class UserRepository {
   private userRepository = AppDataSource.getRepository(User);
 
-  // Get all users
-  async getAllUsers(): Promise<User[]> {
-    return this.userRepository.find();
-  }
+    // Get all users
+    async getAllUsers(): Promise<User[]> {
+        return this.userRepository.find();
+    }
 
   // Get user by ID
   async getUserById(userId: number): Promise<User | null> {
@@ -20,13 +20,11 @@ export class UserRepository {
     return this.userRepository.save(user);
   }
 
-  // Update user by ID
-  async updateUser(userId: number, userData: Partial<User>): Promise<User | null> {
-    const user = await this.userRepository.findOne({ where: { userId } });
-    if (!user) return null;
-    this.userRepository.merge(user, userData);
-    return this.userRepository.save(user);
-  }
+    // Update user by ID
+    async updateUser(userId: number, userData: Partial<User>): Promise<boolean> {
+        const result = await this.userRepository.update(userId, userData);
+        return (result.affected ?? 0) > 0;
+    }
 
   // Soft delete user by ID
   async softDeleteUser(userId: number): Promise<boolean> {
