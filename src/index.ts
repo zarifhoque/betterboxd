@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cors());
 
 
-app.use('/api', userRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/', (req: Request, res: Response): void => {
   res.status(200).send('Movie Review API is running!');
