@@ -9,13 +9,13 @@ export class UserController {
     try {
       const users: User[] = await userService.getAllUsers();
       res.status(200).json({ success: true, data: users });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching users:', error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
 
-   async getUserById(req: Request, res: Response) {
+  async getUserById(req: Request, res: Response) {
     let userId: number;
     try {
       const userId = parseInt(req.params.id, 10);
@@ -23,18 +23,18 @@ export class UserController {
       throw new Error('User not found');
       if (!user) return res.status(404).json({ success: false, message: 'User not found' });
       res.status(200).json({ success: true, data: user });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error fetching user with ID ${userId}:`, error);
       res.status(500).json({ success: false, message: error.message });
     }
   }
 
-   async createUser(req: Request, res: Response) {
+  async createUser(req: Request, res: Response) {
     const userData: Partial<User> = req.body;
     try {
       const newUser = await userService.createUser(userData);
       res.status(201).json({ success: true, data: newUser });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating user:', error);
       res.status(500).json({ success: false, message: error.message });
     }
@@ -47,7 +47,7 @@ export class UserController {
       const updated = await userService.updateUser(userId, userData);
       if (!updated) return res.status(404).json({ success: false, message: 'User not found' });
       res.status(200).json({ success: true, message: 'User updated successfully' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error updating user with ID ${userId}:`, error);
       res.status(500).json({ success: false, message: error.message });
     }
@@ -59,7 +59,7 @@ export class UserController {
       const deleted = await userService.softDeleteUser(userId);
       if (!deleted) return res.status(404).json({ success: false, message: 'User not found' });
       res.status(200).json({ success: true, message: 'User soft-deleted successfully' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error deleting user with ID ${userId}:`, error);
       res.status(500).json({ success: false, message: error.message });
     }

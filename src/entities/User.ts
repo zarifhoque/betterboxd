@@ -3,10 +3,8 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  OneToOne,
   DeleteDateColumn,
 } from 'typeorm';
-import { Auth } from './Auth';
 
 export enum UserRole {
   ADMIN = 'ADMIN',
