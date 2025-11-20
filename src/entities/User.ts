@@ -35,9 +35,6 @@ export class User {
   })
   role!: UserRole;
 
-  @Column({ type: 'timestamp', nullable: true })
-  passwordLastModificationTime!: Date;
-
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt!: Date | null;
 }

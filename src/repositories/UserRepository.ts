@@ -1,5 +1,8 @@
 import { AppDataSource } from '../database/DataSource';
 import { User } from '../entities/User';
+import {UserDTO, UserResponseDTO} from '../dtos/userDTOs';
+import { UserUpdateSchemaType } from '../schemas/userSchema';
+
 
 export class UserRepository {
   private userRepository = AppDataSource.getRepository(User);
@@ -15,13 +18,13 @@ export class UserRepository {
   }
 
   // Create a new user
-  async createUser(userData: Partial<User>): Promise<User> {
+  async createUser(userData: UserDTO): Promise<UserResponseDTO> {
     const user = await this.userRepository.create(userData);
     return this.userRepository.save(user);
   }
 
   // Update user by ID
-  async updateUser(userId: number, userData: Partial<User>): Promise<boolean> {
+  async updateUser(userId: number, userData: Partial<UserDTO>): Promise<boolean> {
     const result = await this.userRepository.update(userId, userData);
     return (result.affected ?? 0) > 0;
   }

@@ -15,6 +15,9 @@ export class Auth {
   @Column({ type: 'varchar', length: 255 })
   hashedPassword!: string;
 
+  @Column({ type: 'timestamp', nullable: true })
+    passwordLastModificationTime!: Date;
+
   @OneToOne(() => User)
   @JoinColumn({ name: 'username', referencedColumnName: 'username' })
   userByUsername!: User;
