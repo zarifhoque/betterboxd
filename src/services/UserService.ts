@@ -9,7 +9,7 @@ export class UserService {
   }
 
   async getUserById(userId: number): Promise<User | null> {
-    const user = this.userRepository.getUserById(userId);
+    const user = await this.userRepository.getUserById(userId);
     if(!user) {
       throw new Error('User not found'); // throw generic error to be handled in controller
     }
