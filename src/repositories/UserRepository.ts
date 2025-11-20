@@ -16,7 +16,7 @@ export class UserRepository {
 
   // Create a new user
   async createUser(userData: Partial<User>): Promise<User> {
-    const user = this.userRepository.create(userData);
+    const user = await this.userRepository.create(userData);
     return this.userRepository.save(user);
   }
 
@@ -37,4 +37,4 @@ export class UserRepository {
     const result = await this.userRepository.delete(userId);
     return (result.affected ?? 0) > 0; // safe nullish handling
   }
-}
+} 
