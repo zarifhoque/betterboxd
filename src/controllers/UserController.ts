@@ -9,35 +9,49 @@ export class UserController {
     try {
       const users: User[] = await userService.getAllUsers();
       res.status(200).json({ success: true, data: users });
-    } catch (error: any) {
-      console.error('Error fetching users:', error);
-      res.status(500).json({ success: false, message: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ success: false, message: error.message });
+      }
+      else {
+        console.error('Unknown error fetching users:', error);
+        res.status(500).json({ success: false, message: 'An unknown error occurred' });
+      }
     }
   }
 
-   async getUserById(req: Request, res: Response): Promise<void> {
+  async getUserById(req: Request, res: Response): Promise<void> {
     try {
       const userId: number = parseInt(req.params.id, 10);
       const user: User | null = await userService.getUserById(userId);
-      if (!user) {
-        res.status(404).json({ success: false, message: 'User not found' });
-        return;  
-      }
       res.status(200).json({ success: true, data: user });
-    } catch (error: any) {
-      console.error(`Error fetching user:`, error);
-      res.status(500).json({ success: false, message: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ success: false, message: error.message });
+      }
+      else {
+        console.error('Unknown error fetching user:', error);
+        res.status(500).json({ success: false, message: 'An unknown error occurred' });
+      }
     }
   }
 
-   async createUser(req: Request, res: Response): Promise<void> {
+  async createUser(req: Request, res: Response): Promise<void> {
     try {
       const userData: Partial<User> = req.body;
       const newUser: User = await userService.createUser(userData);
       res.status(201).json({ success: true, data: newUser });
-    } catch (error: any) {
-      console.error('Error creating user:', error);
-      res.status(500).json({ success: false, message: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error creating user:', error);
+        res.status(500).json({ success: false, message: error.message });
+      }
+      else {
+        console.error('Unknown error creating user:', error);
+        res.status(500).json({ success: false, message: 'An unknown error occurred' });
+      }
     }
   }
 
@@ -45,30 +59,34 @@ export class UserController {
     try {
       const userId: number = parseInt(req.params.id, 10);
       const userData: Partial<User> = req.body;
-      const updatedUser: boolean = await userService.updateUser(userId, userData);
-      if (!updatedUser) {
-        res.status(404).json({ success: false, message: 'User not found' });
-        return;
-      }
+      await userService.updateUser(userId, userData);
       res.status(200).json({ success: true, message: 'User updated successfully' });
-    } catch (error: any) {
-      console.error(`Error updating user with ID:`, error);
-      res.status(500).json({ success: false, message: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error updating user with ID:', error);
+        res.status(500).json({ success: false, message: error.message });
+      }
+      else {
+        console.error('Unknown error updating user:', error);
+        res.status(500).json({ success: false, message: 'An unknown error occurred' });
+      }
     }
   }
 
   async deleteUser(req: Request, res: Response): Promise<void> {
     try {
       const userId: number = parseInt(req.params.id, 10);
-      const deletedUser: boolean = await userService.softDeleteUser(userId);
-      if (!deletedUser){
-        res.status(404).json({ success: false, message: 'User not found' });
-        return ;
-      } 
+      await userService.softDeleteUser(userId);
       res.status(200).json({ success: true, message: 'User soft-deleted successfully' });
-    } catch (error: any) {
-      console.error(`Error deleting user:`, error);
-      res.status(500).json({ success: false, message: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({ success: false, message: error.message });
+      }
+      else {
+        console.error('Unknown error deleting user:', error);
+        res.status(500).json({ success: false, message: 'An unknown error occurred' });
+      }
     }
   }
 }

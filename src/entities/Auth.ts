@@ -3,7 +3,6 @@ import { User } from './User';
 
 @Entity()
 export class Auth {
-
   @PrimaryGeneratedColumn()
   authId!: number;
 
@@ -11,18 +10,16 @@ export class Auth {
   username!: string;
 
   @Column({ unique: true, type: 'varchar', length: 100 })
-  email!: string
+  email!: string;
 
   @Column({ type: 'varchar', length: 255 })
   hashedPassword!: string;
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'username', referencedColumnName: 'username' })
-  userByUsername !: User;
+  userByUsername!: User;
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'email', referencedColumnName: 'email' })
   userByEmail!: User;
-
-
 }
