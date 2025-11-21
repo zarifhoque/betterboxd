@@ -1,6 +1,6 @@
 import { UserRole } from '../entities/User';
 
-export interface UserDTO {
+export interface UserCreateDTO {
   username: string;
   name: string;
   email: string;
@@ -9,13 +9,19 @@ export interface UserDTO {
   profile?: string;
 }
 
+export interface UserUpdateDTO {
+  username?: string;
+  name?: string;
+  email?: string;
+  role?: UserRole;
+  profile?: string;
+}
+
 export interface UserResponseDTO {
-  userId: number;
+  userId: string;
   username: string;
   name: string;
   email: string;
   role: UserRole;
   joinDate: Date;
-  profile?: string;
-  passwordLastModificationTime?: Date;
 }
