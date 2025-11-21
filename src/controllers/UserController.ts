@@ -1,7 +1,12 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/UserService';
 import { User } from '../entities/User';
-import { userUpdateSchema, userCreateSchema, UserCreateSchemaType, UserUpdateSchemaType } from '../schemas/userSchema';
+import {
+  userUpdateSchema,
+  userCreateSchema,
+  UserCreateSchemaType,
+  UserUpdateSchemaType,
+} from '../schemas/UserSchema';
 import { UserResponseDTO } from '../dtos/userDTOs';
 
 const userService = new UserService();
@@ -15,8 +20,7 @@ export class UserController {
       if (error instanceof Error) {
         console.error('Error fetching users:', error);
         res.status(500).json({ success: false, message: error.message });
-      }
-      else {
+      } else {
         console.error('Unknown error fetching users:', error);
         res.status(500).json({ success: false, message: 'An unknown error occurred' });
       }
@@ -32,8 +36,7 @@ export class UserController {
       if (error instanceof Error) {
         console.error('Error fetching user:', error);
         res.status(500).json({ success: false, message: error.message });
-      }
-      else {
+      } else {
         console.error('Unknown error fetching user:', error);
         res.status(500).json({ success: false, message: 'An unknown error occurred' });
       }
@@ -49,8 +52,7 @@ export class UserController {
       if (error instanceof Error) {
         console.error('Error creating user:', error);
         res.status(500).json({ success: false, message: error.message });
-      }
-      else {
+      } else {
         console.error('Unknown error creating user:', error);
         res.status(500).json({ success: false, message: 'An unknown error occurred' });
       }
@@ -67,8 +69,7 @@ export class UserController {
       if (error instanceof Error) {
         console.error('Error updating user with ID:', error);
         res.status(500).json({ success: false, message: error.message });
-      }
-      else {
+      } else {
         console.error('Unknown error updating user:', error);
         res.status(500).json({ success: false, message: 'An unknown error occurred' });
       }
@@ -84,8 +85,7 @@ export class UserController {
       if (error instanceof Error) {
         console.error('Error deleting user:', error);
         res.status(500).json({ success: false, message: error.message });
-      }
-      else {
+      } else {
         console.error('Unknown error deleting user:', error);
         res.status(500).json({ success: false, message: 'An unknown error occurred' });
       }

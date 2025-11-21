@@ -13,8 +13,8 @@ export enum UserRole {
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  userId!: number;
+  @PrimaryGeneratedColumn('uuid')
+  userId!: string;
 
   @Column({ unique: true, type: 'varchar', length: 50 })
   username!: string;

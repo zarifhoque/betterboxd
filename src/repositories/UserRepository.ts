@@ -1,8 +1,7 @@
 import { AppDataSource } from '../database/DataSource';
 import { User } from '../entities/User';
-import {UserDTO, UserResponseDTO} from '../dtos/userDTOs';
-import { UserUpdateSchemaType } from '../schemas/userSchema';
-
+import { UserDTO, UserResponseDTO } from '../dtos/userDTOs';
+import { UserUpdateSchemaType } from '../schemas/UserSchema';
 
 export class UserRepository {
   private userRepository = AppDataSource.getRepository(User);
@@ -34,10 +33,4 @@ export class UserRepository {
     const result = await this.userRepository.softDelete(userId);
     return (result.affected ?? 0) > 0; // safe nullish handling
   }
-
-  // Hard delete user by ID
-  async hardDeleteUser(userId: number): Promise<boolean> {
-    const result = await this.userRepository.delete(userId);
-    return (result.affected ?? 0) > 0; // safe nullish handling
-  }
-} 
+}

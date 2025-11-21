@@ -1,6 +1,6 @@
 import { UserRepository } from '../repositories/UserRepository';
 import { User } from '../entities/User';
-import {UserCreateSchemaType, UserUpdateSchemaType } from '../schemas/userSchema';
+import { UserCreateSchemaType, UserUpdateSchemaType } from '../schemas/UserSchema';
 import { UserResponseDTO } from '../dtos/userDTOs';
 
 export class UserService {
@@ -12,7 +12,7 @@ export class UserService {
 
   async getUserById(userId: number): Promise<User | null> {
     const user = await this.userRepository.getUserById(userId);
-    if(!user) {
+    if (!user) {
       throw new Error('User not found'); // throw generic error to be handled in controller
     }
     return user;
@@ -31,27 +31,25 @@ export class UserService {
       passwordLastModificationTime: newUser.passwordLastModificationTime,
     };
     return userResponse;
-
   }
 
   async updateUser(userId: number, userData: UserUpdateSchemaType): Promise<void> {
-    
     const updatedState = await this.userRepository.updateUser(userId, userData);
-    if(!updatedState) {
+    if (!updatedState) {
       throw new Error('User not found'); // throw generic error to be handled in controller
     }
   }
 
   async softDeleteUser(userId: number): Promise<void> {
     const deletedState = await this.userRepository.softDeleteUser(userId);
-    if(!deletedState) {
+    if (!deletedState) {
       throw new Error('User not found'); // throw generic error to be handled in controller
     }
   }
 
   async hardDeleteUser(userId: number): Promise<void> {
     const deletedState = this.userRepository.hardDeleteUser(userId);
-    if(!deletedState) {
+    if (!deletedState) {
       throw new Error('User not found'); // throw generic error to be handled in controller
     }
   }
