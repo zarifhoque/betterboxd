@@ -4,6 +4,7 @@ import { UserCreateSchemaType, UserUpdateSchemaType } from '../schemas/UserSchem
 import { UserResponseDTO } from '../dtos/UserDTOs';
 import { toUserResponseDTO, toUserResponseDTOs } from '../utils/utils';
 import { NotFoundError } from '../errors/AppErrors';
+import { z } from 'zod';
 
 export class UserService {
   private userRepository = new UserRepository();
@@ -14,13 +15,14 @@ export class UserService {
   }
 
   async getUserById(userId: string): Promise<UserResponseDTO> {
+    z.uuid().parse(userId);
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
       throw new NotFoundError(`User with the id ${userId} not found`);
     }
     return toUserResponseDTO(user);
   }
-
+ 
   async createUser(userData: UserCreateSchemaType): Promise<UserResponseDTO> {
     const newUser = await this.userRepository.createUser(userData);
     const userResponse = toUserResponseDTO(newUser);
@@ -28,6 +30,7 @@ export class UserService {
   }
 
   async updateUser(userId: string, userData: UserUpdateSchemaType): Promise<void> {
+    z.uuid().parse(userId);
     const updatedState = await this.userRepository.updateUser(userId, userData);
     if (!updatedState) {
       throw new NotFoundError(`User with the id ${userId} not found`);
@@ -35,6 +38,7 @@ export class UserService {
   }
 
   async deleteUser(userId: string): Promise<void> {
+    z.uuid().parse(userId);
     const deletedState = await this.userRepository.softDeleteUser(userId);
     if (!deletedState) {
       throw new NotFoundError(`User with the id ${userId} not found`);
