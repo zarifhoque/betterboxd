@@ -3,6 +3,7 @@ import { User } from '../entities/User';
 import { UserCreateSchemaType, UserUpdateSchemaType } from '../schemas/UserSchema';
 import { UserResponseDTO } from '../dtos/UserDTOs';
 import { toUserResponseDTO, toUserResponseDTOs } from '../utils/utils';
+import { NotFoundError } from '../errors/AppErrors';
 
 export class UserService {
   private userRepository = new UserRepository();
@@ -12,10 +13,10 @@ export class UserService {
     return toUserResponseDTOs(users);
   }
 
-  async getUserById(userId: string): Promise<UserResponseDTO | null> {
+  async getUserById(userId: string): Promise<UserResponseDTO> {
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
-      throw new Error('User not found'); // throw generic error to be handled in controller
+      throw new NotFoundError(`User with the id ${userId} not found`);
     }
     return toUserResponseDTO(user);
   }
@@ -29,14 +30,14 @@ export class UserService {
   async updateUser(userId: string, userData: UserUpdateSchemaType): Promise<void> {
     const updatedState = await this.userRepository.updateUser(userId, userData);
     if (!updatedState) {
-      throw new Error('User not found'); // throw generic error to be handled in controller
+      throw new NotFoundError(`User with the id ${userId} not found`);
     }
   }
 
   async deleteUser(userId: string): Promise<void> {
     const deletedState = await this.userRepository.softDeleteUser(userId);
     if (!deletedState) {
-      throw new Error('User not found'); // throw generic error to be handled in controller
+      throw new NotFoundError(`User with the id ${userId} not found`);
     }
   }
 }
