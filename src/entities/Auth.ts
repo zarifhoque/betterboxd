@@ -3,8 +3,8 @@ import { User } from './User';
 
 @Entity()
 export class Auth {
-  @PrimaryGeneratedColumn()
-  authId!: number;
+  @PrimaryGeneratedColumn('uuid')
+  authId!: string;
 
   @Column({ unique: true, type: 'varchar', length: 50 })
   username!: string;
@@ -14,6 +14,9 @@ export class Auth {
 
   @Column({ type: 'varchar', length: 255 })
   hashedPassword!: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  passwordLastModificationTime!: Date;
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'username', referencedColumnName: 'username' })

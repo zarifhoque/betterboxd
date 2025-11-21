@@ -13,8 +13,8 @@ export enum UserRole {
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  userId!: number;
+  @PrimaryGeneratedColumn('uuid')
+  userId!: string;
 
   @Column({ unique: true, type: 'varchar', length: 50 })
   username!: string;
@@ -34,9 +34,6 @@ export class User {
     default: UserRole.USER,
   })
   role!: UserRole;
-
-  @Column({ type: 'timestamp', nullable: true })
-  passwordLastModificationTime!: Date;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt!: Date | null;
