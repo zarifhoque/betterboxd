@@ -22,7 +22,7 @@ export class UserService {
     }
     return toUserResponseDTO(user);
   }
- 
+
   async createUser(userData: UserCreateSchemaType): Promise<UserResponseDTO> {
     const newUser = await this.userRepository.createUser(userData);
     const userResponse = toUserResponseDTO(newUser);
