@@ -16,7 +16,7 @@ export class UserService {
 
   async getUserById(userId: string): Promise<UserResponseDTO> {
     z.uuid().parse(userId);
-    const user = await this.userRepository.getUserById(userId);
+    const user: User | null = await this.userRepository.getUserById(userId);
     if (!user) {
       throw new NotFoundError(`User with the id ${userId} not found`);
     }
