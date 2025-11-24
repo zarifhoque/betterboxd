@@ -3,7 +3,7 @@ import { User } from '../entities/User';
 import { UserCreateSchemaType, UserUpdateSchemaType } from '../schemas/UserSchema';
 import { UserResponseDTO } from '../dtos/UserDTOs';
 import { toUserResponseDTO, toUserResponseDTOs } from '../utils/utils';
-import { NotFoundError } from '../errors/AppErrors';
+import { ConflictError, NotFoundError } from '../errors/AppErrors';
 import { z } from 'zod';
 
 export class UserService {
@@ -24,6 +24,16 @@ export class UserService {
   }
 
   async createUser(userData: UserCreateSchemaType): Promise<UserResponseDTO> {
+    const existingUserByEmail = await this.userRepository.getUserByEmail(userData.email);
+    if (existingUserByEmail) {
+      throw new ConflictError('A user with this email already exists');
+    }
+
+    const existingUserByUsername = await this.userRepository.getUserByUsername(userData.username);
+    if (existingUserByUsername) {
+      throw new ConflictError('A user with this username already exists');
+    }
+
     const newUser = await this.userRepository.createUser(userData);
     const userResponse = toUserResponseDTO(newUser);
     return userResponse;
