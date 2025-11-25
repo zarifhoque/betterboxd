@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/UserController';
+import { validateRequest } from '../middlewares/validateRequest';
+import { storyCreateSchema, storyUpdateSchema } from '../schemas/StorySchema';
 
 const router = Router();
 const userController = new UserController();
@@ -7,8 +9,16 @@ const userController = new UserController();
 // GET /api/users
 router.get('/', userController.getAllUsers.bind(userController));
 router.get('/:id', userController.getUserById.bind(userController));
-router.post('/', userController.createUser.bind(userController));
-router.put('/:id', userController.updateUser.bind(userController));
+router.post(
+  '/',
+  validateRequest(storyCreateSchema),
+  userController.createUser.bind(userController),
+);
+router.put(
+  '/:id',
+  validateRequest(storyUpdateSchema),
+  userController.updateUser.bind(userController),
+);
 router.delete('/:id', userController.deleteUser.bind(userController));
 
 export default router;

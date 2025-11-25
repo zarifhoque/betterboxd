@@ -45,6 +45,7 @@ export default defineConfig([
       quotes: ['error', 'single'],
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-function-return-type': 'off',
+      'no-console': 'warn',
     },
 
     settings: {
