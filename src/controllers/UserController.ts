@@ -1,12 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../services/UserService';
-import {
-  userUpdateSchema,
-  userCreateSchema,
-  UserCreateSchemaType,
-  UserUpdateSchemaType,
-} from '../schemas/UserSchema';
-import { UserResponseDTO } from '../dtos/UserDTOs';
+import { UserCreateDTO, UserResponseDTO, UserUpdateDTO } from '../dtos/UserDTOs';
 
 const userService = new UserService();
 
@@ -32,7 +26,7 @@ export class UserController {
 
   async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userData: UserCreateSchemaType = userCreateSchema.parse(req.body);
+      const userData: UserCreateDTO = req.body;
       const newUser: UserResponseDTO = await userService.createUser(userData);
       res.status(201).json({ success: true, data: newUser, message: 'User created successfully' });
     } catch (error: unknown) {
@@ -43,7 +37,7 @@ export class UserController {
   async updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId: string = req.params.id;
-      const userData: UserUpdateSchemaType = userUpdateSchema.parse(req.body);
+      const userData: UserUpdateDTO = req.body;
       await userService.updateUser(userId, userData);
       res.status(200).json({ success: true, message: 'User updated successfully' });
     } catch (error: unknown) {

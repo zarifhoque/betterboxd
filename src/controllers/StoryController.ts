@@ -1,13 +1,7 @@
 // controllers/storyController.ts
 import { Request, Response, NextFunction } from 'express';
 import { StoryService } from '../services/StoryService';
-import { StoryResponseDTO } from '../dtos/StoryDTOs';
-import {
-  storyCreateSchema,
-  storyUpdateSchema,
-  StoryCreateSchemaType,
-  StoryUpdateSchemaType,
-} from '../schemas/StorySchema';
+import { StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
 
 const storyService = new StoryService();
 
@@ -33,8 +27,7 @@ export class StoryController {
 
   static async createStory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const storyData: StoryCreateSchemaType = storyCreateSchema.parse(req.body);
-      const story: StoryResponseDTO = await storyService.createStory(storyData);
+      const story: StoryResponseDTO = await storyService.createStory(req.body);
       res.status(201).json({ success: true, data: story, message: 'Story created successfully' });
     } catch (error) {
       next(error);
@@ -44,8 +37,8 @@ export class StoryController {
   static async updateStory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const storyId = req.params.id;
-      const storyData: StoryUpdateSchemaType = storyUpdateSchema.parse(req.body);
-      storyService.updateStory(storyId, storyData);
+      const storyData: StoryUpdateDTO = req.body;
+      await storyService.updateStory(storyId, storyData);
       res.json({ success: true, message: 'Story updated succesfully' });
     } catch (error) {
       next(error);
