@@ -1,4 +1,3 @@
-// entities/Story.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -11,18 +10,27 @@ import { User } from './User';
 
 @Entity()
 export class Story {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   storyId!: string;
 
   @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'userId' })
-  userByUserId!: User;
+  @JoinColumn({ name: 'userByUserId' })
+  user!: User;
+
+  @Column({ type: 'uuid' })
+  userByUserId!: string;
 
   @Column({ type: 'varchar', length: 255 })
   title!: string;
 
   @Column({ type: 'text' })
   body!: string;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt!: Date;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt!: Date;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt!: Date | null;

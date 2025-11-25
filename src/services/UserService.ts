@@ -1,7 +1,6 @@
 import { UserRepository } from '../repositories/UserRepository';
 import { User } from '../entities/User';
-import { UserCreateSchemaType, UserUpdateSchemaType } from '../schemas/UserSchema';
-import { UserResponseDTO } from '../dtos/UserDTOs';
+import { UserCreateDTO, UserResponseDTO, UserUpdateDTO } from '../dtos/UserDTOs';
 import { toUserResponseDTO, toUserResponseDTOs } from '../utils/utils';
 import { ConflictError, NotFoundError } from '../errors/AppErrors';
 import { z } from 'zod';
@@ -23,7 +22,7 @@ export class UserService {
     return toUserResponseDTO(user);
   }
 
-  async createUser(userData: UserCreateSchemaType): Promise<UserResponseDTO> {
+  async createUser(userData: UserCreateDTO): Promise<UserResponseDTO> {
     const existingUserByEmail = await this.userRepository.getUserByEmail(userData.email);
     if (existingUserByEmail) {
       throw new ConflictError('A user with this email already exists');
@@ -39,7 +38,7 @@ export class UserService {
     return userResponse;
   }
 
-  async updateUser(userId: string, userData: UserUpdateSchemaType): Promise<void> {
+  async updateUser(userId: string, userData: UserUpdateDTO): Promise<void> {
     z.uuid().parse(userId);
     const updatedState = await this.userRepository.updateUser(userId, userData);
     if (!updatedState) {

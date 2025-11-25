@@ -26,6 +26,14 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
       name: err.name,
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
     };
+  } else if (typeof err === 'string') {
+    error = new AppError(err, 500);
+  } else if (err instanceof SyntaxError && 'body' in err) {
+    error = new BadRequestError('Invalid JSON syntax in request body');
+    errorDetails = {
+      message: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    };
   } else {
     error = new AppError('An unknown error occurred', 500);
     errorDetails = process.env.NODE_ENV === 'development' ? err : undefined;

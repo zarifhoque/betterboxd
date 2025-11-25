@@ -3,25 +3,26 @@ import { StoryRepository } from '../repositories/StoryRepository';
 import { Story } from '../entities/Story';
 import { NotFoundError, ConflictError } from '../errors/AppErrors';
 import { z } from 'zod';
+import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
+import { toStoryResponseDTO, toStoryResponseDTOs } from '../utils/utils';
 
 export class StoryService {
   private storyRepository = new StoryRepository();
 
   // Get all stories
-  async getAllStories(): Promise<Story[]> {
-    // return this.storyRepository.getAllStories();
+  async getAllStories(): Promise<StoryResponseDTO[]> {
     const stories: Story[] = await this.storyRepository.getAllStories();
-    return stories;
+    return toStoryResponseDTOs(stories);
   }
 
   // Get story by ID
-  async getStoryById(storyId: string): Promise<Story> {
+  async getStoryById(storyId: string): Promise<StoryResponseDTO> {
     z.uuid().parse(storyId);
     const story: Story | null = await this.storyRepository.getStoryById(storyId);
     if (!story) {
       throw new NotFoundError(`Story with the id ${storyId} not found`);
     }
-    return story;
+    return toStoryResponseDTO(story);
   }
 
   // Get all stories by user ID
@@ -32,33 +33,35 @@ export class StoryService {
   }
 
   // Create a new story
-  async createStory(story: Story): Promise<Story> {
-    const 
-    return this.storyRepository.createStory(story);
+  async createStory(story: StoryCreateDTO): Promise<StoryResponseDTO> {
+    const newStory = await this.storyRepository.createStory(story);
+    const newStoryResponse = toStoryResponseDTO(newStory);
+    return newStoryResponse;
   }
 
   // Update an existing story
-  async updateStory(story: Story): Promise<void> {
-    const existingStory = await this.storyRepository.getStoryById(story.storyId.toString());
-    if (!existingStory) {
-      throw new NotFoundError(`Story with the id ${story.storyId} not found`);
-    }
-
-    const updated = await this.storyRepository.updateStory(story);
-    if (!updated) {
-      throw new ConflictError(`Failed to update story with id ${story.storyId}`);
-    }
-  }
-
-  // Soft delete a story
-  async deleteStory(storyId: string): Promise<void> {
-    z.string().parse(storyId);
+  async updateStory(storyId: string, story: StoryUpdateDTO): Promise<void> {
+    z.uuid().parse(storyId);
     const existingStory = await this.storyRepository.getStoryById(storyId);
     if (!existingStory) {
       throw new NotFoundError(`Story with the id ${storyId} not found`);
     }
 
-    const deleted = await this.storyRepository.softDeleteStory(Number(storyId));
+    const updatedState: boolean = await this.storyRepository.updateStory(storyId, story);
+    if (!updatedState) {
+      throw new NotFoundError(`Failed to update story with id ${storyId}`);
+    }
+  }
+
+  // Soft delete a story
+  async deleteStory(storyId: string): Promise<void> {
+    z.uuid().parse(storyId);
+    const existingStory = await this.storyRepository.getStoryById(storyId);
+    if (!existingStory) {
+      throw new NotFoundError(`Story with the id ${storyId} not found`);
+    }
+
+    const deleted = await this.storyRepository.softDeleteStory(storyId);
     if (!deleted) {
       throw new ConflictError(`Failed to delete story with id ${storyId}`);
     }
