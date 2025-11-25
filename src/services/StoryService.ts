@@ -1,10 +1,10 @@
 // services/StoryService.ts
 import { StoryRepository } from '../repositories/StoryRepository';
 import { Story } from '../entities/Story';
-import { NotFoundError, ConflictError } from '../errors/AppErrors';
 import { z } from 'zod';
 import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
 import { toStoryResponseDTO, toStoryResponseDTOs } from '../utils/utils';
+import { createError } from '../errors/ErrorFactory';
 
 export class StoryService {
   private storyRepository = new StoryRepository();
@@ -20,7 +20,7 @@ export class StoryService {
     z.uuid().parse(storyId);
     const story: Story | null = await this.storyRepository.getStoryById(storyId);
     if (!story) {
-      throw new NotFoundError(`Story with the id ${storyId} not found`);
+      throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
     return toStoryResponseDTO(story);
   }
@@ -44,12 +44,12 @@ export class StoryService {
     z.uuid().parse(storyId);
     const existingStory = await this.storyRepository.getStoryById(storyId);
     if (!existingStory) {
-      throw new NotFoundError(`Story with the id ${storyId} not found`);
+      throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
 
     const updatedState: boolean = await this.storyRepository.updateStory(storyId, story);
     if (!updatedState) {
-      throw new NotFoundError(`Failed to update story with id ${storyId}`);
+      throw createError('Conflict', `Failed to update story with id ${storyId}`);
     }
   }
 
@@ -58,12 +58,12 @@ export class StoryService {
     z.uuid().parse(storyId);
     const existingStory = await this.storyRepository.getStoryById(storyId);
     if (!existingStory) {
-      throw new NotFoundError(`Story with the id ${storyId} not found`);
+      throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
 
     const deleted = await this.storyRepository.softDeleteStory(storyId);
     if (!deleted) {
-      throw new ConflictError(`Failed to delete story with id ${storyId}`);
+      throw createError('Conflict', `Failed to delete story with id ${storyId}`);
     }
   }
 }

@@ -14,7 +14,7 @@ export class UserController {
   async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const users: UserResponseDTO[] = await userService.getAllUsers();
-      res.status(200).json({ success: true, data: users });
+      res.status(200).json({ success: true, data: users, message: 'Users fetched successfully' });
     } catch (error: unknown) {
       next(error);
     }
@@ -24,7 +24,7 @@ export class UserController {
     try {
       const userId: string = req.params.id;
       const user: UserResponseDTO = await userService.getUserById(userId);
-      res.status(200).json({ success: true, data: user });
+      res.status(200).json({ success: true, data: user, message: 'User fetched successfully' });
     } catch (error: unknown) {
       next(error);
     }
@@ -34,7 +34,7 @@ export class UserController {
     try {
       const userData: UserCreateSchemaType = userCreateSchema.parse(req.body);
       const newUser: UserResponseDTO = await userService.createUser(userData);
-      res.status(201).json({ success: true, data: newUser });
+      res.status(201).json({ success: true, data: newUser, message: 'User created successfully' });
     } catch (error: unknown) {
       next(error);
     }

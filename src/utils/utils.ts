@@ -23,7 +23,7 @@ export function toStoryResponseDTO(story: Story): StoryResponseDTO {
     storyId: story.storyId,
     title: story.title,
     body: story.body,
-    userId: story.userByUserId.userId,
+    userId: story.userByUserId,
     updatedAt: story.updatedAt,
   };
 }

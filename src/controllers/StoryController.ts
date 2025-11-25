@@ -15,7 +15,7 @@ export class StoryController {
   static async getAllStories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const stories: StoryResponseDTO[] = await storyService.getAllStories();
-      res.json({ success: true, data: stories });
+      res.json({ success: true, data: stories, message: 'Stories fetched successfully' });
     } catch (error: unknown) {
       next(error);
     }
@@ -25,7 +25,7 @@ export class StoryController {
     try {
       const storyId = req.params.id;
       const story = await storyService.getStoryById(storyId);
-      res.json({ success: true, data: story });
+      res.json({ success: true, data: story, message: 'Story fetched successfully' });
     } catch (error) {
       next(error);
     }
@@ -35,7 +35,7 @@ export class StoryController {
     try {
       const storyData: StoryCreateSchemaType = storyCreateSchema.parse(req.body);
       const story: StoryResponseDTO = await storyService.createStory(storyData);
-      res.status(201).json({ success: true, data: story });
+      res.status(201).json({ success: true, data: story, message: 'Story created successfully' });
     } catch (error) {
       next(error);
     }

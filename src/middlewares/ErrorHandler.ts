@@ -1,11 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
-import { AppError, BadRequestError } from '../errors/AppErrors';
+import { AppError } from '../errors/AppErrors';
+import { isDev, isProd } from '../config/env';
+import { createError } from '../errors/ErrorFactory';
 
 interface ErrorResponse {
   message: string;
   status: number;
-  details?: unknown;
+  details?: string[] | unknown;
 }
 
 export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction): void {
@@ -15,28 +17,27 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
 
   if (err instanceof ZodError) {
     const formattedMessage = err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
-
-    error = new BadRequestError(formattedMessage);
+    error = createError('BadRequest', formattedMessage);
     errorDetails = err.issues;
   } else if (err instanceof AppError) {
     error = err;
   } else if (err instanceof Error) {
-    error = new AppError(err.message, 500);
+    error = createError('InternalServerError', err.message);
     errorDetails = {
       name: err.name,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      stack: isDev ? err.stack : undefined,
     };
   } else if (typeof err === 'string') {
-    error = new AppError(err, 500);
+    error = createError('InternalServerError', err);
   } else if (err instanceof SyntaxError && 'body' in err) {
-    error = new BadRequestError('Invalid JSON syntax in request body');
+    error = createError('BadRequest', 'Invalid JSON syntax in request body');
     errorDetails = {
       message: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      stack: isDev ? err.stack : undefined,
     };
   } else {
-    error = new AppError('An unknown error occurred', 500);
-    errorDetails = process.env.NODE_ENV === 'development' ? err : undefined;
+    error = createError('InternalServerError', 'An unknown error occurred');
+    errorDetails = isDev ? err : undefined;
   }
 
   const response: ErrorResponse = {
@@ -44,11 +45,11 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     status: error.statusCode,
   };
 
-  if (process.env.NODE_ENV === 'development' && errorDetails) {
+  if (isDev && errorDetails) {
     response.details = errorDetails;
   }
 
-  if (error.statusCode === 500 && process.env.NODE_ENV === 'production') {
+  if (error.statusCode === 500 && isProd) {
     response.message = 'Internal Server Error';
   }
 
