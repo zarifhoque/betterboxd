@@ -12,7 +12,6 @@ const EnvSchema = z.object({
   DB_USER: z.string(),
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
-
   JWT_SECRET: z.string(),
 });
 
