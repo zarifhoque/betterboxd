@@ -1,3 +1,4 @@
+// utils/responseHandler.ts
 import { Request, Response, NextFunction } from 'express';
 
 type ServiceFunction<T> = (req: Request) => Promise<T>;
