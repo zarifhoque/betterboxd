@@ -1,7 +1,6 @@
 import { UserRepository } from '../repositories/UserRepository';
-import { User } from '../entities/User';
 import { UserCreateDTO, UserResponseDTO, UserUpdateDTO } from '../dtos/UserDTOs';
-import { toUserResponseDTO, toUserResponseDTOs } from '../utils/utils';
+import { toUserResponseDTO, toUserResponseDTOs } from '../utils/Utils';
 import { z } from 'zod';
 import { createError } from '../errors/ErrorFactory';
 

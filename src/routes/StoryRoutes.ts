@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { StoryController } from '../controllers/StoryController';
-import { validateRequest } from '../middlewares/validateRequest';
+import { validateRequest } from '../middlewares/ValidateRequest';
 import { storyCreateSchema, storyUpdateSchema } from '../schemas/StorySchema';
 
 const router = Router();

@@ -1,7 +1,7 @@
 // utils/responseHandler.ts
 import { Request, Response, NextFunction } from 'express';
 
-type ServiceFunction<T> = (req: Request) => Promise<T>;
+type ServiceFunction<T> = (_req: Request) => Promise<T>;
 
 export function handleRequest<T>(serviceFn: ServiceFunction<T>, statusCode = 200) {
   return async (req: Request, res: Response, next: NextFunction) => {
