@@ -4,13 +4,15 @@ import { AppDataSource } from './database/DataSource';
 import userRoutes from './routes/UserRoutes';
 import storyRoutes from './routes/StoryRoutes';
 import { errorHandler } from './middlewares/ErrorHandler';
+import { logger } from './utils/Logger';
+import { log } from 'console';
 
 AppDataSource.initialize()
   .then(() => {
-    console.log('Data Source has been initialized!');
+    logger.info('Data Source has been initialized!');
   })
   .catch((err) => {
-    console.error('Error during Data Source initialization:', err);
+    logger.error('Error during Data Source initialization:', err);
   });
 
 const app = express();
@@ -34,8 +36,8 @@ app.use(errorHandler);
 
 app
   .listen(PORT, (): void => {
-    console.log(`Server running on port ${PORT}`);
+    logger.info(`Server running on port ${PORT}`);
   })
   .on('error', (err: Error) => {
-    console.error('Server error:', err);
+    logger.error('Server error:', err);
   });

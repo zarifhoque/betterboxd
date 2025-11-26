@@ -4,6 +4,7 @@ import { User } from '../entities/User';
 import { Auth } from '../entities/Auth';
 import { Story } from '../entities/Story';
 import { ENV } from '../config/env';
+import { logger } from '../utils/Logger';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -21,8 +22,8 @@ export const AppDataSource = new DataSource({
 
 AppDataSource.initialize()
   .then(() => {
-    console.log('Database connected successfully!');
+    logger.info('Database connected successfully!');
   })
   .catch((err) => {
-    console.error('Database connection error:', err);
+    logger.error('Database connection error:', err);
   });

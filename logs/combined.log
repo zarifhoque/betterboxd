@@ -1,0 +1,70 @@
+2025-11-26 15:02:36 [info]: Data Source has been initialized!
+2025-11-26 15:02:39 [info]: Data Source has been initialized!
+2025-11-26 15:02:42 [info]: Data Source has been initialized!
+2025-11-26 15:02:46 [info]: Data Source has been initialized!
+2025-11-26 15:02:48 [info]: Data Source has been initialized!
+2025-11-26 15:03:10 [info]: Server running on port 3000
+2025-11-26 15:03:10 [info]: Data Source has been initialized!
+2025-11-26 15:03:12 [info]: Server running on port 3000
+2025-11-26 15:03:12 [info]: Data Source has been initialized!
+2025-11-26 15:03:18 [info]: Server running on port 3000
+2025-11-26 15:03:19 [info]: Data Source has been initialized!
+2025-11-26 15:03:20 [info]: Server running on port 3000
+2025-11-26 15:03:20 [info]: Data Source has been initialized!
+2025-11-26 15:03:22 [info]: Server running on port 3000
+2025-11-26 15:03:22 [info]: Data Source has been initialized!
+2025-11-26 15:03:27 [info]: Server running on port 3000
+2025-11-26 15:03:27 [info]: Data Source has been initialized!
+2025-11-26 15:03:28 [info]: Server running on port 3000
+2025-11-26 15:03:28 [info]: Data Source has been initialized!
+2025-11-26 15:03:29 [info]: Server running on port 3000
+2025-11-26 15:03:29 [info]: Data Source has been initialized!
+2025-11-26 15:03:31 [info]: Server running on port 3000
+2025-11-26 15:03:32 [info]: Data Source has been initialized!
+2025-11-26 15:03:33 [info]: Server running on port 3000
+2025-11-26 15:03:33 [info]: Data Source has been initialized!
+2025-11-26 15:03:35 [info]: Server running on port 3000
+2025-11-26 15:03:35 [info]: Data Source has been initialized!
+2025-11-26 15:03:44 [info]: Server running on port 3000
+2025-11-26 15:03:44 [info]: Database connected successfully!
+2025-11-26 15:03:44 [info]: Data Source has been initialized!
+2025-11-26 15:03:47 [info]: Server running on port 3000
+2025-11-26 15:03:47 [info]: Database connected successfully!
+2025-11-26 15:03:47 [info]: Data Source has been initialized!
+2025-11-26 15:03:48 [info]: Server running on port 3000
+2025-11-26 15:03:49 [info]: Data Source has been initialized!
+2025-11-26 15:03:49 [info]: Database connected successfully!
+2025-11-26 15:03:50 [info]: Server running on port 3000
+2025-11-26 15:03:50 [info]: Database connected successfully!
+2025-11-26 15:03:51 [info]: Data Source has been initialized!
+2025-11-26 15:03:57 [info]: Server running on port 3000
+2025-11-26 15:03:57 [info]: Database connected successfully!
+2025-11-26 15:03:57 [info]: Data Source has been initialized!
+2025-11-26 15:04:04 [info]: Server running on port 3000
+2025-11-26 15:04:04 [info]: Database connected successfully!
+2025-11-26 15:04:04 [info]: Data Source has been initialized!
+2025-11-26 15:04:09 [info]: Server running on port 3000
+2025-11-26 15:04:09 [info]: Database connected successfully!
+2025-11-26 15:04:10 [info]: Data Source has been initialized!
+2025-11-26 15:04:21 [info]: Server running on port 3000
+2025-11-26 15:04:21 [info]: Data Source has been initialized!
+2025-11-26 15:04:21 [info]: Database connected successfully!
+2025-11-26 15:04:48 [info]: Server running on port 3000
+2025-11-26 15:04:48 [info]: Data Source has been initialized!
+2025-11-26 15:04:48 [info]: Database connected successfully!
+2025-11-26 15:04:55 [info]: Server running on port 3000
+2025-11-26 15:04:55 [info]: Database connected successfully!
+2025-11-26 15:04:55 [info]: Data Source has been initialized!
+2025-11-26 15:05:27 [info]: Server running on port 3000
+2025-11-26 15:05:27 [error]: error: database "betterboxddbcccc" does not exist
+    at Parser.parseErrorMessage (C:\Users\cefalo\Desktop\betterboxd\node_modules\pg-protocol\src\parser.ts:369:69)
+    at Parser.handlePacket (C:\Users\cefalo\Desktop\betterboxd\node_modules\pg-protocol\src\parser.ts:187:21)
+    at Parser.parse (C:\Users\cefalo\Desktop\betterboxd\node_modules\pg-protocol\src\parser.ts:102:30)
+    at Socket.<anonymous> (C:\Users\cefalo\Desktop\betterboxd\node_modules\pg-protocol\src\index.ts:7:48)
+    at Socket.emit (node:events:508:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Socket.Readable.push (node:internal/streams/readable:390:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:189:23)
+2025-11-26 15:05:27 [error]: Error: read ECONNRESET
+    at TCP.onStreamRead (node:internal/stream_base_commons:216:20)

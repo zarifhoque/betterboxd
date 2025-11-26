@@ -3,6 +3,7 @@ import { ZodError } from 'zod';
 import { AppError } from '../errors/AppErrors';
 import { isDev, isProd } from '../config/env';
 import { createError } from '../errors/ErrorFactory';
+import { logger } from '../utils/Logger';
 
 interface ErrorResponse {
   message: string;
@@ -10,10 +11,10 @@ interface ErrorResponse {
   details?: string[] | unknown;
 }
 
-export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction): void {
+export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
   let error: AppError;
   let errorDetails: unknown = null;
-  console.error('Error occurred:', err);
+  logger.error('Error occurred:', err);
 
   if (err instanceof ZodError) {
     const formattedMessage = err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');

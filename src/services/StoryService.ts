@@ -3,7 +3,7 @@ import { StoryRepository } from '../repositories/StoryRepository';
 import { Story } from '../entities/Story';
 import { z } from 'zod';
 import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
-import { toStoryResponseDTO, toStoryResponseDTOs } from '../utils/utils';
+import { toStoryResponseDTO, toStoryResponseDTOs } from '../utils/Utils';
 import { createError } from '../errors/ErrorFactory';
 import { UserRepository } from '../repositories/UserRepository';
 
