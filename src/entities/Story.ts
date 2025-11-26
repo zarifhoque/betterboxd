@@ -15,10 +15,7 @@ export class Story {
 
   @ManyToOne(() => User, { nullable: false })
   @JoinColumn({ name: 'userByUserId' })
-  user!: User;
-
-  @Column({ type: 'uuid' })
-  userByUserId!: string;
+  userByUserId!: User;
 
   @Column({ type: 'varchar', length: 255 })
   title!: string;
