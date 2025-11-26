@@ -9,13 +9,13 @@ export class UserService {
   private userRepository = new UserRepository();
 
   async getAllUsers(): Promise<UserResponseDTO[]> {
-    const users: User[] = await this.userRepository.getAllUsers();
+    const users = await this.userRepository.getAllUsers();
     return toUserResponseDTOs(users);
   }
 
   async getUserById(userId: string): Promise<UserResponseDTO> {
     z.uuid().parse(userId);
-    const user: User | null = await this.userRepository.getUserById(userId);
+    const user = await this.userRepository.getUserById(userId);
     if (!user) {
       throw createError('NotFound', `User with the id ${userId} not found`);
     }

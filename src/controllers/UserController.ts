@@ -8,7 +8,7 @@ const userService = new UserService();
 export class UserController {
   async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const users: UserResponseDTO[] = await userService.getAllUsers();
+      const users = await userService.getAllUsers();
       res.status(200).json({ success: true, data: users, message: 'Users fetched successfully' });
     } catch (error: unknown) {
       next(error);
@@ -19,7 +19,7 @@ export class UserController {
     try {
       const userId: string = req.params.id;
       z.uuid().parse(userId);
-      const user: UserResponseDTO = await userService.getUserById(userId);
+      const user = await userService.getUserById(userId);
       res.status(200).json({ success: true, data: user, message: 'User fetched successfully' });
     } catch (error: unknown) {
       next(error);
@@ -29,7 +29,7 @@ export class UserController {
   async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userData: UserCreateDTO = req.body;
-      const newUser: UserResponseDTO = await userService.createUser(userData);
+      const newUser = await userService.createUser(userData);
       res.status(201).json({ success: true, data: newUser, message: 'User created successfully' });
     } catch (error: unknown) {
       next(error);

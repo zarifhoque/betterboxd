@@ -14,14 +14,14 @@ export class StoryService {
 
   // Get all stories
   async getAllStories(): Promise<StoryResponseDTO[]> {
-    const stories: Story[] = await this.storyRepository.getAllStories();
+    const stories = await this.storyRepository.getAllStories();
     return toStoryResponseDTOs(stories);
   }
 
   // Get story by ID
   async getStoryById(storyId: string): Promise<StoryResponseDTO> {
     z.uuid().parse(storyId);
-    const story: Story | null = await this.storyRepository.getStoryById(storyId);
+    const story = await this.storyRepository.getStoryById(storyId);
     if (!story) {
       throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
@@ -31,13 +31,13 @@ export class StoryService {
   // Get all stories by user ID
   async getStoriesByUserId(userId: string): Promise<Story[]> {
     z.uuid().parse(userId);
-    const stories: Story[] = await this.storyRepository.getStoriesByUserId(userId);
+    const stories = await this.storyRepository.getStoriesByUserId(userId);
     return stories;
   }
 
   // Create a new story
   async createStory(story: StoryCreateDTO): Promise<StoryResponseDTO> {
-    const user: User | null = await this.userRepository.getUserById(story.userByUserId);
+    const user = await this.userRepository.getUserById(story.userByUserId);
     if (!user) {
       throw createError('NotFound', `User with the id ${story.userByUserId} not found`);
     }
@@ -53,7 +53,7 @@ export class StoryService {
       throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
 
-    const updatedState: boolean = await this.storyRepository.updateStory(storyId, story);
+    const updatedState = await this.storyRepository.updateStory(storyId, story);
     if (!updatedState) {
       throw createError('Conflict', `Failed to update story with id ${storyId}`);
     }
