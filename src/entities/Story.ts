@@ -13,8 +13,11 @@ export class Story {
   @PrimaryGeneratedColumn('uuid')
   storyId!: string;
 
+  @Column({ type: 'uuid' })
+  userId!: string;
+
   @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'userByUserId' })
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   userByUserId!: User;
 
   @Column({ type: 'varchar', length: 255 })
