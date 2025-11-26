@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
 import { toStoryResponseDTO, toStoryResponseDTOs } from '../utils/utils';
 import { createError } from '../errors/ErrorFactory';
-import { User } from '../entities/User';
 import { UserRepository } from '../repositories/UserRepository';
 
 export class StoryService {
