@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../services/UserService';
 import { UserCreateDTO, UserResponseDTO, UserUpdateDTO } from '../dtos/UserDTOs';
+import { z } from 'zod';
 
 const userService = new UserService();
 
@@ -17,6 +18,7 @@ export class UserController {
   async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId: string = req.params.id;
+      z.uuid().parse(userId);
       const user: UserResponseDTO = await userService.getUserById(userId);
       res.status(200).json({ success: true, data: user, message: 'User fetched successfully' });
     } catch (error: unknown) {
@@ -37,9 +39,10 @@ export class UserController {
   async updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId: string = req.params.id;
+      z.uuid().parse(userId);
       const userData: UserUpdateDTO = req.body;
       await userService.updateUser(userId, userData);
-      res.status(200).json({ success: true, message: 'User updated successfully' });
+      res.status(204).json({ success: true, message: 'User updated successfully' });
     } catch (error: unknown) {
       next(error);
     }
@@ -48,8 +51,9 @@ export class UserController {
   async deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId: string = req.params.id;
+      z.uuid().parse(userId);
       await userService.deleteUser(userId);
-      res.status(200).json({ success: true, message: 'User soft-deleted successfully' });
+      res.status(204).json({ success: true, message: 'User soft-deleted successfully' });
     } catch (error: unknown) {
       next(error);
     }

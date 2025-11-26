@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { StoryService } from '../services/StoryService';
 import { StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
+import z from 'zod';
 
 const storyService = new StoryService();
 
@@ -18,6 +19,7 @@ export class StoryController {
   static async getStoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const storyId = req.params.id;
+      z.uuid().parse(storyId);
       const story = await storyService.getStoryById(storyId);
       res.json({ success: true, data: story, message: 'Story fetched successfully' });
     } catch (error) {
@@ -37,9 +39,10 @@ export class StoryController {
   static async updateStory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const storyId = req.params.id;
+      z.uuid().parse(storyId);
       const storyData: StoryUpdateDTO = req.body;
       await storyService.updateStory(storyId, storyData);
-      res.json({ success: true, message: 'Story updated succesfully' });
+      res.status(204).json({ success: true, message: 'Story updated succesfully' });
     } catch (error) {
       next(error);
     }
@@ -47,8 +50,9 @@ export class StoryController {
   static async deleteStory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const storyId = req.params.id;
+      z.uuid().parse(storyId);
       await storyService.deleteStory(storyId);
-      res.json({ success: true, message: 'Story deleted successfully' });
+      res.status(204).json({ success: true, message: 'Story deleted successfully' });
     } catch (error) {
       next(error);
     }

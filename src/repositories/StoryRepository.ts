@@ -8,22 +8,25 @@ export class StoryRepository {
 
   // Get all stories
   async getAllStories(): Promise<Story[]> {
-    return this.storyRepository.find({ relations: ['user'] });
+    return this.storyRepository.find({});
   }
 
   // Get story by ID
   async getStoryById(storyId: string): Promise<Story | null> {
-    return this.storyRepository.findOne({ where: { storyId }, relations: ['user'] });
+    return this.storyRepository.findOne({ where: { storyId } });
   }
 
   // Get Stories by User ID
   async getStoriesByUserId(userId: string): Promise<Story[]> {
-    return this.storyRepository.find({ where: { userByUserId: userId }, relations: ['user'] });
+    return this.storyRepository.find({ where: { userByUserId: { userId } } });
   }
 
   // Create a new story
   async createStory(story: StoryCreateDTO): Promise<Story> {
-    const newStory = this.storyRepository.create(story);
+    const newStory = this.storyRepository.create({
+      ...story,
+      userByUserId: { userId: story.userByUserId },
+    });
     return this.storyRepository.save(newStory);
   }
 

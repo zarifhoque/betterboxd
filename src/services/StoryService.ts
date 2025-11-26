@@ -5,9 +5,12 @@ import { z } from 'zod';
 import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
 import { toStoryResponseDTO, toStoryResponseDTOs } from '../utils/utils';
 import { createError } from '../errors/ErrorFactory';
+import { User } from '../entities/User';
+import { UserRepository } from '../repositories/UserRepository';
 
 export class StoryService {
   private storyRepository = new StoryRepository();
+  private userRepository = new UserRepository();
 
   // Get all stories
   async getAllStories(): Promise<StoryResponseDTO[]> {
@@ -34,6 +37,10 @@ export class StoryService {
 
   // Create a new story
   async createStory(story: StoryCreateDTO): Promise<StoryResponseDTO> {
+    const user: User | null = await this.userRepository.getUserById(story.userByUserId);
+    if (!user) {
+      throw createError('NotFound', `User with the id ${story.userByUserId} not found`);
+    }
     const newStory = await this.storyRepository.createStory(story);
     const newStoryResponse = toStoryResponseDTO(newStory);
     return newStoryResponse;
@@ -41,7 +48,6 @@ export class StoryService {
 
   // Update an existing story
   async updateStory(storyId: string, story: StoryUpdateDTO): Promise<void> {
-    z.uuid().parse(storyId);
     const existingStory = await this.storyRepository.getStoryById(storyId);
     if (!existingStory) {
       throw createError('NotFound', `Story with the id ${storyId} not found`);
