@@ -1,20 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../services/UserService';
-import {
-  userUpdateSchema,
-  userCreateSchema,
-  UserCreateSchemaType,
-  UserUpdateSchemaType,
-} from '../schemas/UserSchema';
-import { UserResponseDTO } from '../dtos/UserDTOs';
+import { UserCreateDTO, UserUpdateDTO } from '../dtos/UserDTOs';
+import { z } from 'zod';
 
 const userService = new UserService();
 
 export class UserController {
   async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const users: UserResponseDTO[] = await userService.getAllUsers();
-      res.status(200).json({ success: true, data: users });
+      const users = await userService.getAllUsers();
+      res.status(200).json({ success: true, data: users, message: 'Users fetched successfully' });
     } catch (error: unknown) {
       next(error);
     }
@@ -23,8 +18,9 @@ export class UserController {
   async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId: string = req.params.id;
-      const user: UserResponseDTO = await userService.getUserById(userId);
-      res.status(200).json({ success: true, data: user });
+      z.uuid().parse(userId);
+      const user = await userService.getUserById(userId);
+      res.status(200).json({ success: true, data: user, message: 'User fetched successfully' });
     } catch (error: unknown) {
       next(error);
     }
@@ -32,9 +28,9 @@ export class UserController {
 
   async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userData: UserCreateSchemaType = userCreateSchema.parse(req.body);
-      const newUser: UserResponseDTO = await userService.createUser(userData);
-      res.status(201).json({ success: true, data: newUser });
+      const userData: UserCreateDTO = req.body;
+      const newUser = await userService.createUser(userData);
+      res.status(201).json({ success: true, data: newUser, message: 'User created successfully' });
     } catch (error: unknown) {
       next(error);
     }
@@ -43,9 +39,10 @@ export class UserController {
   async updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId: string = req.params.id;
-      const userData: UserUpdateSchemaType = userUpdateSchema.parse(req.body);
+      z.uuid().parse(userId);
+      const userData: UserUpdateDTO = req.body;
       await userService.updateUser(userId, userData);
-      res.status(200).json({ success: true, message: 'User updated successfully' });
+      res.status(204).json({ success: true, message: 'User updated successfully' });
     } catch (error: unknown) {
       next(error);
     }
@@ -54,8 +51,9 @@ export class UserController {
   async deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId: string = req.params.id;
+      z.uuid().parse(userId);
       await userService.deleteUser(userId);
-      res.status(200).json({ success: true, message: 'User soft-deleted successfully' });
+      res.status(204).json({ success: true, message: 'User soft-deleted successfully' });
     } catch (error: unknown) {
       next(error);
     }

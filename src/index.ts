@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { AppDataSource } from './database/DataSource';
 import userRoutes from './routes/UserRoutes';
+import storyRoutes from './routes/StoryRoutes';
 import { errorHandler } from './middlewares/ErrorHandler';
 
 AppDataSource.initialize()
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/stories', storyRoutes);
 
 app.get('/', (req: Request, res: Response): void => {
   res.status(200).send('Movie Review API is running!');
