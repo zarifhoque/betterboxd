@@ -26,6 +26,20 @@ app.use(cors());
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/stories', storyRoutes);
+app.get('/api/v1/health', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Server is healthy',
+    timestamp: new Date().toISOString(),
+  });
+});
+app.use((req: Request, res: Response) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Endpoint not found',
+    path: req.originalUrl,
+  });
+});
 
 app.get('/', (req: Request, res: Response): void => {
   res.status(200).send('Movie Review API is running!');
