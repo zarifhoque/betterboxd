@@ -2,13 +2,16 @@
 import { AppDataSource } from '../database/DataSource';
 import { StoryCreateDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
 import { Story } from '../entities/Story';
+import { QueryParamsSchema } from '../schemas/QuerySchema';
+import { applyPagination } from '../utils/Pagination';
 
 export class StoryRepository {
   private storyRepository = AppDataSource.getRepository(Story);
 
   // Get all stories
-  async getAllStories(): Promise<Story[]> {
-    return this.storyRepository.find({});
+  async getAllStories(options: QueryParamsSchema = {}): Promise<Story[]> {
+    const query = this.storyRepository.createQueryBuilder('story');
+    return applyPagination(query, options, 'story').getMany();
   }
 
   // Get story by ID

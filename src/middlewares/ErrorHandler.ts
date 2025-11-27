@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { AppError } from '../errors/AppErrors';
-import { isDev, isProd } from '../config/env';
+import { isDev, isProd } from '../config/Env';
 import { createError } from '../errors/ErrorFactory';
-import { logger } from '../utils/Logger';
+import { logger } from '../config/Logger';
 
 interface ErrorResponse {
   message: string;
@@ -22,6 +22,12 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
     errorDetails = err.issues;
   } else if (err instanceof AppError) {
     error = err;
+  } else if (err instanceof SyntaxError && 'body' in err) {
+    error = createError('BadRequest', 'Invalid JSON syntax in request body');
+    errorDetails = {
+      message: err.message,
+      stack: isDev ? err.stack : undefined,
+    };
   } else if (err instanceof Error) {
     error = createError('InternalServerError', err.message);
     errorDetails = {
@@ -30,12 +36,6 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
     };
   } else if (typeof err === 'string') {
     error = createError('InternalServerError', err);
-  } else if (err instanceof SyntaxError && 'body' in err) {
-    error = createError('BadRequest', 'Invalid JSON syntax in request body');
-    errorDetails = {
-      message: err.message,
-      stack: isDev ? err.stack : undefined,
-    };
   } else {
     error = createError('InternalServerError', 'An unknown error occurred');
     errorDetails = isDev ? err : undefined;

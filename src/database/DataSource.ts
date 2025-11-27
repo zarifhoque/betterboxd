@@ -3,8 +3,8 @@ import { DataSource } from 'typeorm';
 import { User } from '../entities/User';
 import { Auth } from '../entities/Auth';
 import { Story } from '../entities/Story';
-import { ENV } from '../config/env';
-import { logger } from '../utils/Logger';
+import { ENV } from '../config/Env';
+import { logger } from '../config/Logger';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',

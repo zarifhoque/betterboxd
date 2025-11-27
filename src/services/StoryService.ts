@@ -3,18 +3,19 @@ import { StoryRepository } from '../repositories/StoryRepository';
 import { Story } from '../entities/Story';
 import { z } from 'zod';
 import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
-import { toStoryResponseDTO, toStoryResponseDTOs } from '../utils/Utils';
+import { plainToInstance } from 'class-transformer';
 import { createError } from '../errors/ErrorFactory';
 import { UserRepository } from '../repositories/UserRepository';
+import { QueryParamsSchema } from '../schemas/QuerySchema';
 
 export class StoryService {
   private storyRepository = new StoryRepository();
   private userRepository = new UserRepository();
 
   // Get all stories
-  async getAllStories(): Promise<StoryResponseDTO[]> {
-    const stories = await this.storyRepository.getAllStories();
-    return toStoryResponseDTOs(stories);
+  async getAllStories(paginationOptions: QueryParamsSchema): Promise<StoryResponseDTO[]> {
+    const stories = await this.storyRepository.getAllStories(paginationOptions);
+    return plainToInstance(StoryResponseDTO, stories);
   }
 
   // Get story by ID
@@ -24,7 +25,7 @@ export class StoryService {
     if (!story) {
       throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
-    return toStoryResponseDTO(story);
+    return plainToInstance(StoryResponseDTO, story);
   }
 
   // Get all stories by user ID
@@ -41,8 +42,7 @@ export class StoryService {
       throw createError('NotFound', `User with the id ${story.userByUserId} not found`);
     }
     const newStory = await this.storyRepository.createStory(story);
-    const newStoryResponse = toStoryResponseDTO(newStory);
-    return newStoryResponse;
+    return plainToInstance(StoryResponseDTO, newStory);
   }
 
   // Update an existing story

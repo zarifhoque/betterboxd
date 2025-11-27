@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodObject, ZodRawShape } from 'zod';
-import { logger } from '../utils/Logger';
+import { logger } from '../config/Logger';
 
 interface ValidationOptions {
   source?: 'body' | 'query' | 'params';

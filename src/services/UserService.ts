@@ -1,17 +1,16 @@
 import { UserRepository } from '../repositories/UserRepository';
 import { UserCreateDTO, UserResponseDTO, UserUpdateDTO } from '../dtos/UserDTOs';
-import { toUserResponseDTO, toUserResponseDTOs } from '../utils/Utils';
+import { plainToInstance } from 'class-transformer';
 import { z } from 'zod';
 import { createError } from '../errors/ErrorFactory';
-import { parsePaginationOptions } from '../utils/Pagination';
+import { QueryParamsSchema } from '../schemas/QuerySchema';
 
 export class UserService {
   private userRepository = new UserRepository();
 
-  async getAllUsers(rawQuery: Record<string, unknown>): Promise<UserResponseDTO[]> {
-    const paginationOptions = parsePaginationOptions(rawQuery);
+  async getAllUsers(paginationOptions: QueryParamsSchema): Promise<UserResponseDTO[]> {
     const users = await this.userRepository.getAllUsers(paginationOptions);
-    return toUserResponseDTOs(users);
+    return plainToInstance(UserResponseDTO, users);
   }
 
   async getUserById(userId: string): Promise<UserResponseDTO> {
@@ -20,7 +19,7 @@ export class UserService {
     if (!user) {
       throw createError('NotFound', `User with the id ${userId} not found`);
     }
-    return toUserResponseDTO(user);
+    return plainToInstance(UserResponseDTO, user);
   }
 
   async createUser(userData: UserCreateDTO): Promise<UserResponseDTO> {
@@ -35,8 +34,8 @@ export class UserService {
     }
 
     const newUser = await this.userRepository.createUser(userData);
-    const userResponse = toUserResponseDTO(newUser);
-    return userResponse;
+
+    return plainToInstance(UserResponseDTO, newUser);
   }
 
   async updateUser(userId: string, userData: UserUpdateDTO): Promise<void> {

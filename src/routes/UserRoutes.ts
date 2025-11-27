@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { UserController } from '../controllers/UserController';
 import { validationHandler } from '../middlewares/ValidationHandler';
 import { loggerHandler } from '../middlewares/LoggerHandler';
-import { getUsersQuerySchema, userCreateSchema, userUpdateSchema } from '../schemas/UserSchema';
+import { userCreateSchema, userUpdateSchema } from '../schemas/UserSchema';
+import { queryParamsSchema } from '../schemas/QuerySchema';
 
 const router = Router();
 const userController = new UserController();
@@ -11,7 +12,7 @@ const userController = new UserController();
 router.get(
   '/',
   loggerHandler,
-  validationHandler(getUsersQuerySchema, { source: 'query' }),
+  validationHandler(queryParamsSchema, { source: 'query' }),
   userController.getAllUsers.bind(userController),
 );
 router.get('/:id', userController.getUserById.bind(userController));

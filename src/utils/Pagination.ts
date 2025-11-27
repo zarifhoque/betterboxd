@@ -1,19 +1,20 @@
-export interface PaginationOptions {
-  page?: number;
-  itemsPerPage?: number;
-  offset?: number;
-  limit?: number;
-  startAfter?: string;
-  search?: string;
-}
+import { ObjectLiteral, SelectQueryBuilder } from 'typeorm';
+import { QueryParamsSchema } from '../schemas/QuerySchema';
 
-export function parsePaginationOptions(rawQuery: Record<string, unknown>): PaginationOptions {
-  return {
-    page: rawQuery.page !== undefined ? Number(rawQuery.page) : undefined,
-    itemsPerPage: rawQuery.itemsPerPage !== undefined ? Number(rawQuery.itemsPerPage) : undefined,
-    offset: rawQuery.offset !== undefined ? Number(rawQuery.offset) : undefined,
-    limit: rawQuery.limit !== undefined ? Number(rawQuery.limit) : undefined,
-    startAfter: rawQuery.startAfter !== undefined ? String(rawQuery.startAfter) : undefined,
-    search: rawQuery.search !== undefined ? String(rawQuery.search) : undefined,
-  };
+export function applyPagination<T extends ObjectLiteral>(
+  query: SelectQueryBuilder<T>,
+  options: QueryParamsSchema,
+  alias: string,
+): SelectQueryBuilder<T> {
+  if (options.page !== undefined && options.itemsPerPage !== undefined) {
+    const skip = (options.page - 1) * options.itemsPerPage;
+    query.skip(skip).take(options.itemsPerPage);
+  } else if (options.offset !== undefined && options.limit !== undefined) {
+    query.skip(options.offset).take(options.limit);
+  } else if (options.startAfter && options.limit !== undefined) {
+    query.where(`${alias}.${alias}Id > :startAfter`, { startAfter: options.startAfter });
+    query.take(options.limit);
+  }
+
+  return query;
 }
