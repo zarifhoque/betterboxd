@@ -5,7 +5,6 @@ import userRoutes from './routes/UserRoutes';
 import storyRoutes from './routes/StoryRoutes';
 import { errorHandler } from './middlewares/ErrorHandler';
 import { logger } from './utils/Logger';
-import { log } from 'console';
 
 AppDataSource.initialize()
   .then(() => {

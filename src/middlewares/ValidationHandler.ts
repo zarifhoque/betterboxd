@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodObject, ZodRawShape } from 'zod';
+import { logger } from '../utils/Logger';
 
 interface ValidationOptions {
   source?: 'body' | 'query' | 'params';
@@ -13,10 +14,10 @@ export function validationHandler<T extends ZodRawShape>(
     const source = options.source || 'body';
     const data = req[source];
     const result: ReturnType<typeof schema.safeParse> = schema.safeParse(data);
+    logger.debug(result);
     if (!result.success) {
       return next(result.error);
     }
-    req[source] = result.data;
     next();
   };
 }

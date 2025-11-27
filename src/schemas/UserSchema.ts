@@ -56,24 +56,34 @@ const baseQuerySchema = z.object({
     .int({ error: 'Limit must be an integer value' })
     .min(1, { error: 'Limit must be at least 1' })
     .optional(),
-  startAfter: z.string().optional(),
+  startAfter: z.uuid().optional(),
   search: z.string().optional(),
 });
 
 export const getUsersQuerySchema = baseQuerySchema.refine(
   (data) => {
-    if ((data.offset !== undefined) !== (data.limit !== undefined)) {
-      return false;
-    }
-    if ((data.page !== undefined) !== (data.itemsPerPage !== undefined)) {
-      return false;
-    }
-    return true;
+    const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
+
+    const validCombos = [
+      ['offset', 'limit'],
+      ['page', 'itemsPerPage'],
+      ['startAfter', 'limit'],
+      [],
+    ];
+
+    // Check if keys match any valid combo exactly
+    const isValid = validCombos.some(
+      (combo) =>
+        combo.every((key) => keys.includes(key)) && keys.every((key) => combo.includes(key)),
+    );
+
+    return isValid;
   },
   {
     message:
-      'Pagination params must appear in valid combinations: either offset+limit or page+itemsPerPage',
+      'Pagination params must appear in valid combinations: either offset+limit or page+itemsPerPage or startAfter+limit',
   },
 );
+
 export type UserCreateSchemaType = z.infer<typeof userCreateSchema>;
 export type UserUpdateSchemaType = z.infer<typeof userUpdateSchema>;

@@ -1,0 +1,7 @@
+import { Request, Response, NextFunction } from 'express';
+import { logger } from '../utils/Logger';
+
+export function loggerHandler(req: Request, _res: Response, next: NextFunction) {
+  logger.info(`[Request] ${req.method} ${req.originalUrl}`);
+  next();
+}
