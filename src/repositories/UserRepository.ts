@@ -1,13 +1,26 @@
 import { AppDataSource } from '../database/DataSource';
 import { User } from '../entities/User';
 import { UserCreateDTO, UserUpdateDTO } from '../dtos/UserDTOs';
+import { PaginationOptions } from '../utils/Pagination';
 
 export class UserRepository {
   private userRepository = AppDataSource.getRepository(User);
 
   // Get all users
-  async getAllUsers(): Promise<User[]> {
-    return this.userRepository.find();
+  async getAllUsers(options: PaginationOptions = {}): Promise<User[]> {
+    const query = this.userRepository.createQueryBuilder('user');
+    if (options.page !== undefined) {
+      const skip = (options.page - 1) * options.itemsPerPage!;
+      query.skip(skip).take(options.itemsPerPage);
+    }
+    if (options.offset !== undefined) {
+      query.skip(options.offset).take(options.limit);
+    }
+    if (options.startAfter) {
+      query.where('user.userId > :startAfter', { startAfter: options.startAfter });
+    }
+
+    return query.getMany();
   }
 
   // Get user by ID

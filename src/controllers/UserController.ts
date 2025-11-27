@@ -8,7 +8,7 @@ const userService = new UserService();
 export class UserController {
   async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const users = await userService.getAllUsers();
+      const users = await userService.getAllUsers(req.query);
       res.status(200).json({ success: true, data: users, message: 'Users fetched successfully' });
     } catch (error: unknown) {
       next(error);

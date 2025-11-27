@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodObject, ZodTypeAny } from 'zod';
+import { ZodObject, ZodRawShape } from 'zod';
 
 interface ValidationOptions {
   source?: 'body' | 'query' | 'params';
 }
 
-export function validationHandler<T extends ZodTypeAny>(
+export function validationHandler<T extends ZodRawShape>(
   schema: ZodObject<T>,
   options: ValidationOptions = { source: 'body' },
 ) {

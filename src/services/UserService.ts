@@ -3,12 +3,14 @@ import { UserCreateDTO, UserResponseDTO, UserUpdateDTO } from '../dtos/UserDTOs'
 import { toUserResponseDTO, toUserResponseDTOs } from '../utils/Utils';
 import { z } from 'zod';
 import { createError } from '../errors/ErrorFactory';
+import { parsePaginationOptions } from '../utils/Pagination';
 
 export class UserService {
   private userRepository = new UserRepository();
 
-  async getAllUsers(): Promise<UserResponseDTO[]> {
-    const users = await this.userRepository.getAllUsers();
+  async getAllUsers(rawQuery: Record<string, unknown>): Promise<UserResponseDTO[]> {
+    const paginationOptions = parsePaginationOptions(rawQuery);
+    const users = await this.userRepository.getAllUsers(paginationOptions);
     return toUserResponseDTOs(users);
   }
 
