@@ -20,7 +20,7 @@ export function applyPagination<T extends ObjectLiteral>(
     query.take(limit);
   }
   // Page-based pagination
-  if (options.page !== undefined || options.itemsPerPage !== undefined) {
+  else if (options.page !== undefined || options.itemsPerPage !== undefined) {
     const page = options.page ?? DEFAULT_PAGE;
     const itemsPerPage = options.itemsPerPage ?? DEFAULT_ITEMS_PER_PAGE;
     const skip = (page - 1) * itemsPerPage;
