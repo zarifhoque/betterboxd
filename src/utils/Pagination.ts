@@ -4,6 +4,7 @@ import {
   DEFAULT_PAGE,
   DEFAULT_ITEMS_PER_PAGE,
   DEFAULT_LIMIT,
+  DEFAULT_OFFSET,
 } from '../constants/PaginationConstants';
 
 export function applyPagination<T extends ObjectLiteral>(
@@ -19,9 +20,10 @@ export function applyPagination<T extends ObjectLiteral>(
     query.skip(skip).take(itemsPerPage);
 
     // Offset-based pagination
-  } else if (options.offset !== undefined) {
+  } else if (options.offset !== undefined || options.limit !== undefined) {
     const limit = options.limit ?? DEFAULT_LIMIT;
-    query.skip(options.offset).take(limit);
+    const offset = options.offset ?? DEFAULT_OFFSET;
+    query.skip(offset).take(limit);
 
     // StartAfter-based pagination
   } else if (options.startAfter !== undefined) {

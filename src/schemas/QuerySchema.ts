@@ -33,8 +33,10 @@ export const queryParamsSchema = baseQuerySchema.refine(
     const validCombos = [
       ['offset', 'limit'],
       ['offset'],
+      ['limit'],
       ['page', 'itemsPerPage'],
       ['page'],
+      ['itemsPerPage'],
       ['startAfter', 'limit'],
       ['startAfter'],
       [],
