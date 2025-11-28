@@ -12,6 +12,13 @@ export function applyPagination<T extends ObjectLiteral>(
   options: QueryParamsSchema,
   alias: string,
 ): SelectQueryBuilder<T> {
+  // StartAfter-based pagination
+  if (options.startAfter !== undefined) {
+    const limit = options.limit ?? DEFAULT_LIMIT;
+    const startAfter = options.startAfter ?? DEFAULT_OFFSET;
+    query.where(`${alias}.${alias}Id > :startAfter`, { startAfter: startAfter });
+    query.take(limit);
+  }
   // Page-based pagination
   if (options.page !== undefined || options.itemsPerPage !== undefined) {
     const page = options.page ?? DEFAULT_PAGE;
@@ -24,12 +31,6 @@ export function applyPagination<T extends ObjectLiteral>(
     const limit = options.limit ?? DEFAULT_LIMIT;
     const offset = options.offset ?? DEFAULT_OFFSET;
     query.skip(offset).take(limit);
-
-    // StartAfter-based pagination
-  } else if (options.startAfter !== undefined) {
-    const limit = options.limit ?? DEFAULT_LIMIT;
-    query.where(`${alias}.${alias}Id > :startAfter`, { startAfter: options.startAfter });
-    query.take(limit);
   }
 
   return query;
