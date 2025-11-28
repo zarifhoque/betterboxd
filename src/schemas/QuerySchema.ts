@@ -32,8 +32,11 @@ export const queryParamsSchema = baseQuerySchema.refine(
 
     const validCombos = [
       ['offset', 'limit'],
+      ['offset'],
       ['page', 'itemsPerPage'],
+      ['page'],
       ['startAfter', 'limit'],
+      ['startAfter'],
       [],
     ];
 
@@ -47,7 +50,7 @@ export const queryParamsSchema = baseQuerySchema.refine(
   },
   {
     message:
-      'Pagination params must appear in valid combinations: either offset+limit or page+itemsPerPage or startAfter+limit',
+      'Pagination params must appear in valid combinations: either offset+limit or page+itemsPerPage or startAfter+limit. Alternatively, you can also simply provide offset or startAfter in which case a default value of limit will be assumed',
   },
 );
 

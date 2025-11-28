@@ -1,6 +1,7 @@
 import { UserRepository } from '../repositories/UserRepository';
-import { UserCreateDTO, UserResponseDTO, UserUpdateDTO } from '../dtos/UserDTOs';
-import { plainToInstance } from 'class-transformer';
+import { UserCreateDTO, UserResponse, UserUpdateDTO } from '../dtos/UserDTOs';
+
+import { instanceToPlain } from 'class-transformer';
 import { z } from 'zod';
 import { createError } from '../errors/ErrorFactory';
 import { QueryParamsSchema } from '../schemas/QuerySchema';
@@ -8,21 +9,21 @@ import { QueryParamsSchema } from '../schemas/QuerySchema';
 export class UserService {
   private userRepository = new UserRepository();
 
-  async getAllUsers(paginationOptions: QueryParamsSchema): Promise<UserResponseDTO[]> {
+  async getAllUsers(paginationOptions: QueryParamsSchema): Promise<UserResponse[]> {
     const users = await this.userRepository.getAllUsers(paginationOptions);
-    return plainToInstance(UserResponseDTO, users);
+    return instanceToPlain(users) as UserResponse[];
   }
 
-  async getUserById(userId: string): Promise<UserResponseDTO> {
+  async getUserById(userId: string): Promise<UserResponse> {
     z.uuid().parse(userId);
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
       throw createError('NotFound', `User with the id ${userId} not found`);
     }
-    return plainToInstance(UserResponseDTO, user);
+    return instanceToPlain(user) as UserResponse;
   }
 
-  async createUser(userData: UserCreateDTO): Promise<UserResponseDTO> {
+  async createUser(userData: UserCreateDTO): Promise<UserResponse> {
     const existingUserByEmail = await this.userRepository.getUserByEmail(userData.email);
     if (existingUserByEmail) {
       throw createError('Conflict', 'A user with this email already exists');
@@ -35,7 +36,7 @@ export class UserService {
 
     const newUser = await this.userRepository.createUser(userData);
 
-    return plainToInstance(UserResponseDTO, newUser);
+    return instanceToPlain(newUser) as UserResponse;
   }
 
   async updateUser(userId: string, userData: UserUpdateDTO): Promise<void> {

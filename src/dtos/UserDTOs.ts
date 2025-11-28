@@ -1,5 +1,4 @@
 import { UserRole } from '../entities/User';
-import { Expose } from 'class-transformer';
 
 export interface UserCreateDTO {
   username: string;
@@ -18,17 +17,11 @@ export interface UserUpdateDTO {
   profile?: string;
 }
 
-export class UserResponseDTO {
-  @Expose()
-  userId!: string;
-  @Expose()
-  username!: string;
-  @Expose()
-  name!: string;
-  @Expose()
-  email!: string;
-  @Expose()
-  role!: UserRole;
-  @Expose()
-  joinDate!: Date;
-}
+export type UserResponse = {
+  userId: string;
+  username: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  joinDate: Date;
+};

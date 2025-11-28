@@ -1,5 +1,3 @@
-import { Expose } from 'class-transformer';
-
 export interface StoryCreateDTO {
   title: string;
   body: string;
@@ -11,15 +9,10 @@ export interface StoryUpdateDTO {
   body?: string;
 }
 
-export class StoryResponseDTO {
-  @Expose()
-  storyId!: string;
-  @Expose()
-  userId!: string;
-  @Expose()
-  title!: string;
-  @Expose()
-  body!: string;
-  @Expose()
-  updatedAt!: Date;
-}
+export type StoryResponse = {
+  storyId: string;
+  userId: string;
+  title: string;
+  body: string;
+  updatedAt: Date;
+};

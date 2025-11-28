@@ -2,8 +2,8 @@
 import { StoryRepository } from '../repositories/StoryRepository';
 import { Story } from '../entities/Story';
 import { z } from 'zod';
-import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
-import { plainToInstance } from 'class-transformer';
+import { StoryCreateDTO, StoryResponse, StoryUpdateDTO } from '../dtos/StoryDTOs';
+import { instanceToPlain } from 'class-transformer';
 import { createError } from '../errors/ErrorFactory';
 import { UserRepository } from '../repositories/UserRepository';
 import { QueryParamsSchema } from '../schemas/QuerySchema';
@@ -13,19 +13,19 @@ export class StoryService {
   private userRepository = new UserRepository();
 
   // Get all stories
-  async getAllStories(paginationOptions: QueryParamsSchema): Promise<StoryResponseDTO[]> {
+  async getAllStories(paginationOptions: QueryParamsSchema): Promise<StoryResponse[]> {
     const stories = await this.storyRepository.getAllStories(paginationOptions);
-    return plainToInstance(StoryResponseDTO, stories);
+    return instanceToPlain(stories) as StoryResponse[];
   }
 
   // Get story by ID
-  async getStoryById(storyId: string): Promise<StoryResponseDTO> {
+  async getStoryById(storyId: string): Promise<StoryResponse> {
     z.uuid().parse(storyId);
     const story = await this.storyRepository.getStoryById(storyId);
     if (!story) {
       throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
-    return plainToInstance(StoryResponseDTO, story);
+    return instanceToPlain(story) as StoryResponse;
   }
 
   // Get all stories by user ID
@@ -36,13 +36,13 @@ export class StoryService {
   }
 
   // Create a new story
-  async createStory(story: StoryCreateDTO): Promise<StoryResponseDTO> {
+  async createStory(story: StoryCreateDTO): Promise<StoryResponse> {
     const user = await this.userRepository.getUserById(story.userByUserId);
     if (!user) {
       throw createError('NotFound', `User with the id ${story.userByUserId} not found`);
     }
     const newStory = await this.storyRepository.createStory(story);
-    return plainToInstance(StoryResponseDTO, newStory);
+    return instanceToPlain(newStory) as StoryResponse;
   }
 
   // Update an existing story
