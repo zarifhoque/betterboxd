@@ -4,13 +4,14 @@ import { AppDataSource } from './database/DataSource';
 import userRoutes from './routes/UserRoutes';
 import storyRoutes from './routes/StoryRoutes';
 import { errorHandler } from './middlewares/ErrorHandler';
+import { logger } from './config/Logger';
 
 AppDataSource.initialize()
   .then(() => {
-    console.log('Data Source has been initialized!');
+    logger.info('Data Source has been initialized!');
   })
   .catch((err) => {
-    console.error('Error during Data Source initialization:', err);
+    logger.error('Error during Data Source initialization:', err);
   });
 
 const app = express();
@@ -25,6 +26,20 @@ app.use(cors());
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/stories', storyRoutes);
+app.get('/api/v1/health', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Server is healthy',
+    timestamp: new Date().toISOString(),
+  });
+});
+app.use((req: Request, res: Response) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Endpoint not found',
+    path: req.originalUrl,
+  });
+});
 
 app.get('/', (req: Request, res: Response): void => {
   res.status(200).send('Movie Review API is running!');
@@ -34,8 +49,8 @@ app.use(errorHandler);
 
 app
   .listen(PORT, (): void => {
-    console.log(`Server running on port ${PORT}`);
+    logger.info(`Server running on port ${PORT}`);
   })
   .on('error', (err: Error) => {
-    console.error('Server error:', err);
+    logger.error('Server error:', err);
   });

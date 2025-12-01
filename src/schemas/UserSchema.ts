@@ -1,17 +1,18 @@
 import { z } from 'zod';
 import { UserRole } from '../entities/User';
-
 export const userCreateSchema = z
   .object({
     username: z
       .string()
-      .min(3, 'Username must be at least 3 characters long')
-      .max(50, 'Username can be at most 50 characters long'),
+      .min(3, { error: 'Username must be at least 3 characters long' })
+      .max(50, { error: 'Username can be at most 50 characters long' }),
     name: z
       .string()
-      .min(1, 'Name is required')
-      .max(100, 'Name must be at most 100 characters long'),
-    email: z.email('Invalid email address').max(100, 'Email must be at most 100 characters long'),
+      .min(1, { error: 'Name is required' })
+      .max(100, { error: 'Name must be at most 100 characters long' }),
+    email: z
+      .email({ error: 'Invalid email address' })
+      .max(100, { error: 'Email must be at most 100 characters long' }),
     joinDate: z.date().optional(),
     role: z.enum(UserRole).optional(),
   })
@@ -20,13 +21,15 @@ export const userUpdateSchema = z
   .object({
     username: z
       .string()
-      .min(3, 'Username must be at least 3 characters long')
-      .max(50, 'Username can be at most 50 characters long'),
+      .min(3, { error: 'Username must be at least 3 characters long' })
+      .max(50, { error: 'Username can be at most 50 characters long' }),
     name: z
       .string()
-      .min(1, 'Name is required')
-      .max(100, 'Name must be at most 100 characters long'),
-    email: z.email('Invalid email address').max(100, 'Email must be at most 100 characters long'),
+      .min(1, { error: 'Name is required' })
+      .max(100, { error: 'Name must be at most 100 characters long' }),
+    email: z
+      .email({ error: 'Invalid email address' })
+      .max(100, { error: 'Email must be at most 100 characters long' }),
     role: z.enum(UserRole).optional(),
   })
   .partial();

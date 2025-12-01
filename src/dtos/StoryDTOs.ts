@@ -9,10 +9,10 @@ export interface StoryUpdateDTO {
   body?: string;
 }
 
-export interface StoryResponseDTO {
+export type StoryResponse = {
   storyId: string;
   userId: string;
   title: string;
   body: string;
   updatedAt: Date;
-}
+};

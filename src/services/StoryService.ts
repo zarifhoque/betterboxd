@@ -2,29 +2,30 @@
 import { StoryRepository } from '../repositories/StoryRepository';
 import { Story } from '../entities/Story';
 import { z } from 'zod';
-import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
-import { toStoryResponseDTO, toStoryResponseDTOs } from '../utils/utils';
+import { StoryCreateDTO, StoryResponse, StoryUpdateDTO } from '../dtos/StoryDTOs';
+import { instanceToPlain } from 'class-transformer';
 import { createError } from '../errors/ErrorFactory';
 import { UserRepository } from '../repositories/UserRepository';
+import { QueryParamsSchema } from '../schemas/QuerySchema';
 
 export class StoryService {
   private storyRepository = new StoryRepository();
   private userRepository = new UserRepository();
 
   // Get all stories
-  async getAllStories(): Promise<StoryResponseDTO[]> {
-    const stories = await this.storyRepository.getAllStories();
-    return toStoryResponseDTOs(stories);
+  async getAllStories(paginationOptions: QueryParamsSchema): Promise<StoryResponse[]> {
+    const stories = await this.storyRepository.getAllStories(paginationOptions);
+    return instanceToPlain(stories) as StoryResponse[];
   }
 
   // Get story by ID
-  async getStoryById(storyId: string): Promise<StoryResponseDTO> {
+  async getStoryById(storyId: string): Promise<StoryResponse> {
     z.uuid().parse(storyId);
     const story = await this.storyRepository.getStoryById(storyId);
     if (!story) {
       throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
-    return toStoryResponseDTO(story);
+    return instanceToPlain(story) as StoryResponse;
   }
 
   // Get all stories by user ID
@@ -35,14 +36,13 @@ export class StoryService {
   }
 
   // Create a new story
-  async createStory(story: StoryCreateDTO): Promise<StoryResponseDTO> {
+  async createStory(story: StoryCreateDTO): Promise<StoryResponse> {
     const user = await this.userRepository.getUserById(story.userByUserId);
     if (!user) {
       throw createError('NotFound', `User with the id ${story.userByUserId} not found`);
     }
     const newStory = await this.storyRepository.createStory(story);
-    const newStoryResponse = toStoryResponseDTO(newStory);
-    return newStoryResponse;
+    return instanceToPlain(newStory) as StoryResponse;
   }
 
   // Update an existing story

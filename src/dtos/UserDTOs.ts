@@ -17,11 +17,11 @@ export interface UserUpdateDTO {
   profile?: string;
 }
 
-export interface UserResponseDTO {
+export type UserResponse = {
   userId: string;
   username: string;
   name: string;
   email: string;
   role: UserRole;
   joinDate: Date;
-}
+};

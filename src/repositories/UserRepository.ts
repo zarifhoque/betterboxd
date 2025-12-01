@@ -1,13 +1,16 @@
 import { AppDataSource } from '../database/DataSource';
 import { User } from '../entities/User';
 import { UserCreateDTO, UserUpdateDTO } from '../dtos/UserDTOs';
+import { QueryParamsSchema } from '../schemas/QuerySchema';
+import { applyPagination } from '../utils/Pagination';
 
 export class UserRepository {
   private userRepository = AppDataSource.getRepository(User);
 
   // Get all users
-  async getAllUsers(): Promise<User[]> {
-    return this.userRepository.find();
+  async getAllUsers(options: QueryParamsSchema = {}): Promise<User[]> {
+    const query = this.userRepository.createQueryBuilder('user');
+    return applyPagination(query, options, 'user').getMany();
   }
 
   // Get user by ID
