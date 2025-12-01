@@ -13,6 +13,11 @@ const EnvSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
   JWT_SECRET: z.string(),
+  SALT_ROUNDS: z.coerce
+    .number()
+    .int()
+    .min(1, 'Minimum number of rounds of schema validation must be 10')
+    .default(10),
 });
 
 export const ENV = EnvSchema.parse(process.env);

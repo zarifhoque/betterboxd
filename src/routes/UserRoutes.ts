@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { UserController } from '../controllers/UserController';
 import { validationHandler } from '../middlewares/ValidationHandler';
 import { loggerHandler } from '../middlewares/LoggerHandler';
-import { userCreateSchema, userUpdateSchema } from '../schemas/UserSchema';
+// import { userCreateSchema } from '../schemas/UserSchema';
+import { userSignupSchema, userUpdateSchema } from '../schemas/UserSchema';
 import { paginationSchema } from '../schemas/PaginationSchema';
 import { userSearchSchema } from '../schemas/SearchSchema';
 
@@ -18,12 +19,12 @@ router.get(
   userController.getAllUsers.bind(userController),
 );
 router.get('/:id', userController.getUserById.bind(userController));
-router.post(
-  '/',
-  loggerHandler,
-  validationHandler(userCreateSchema),
-  userController.createUser.bind(userController),
-);
+// router.post(
+//   '/',
+//   loggerHandler,
+//   validationHandler(userCreateSchema),
+//   userController.createUser.bind(userController),
+// );
 router.put(
   '/:id',
   loggerHandler,
@@ -31,5 +32,15 @@ router.put(
   userController.updateUser.bind(userController),
 );
 router.delete('/:id', loggerHandler, userController.deleteUser.bind(userController));
+
+router.post(
+  '/auth/signup',
+  loggerHandler,
+  validationHandler(userSignupSchema),
+  userController.signupUser.bind(userController),
+);
+
+router.post('/auth/login', loggerHandler, userController.loginUser.bind(userController));
+
 
 export default router;

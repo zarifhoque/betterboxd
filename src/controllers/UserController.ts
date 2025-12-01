@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../services/UserService';
-import { UserCreateDTO, UserUpdateDTO } from '../dtos/UserDTOs';
+import { UserCreateDTO, UserUpdateDTO, UserSignupDTO } from '../dtos/UserDTOs';
 import { z } from 'zod';
 import { UserQueryType } from '../schemas/QuerySchema';
 
@@ -56,6 +56,28 @@ export class UserController {
       z.uuid().parse(userId);
       await userService.deleteUser(userId);
       res.status(204).json({ success: true, message: 'User soft-deleted successfully' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async signupUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userData: UserSignupDTO = req.body;
+      const newUser = await userService.signupUser(userData);
+      res
+        .status(201)
+        .json({ success: true, data: newUser, message: 'User signed up successfully' });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async loginUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // const userData: UserCreateDTO = req.body;
+      // const newUser = await userService.createUser(userData);
+      // res.status(201).json({ success: true, data: newUser, message: 'User created successfully' });
     } catch (error: unknown) {
       next(error);
     }
