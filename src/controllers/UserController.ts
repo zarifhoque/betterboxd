@@ -2,14 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../services/UserService';
 import { UserCreateDTO, UserUpdateDTO } from '../dtos/UserDTOs';
 import { z } from 'zod';
-import { QueryParamsSchema } from '../schemas/QuerySchema';
+import { UserQueryType } from '../schemas/QuerySchema';
 
 const userService = new UserService();
 
 export class UserController {
   async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const queryParams = req.query as QueryParamsSchema;
+      const queryParams = req.query as unknown as UserQueryType;
       const users = await userService.getAllUsers(queryParams);
       res.status(200).json({ success: true, data: users, message: 'Users fetched successfully' });
     } catch (error: unknown) {

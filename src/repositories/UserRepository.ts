@@ -1,16 +1,34 @@
 import { AppDataSource } from '../database/DataSource';
 import { User } from '../entities/User';
 import { UserCreateDTO, UserUpdateDTO } from '../dtos/UserDTOs';
-import { QueryParamsSchema } from '../schemas/QuerySchema';
 import { applyPagination } from '../utils/Pagination';
+import { UserQueryType } from '../schemas/QuerySchema';
 
 export class UserRepository {
   private userRepository = AppDataSource.getRepository(User);
 
   // Get all users
-  async getAllUsers(options: QueryParamsSchema = {}): Promise<User[]> {
+  async getAllUsers(queryParams: UserQueryType): Promise<User[]> {
     const query = this.userRepository.createQueryBuilder('user');
-    return applyPagination(query, options, 'user').getMany();
+    const name = queryParams.name;
+    const email = queryParams.email;
+    const fuzzy = queryParams.fuzzy;
+    if (name) {
+      if (fuzzy) {
+        query.orWhere('user.name ILIKE :name', { name: `%${queryParams.name}%` });
+      } else {
+        query.orWhere('user.name = :name', { name: queryParams.name });
+      }
+    }
+
+    if (email) {
+      if (fuzzy) {
+        query.orWhere('user.email ILIKE :email', { email: `%${queryParams.email}%` });
+      } else {
+        query.orWhere('user.email = :email', { email: queryParams.email });
+      }
+    }
+    return applyPagination(query, queryParams, 'user').getMany();
   }
 
   // Get user by ID

@@ -6,15 +6,15 @@ import { StoryCreateDTO, StoryResponse, StoryUpdateDTO } from '../dtos/StoryDTOs
 import { instanceToPlain } from 'class-transformer';
 import { createError } from '../errors/ErrorFactory';
 import { UserRepository } from '../repositories/UserRepository';
-import { QueryParamsSchema } from '../schemas/QuerySchema';
+import { StoryQueryType } from '../schemas/QuerySchema';
 
 export class StoryService {
   private storyRepository = new StoryRepository();
   private userRepository = new UserRepository();
 
   // Get all stories
-  async getAllStories(paginationOptions: QueryParamsSchema): Promise<StoryResponse[]> {
-    const stories = await this.storyRepository.getAllStories(paginationOptions);
+  async getAllStories(queryParams: StoryQueryType): Promise<StoryResponse[]> {
+    const stories = await this.storyRepository.getAllStories(queryParams);
     return instanceToPlain(stories) as StoryResponse[];
   }
 

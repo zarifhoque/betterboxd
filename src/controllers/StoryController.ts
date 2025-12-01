@@ -3,14 +3,14 @@ import { Request, Response, NextFunction } from 'express';
 import { StoryService } from '../services/StoryService';
 import { StoryUpdateDTO } from '../dtos/StoryDTOs';
 import z from 'zod';
-import { QueryParamsSchema } from '../schemas/QuerySchema';
+import { StoryQueryType } from '../schemas/QuerySchema';
 
 const storyService = new StoryService();
 
 export class StoryController {
   static async getAllStories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const queryParams = req.query as QueryParamsSchema;
+      const queryParams = req.query as unknown as StoryQueryType;
       const stories = await storyService.getAllStories(queryParams);
       res.json({ success: true, data: stories, message: 'Stories fetched successfully' });
     } catch (error: unknown) {

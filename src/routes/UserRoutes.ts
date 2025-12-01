@@ -3,7 +3,8 @@ import { UserController } from '../controllers/UserController';
 import { validationHandler } from '../middlewares/ValidationHandler';
 import { loggerHandler } from '../middlewares/LoggerHandler';
 import { userCreateSchema, userUpdateSchema } from '../schemas/UserSchema';
-import { queryParamsSchema } from '../schemas/QuerySchema';
+import { paginationSchema } from '../schemas/PaginationSchema';
+import { userSearchSchema } from '../schemas/SearchSchema';
 
 const router = Router();
 const userController = new UserController();
@@ -12,7 +13,8 @@ const userController = new UserController();
 router.get(
   '/',
   loggerHandler,
-  validationHandler(queryParamsSchema, { source: 'query' }),
+  validationHandler(paginationSchema, { source: 'query' }),
+  validationHandler(userSearchSchema, { source: 'query' }),
   userController.getAllUsers.bind(userController),
 );
 router.get('/:id', userController.getUserById.bind(userController));
