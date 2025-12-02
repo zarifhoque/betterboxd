@@ -10,7 +10,6 @@ export const userSearchSchema = z.object({
     .string()
     .optional()
     .refine((v) => !v || /\S+@\S+\.\S+/.test(v), { message: 'Email must be valid if provided' }),
-  fuzzy: z.coerce.boolean().optional().default(false),
 });
 
 // Story search schema
@@ -35,7 +34,6 @@ export const storySearchSchema = z.object({
     .refine((v) => !v || !isNaN(Date.parse(v)), {
       message: 'createdBefore must be a valid datetime if provided',
     }),
-  fuzzy: z.coerce.boolean().optional().default(false),
 });
 
 // Type export

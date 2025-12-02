@@ -6,10 +6,10 @@ interface ValidationOptions {
   source?: 'body' | 'query' | 'params';
 }
 
-export function validationHandler<T extends ZodRawShape>(
+export const validationHandler = <T extends ZodRawShape>(
   schema: ZodObject<T>,
   options: ValidationOptions = { source: 'body' },
-) {
+) => {
   return (req: Request, _res: Response, next: NextFunction) => {
     const source = options.source || 'body';
     const data = req[source];
@@ -20,4 +20,4 @@ export function validationHandler<T extends ZodRawShape>(
     }
     next();
   };
-}
+};

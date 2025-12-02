@@ -11,7 +11,12 @@ interface ErrorResponse {
   details?: string[] | unknown;
 }
 
-export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction): void {
+export const errorHandler = (
+  err: unknown,
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+): void => {
   let error: AppError;
   let errorDetails: unknown = null;
   logger.error('Error occurred:', err);
@@ -57,4 +62,4 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
   res.locals = { ...res.locals, errorMessage: error.message };
 
   res.status(error.statusCode).json(response);
-}
+};

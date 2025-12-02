@@ -3,6 +3,8 @@ import { User } from '../entities/User';
 import { UserCreateDTO, UserUpdateDTO } from '../dtos/UserDTOs';
 import { applyPagination } from '../utils/Pagination';
 import { UserQueryType } from '../schemas/QuerySchema';
+import { NAME_FUZZY_THRESHOLDS } from '../constants/SearchConstants';
+
 
 export class UserRepository {
   private userRepository = AppDataSource.getRepository(User);
@@ -10,24 +12,32 @@ export class UserRepository {
   // Get all users
   async getAllUsers(queryParams: UserQueryType): Promise<User[]> {
     const query = this.userRepository.createQueryBuilder('user');
-    const name = queryParams.name;
-    const email = queryParams.email;
-    const fuzzy = queryParams.fuzzy;
+    const { name, email } = queryParams;
+    const whereParts: string[] = [];
+    const parameters: Record<string, string | number> = {};
+
     if (name) {
-      if (fuzzy) {
-        query.orWhere('user.name ILIKE :name', { name: `%${queryParams.name}%` });
-      } else {
-        query.orWhere('user.name = :name', { name: queryParams.name });
-      }
+      whereParts.push('similarity(user.name, :name) > :nameThreshold');
+      parameters.name = name;
+      parameters.nameThreshold = NAME_FUZZY_THRESHOLDS.NAME_THRESHOLD;
     }
 
     if (email) {
-      if (fuzzy) {
-        query.orWhere('user.email ILIKE :email', { email: `%${queryParams.email}%` });
-      } else {
-        query.orWhere('user.email = :email', { email: queryParams.email });
-      }
+      whereParts.push('similarity(user.email, :email) > 0.7');
+      parameters.email = email;
+      parameters.emailThreshold = NAME_FUZZY_THRESHOLDS.EMAIL_THRESHOLD;
     }
+
+    if (whereParts.length > 0) {
+      query.andWhere(whereParts.join(' OR '), parameters);
+
+      const orderExpressions: string[] = [];
+      if (name) orderExpressions.push('similarity(user.name, :name)');
+      if (email) orderExpressions.push('similarity(user.email, :email)');
+
+      query.orderBy(`GREATEST(${orderExpressions.join(', ')})`, 'DESC');
+    }
+
     return applyPagination(query, queryParams, 'user').getMany();
   }
 

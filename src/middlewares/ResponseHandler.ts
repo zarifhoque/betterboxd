@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 
 type ServiceFunction<T> = (_req: Request) => Promise<T>;
 
-export function handleRequest<T>(serviceFn: ServiceFunction<T>, statusCode = 200) {
+export const handleRequest = <T>(serviceFn: ServiceFunction<T>, statusCode = 200) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = await serviceFn(req);
@@ -12,4 +12,4 @@ export function handleRequest<T>(serviceFn: ServiceFunction<T>, statusCode = 200
       next(err);
     }
   };
-}
+};
