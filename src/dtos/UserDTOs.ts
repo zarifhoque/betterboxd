@@ -4,7 +4,6 @@ export interface UserCreateDTO {
   username: string;
   name: string;
   email: string;
-  role?: UserRole;
   joinDate?: Date;
   profile?: string;
 }
@@ -12,7 +11,6 @@ export interface UserCreateDTO {
 export interface UserUpdateDTO {
   username?: string;
   name?: string;
-  email?: string;
   role?: UserRole;
   profile?: string;
 }

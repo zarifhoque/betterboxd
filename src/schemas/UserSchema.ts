@@ -18,7 +18,6 @@ export const userCreateSchema = z
       .email({ error: 'Invalid email address' })
       .max(100, { error: 'Email must be at most 100 characters long' }),
     joinDate: z.date().optional(),
-    role: z.enum(UserRole).optional(),
   })
   .strict();
 export const userUpdateSchema = z
@@ -35,9 +34,6 @@ export const userUpdateSchema = z
       .string()
       .min(1, { error: 'Name is required' })
       .max(100, { error: 'Name must be at most 100 characters long' }),
-    email: z
-      .email({ error: 'Invalid email address' })
-      .max(100, { error: 'Email must be at most 100 characters long' }),
     role: z.enum(UserRole).optional(),
   })
   .partial()
