@@ -3,7 +3,7 @@ import { StoryRepository } from '../repositories/StoryRepository';
 import { Story } from '../entities/Story';
 import { z } from 'zod';
 import { StoryCreateDTO, StoryResponse, StoryUpdateDTO } from '../dtos/StoryDTOs';
-import { instanceToPlain, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { createError } from '../errors/ErrorFactory';
 import { StoryQueryType } from '../schemas/QuerySchema';
 import { UserService } from './UserService';

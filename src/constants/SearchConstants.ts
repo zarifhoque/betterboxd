@@ -3,7 +3,7 @@ export const STORY_FUZZY_THRESHOLDS = {
   AUTHOR_THRESHOLD: 0.3,
 };
 
-export const NAME_FUZZY_THRESHOLDS = {
+export const USER_FUZZY_THRESHOLDS = {
   NAME_THRESHOLD: 0.1,
   EMAIL_THRESHOLD: 0.1,
 };

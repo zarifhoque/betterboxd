@@ -3,7 +3,7 @@ import { User } from '../entities/User';
 import { UserCreateDTO, UserUpdateDTO } from '../dtos/UserDTOs';
 import { applyPagination } from '../utils/Pagination';
 import { UserQueryType } from '../schemas/QuerySchema';
-import { NAME_FUZZY_THRESHOLDS } from '../constants/SearchConstants';
+import { USER_FUZZY_THRESHOLDS } from '../constants/SearchConstants';
 
 
 export class UserRepository {
@@ -19,13 +19,13 @@ export class UserRepository {
     if (name) {
       whereParts.push('similarity(user.name, :name) > :nameThreshold');
       parameters.name = name;
-      parameters.nameThreshold = NAME_FUZZY_THRESHOLDS.NAME_THRESHOLD;
+      parameters.nameThreshold = USER_FUZZY_THRESHOLDS.NAME_THRESHOLD;
     }
 
     if (email) {
-      whereParts.push('similarity(user.email, :email) > 0.7');
+      whereParts.push('similarity(user.email, :email) > :emailThreshold');
       parameters.email = email;
-      parameters.emailThreshold = NAME_FUZZY_THRESHOLDS.EMAIL_THRESHOLD;
+      parameters.emailThreshold = USER_FUZZY_THRESHOLDS.EMAIL_THRESHOLD;
     }
 
     if (whereParts.length > 0) {
