@@ -42,5 +42,4 @@ router.post(
 
 router.post('/auth/login', loggerHandler, userController.loginUser.bind(userController));
 
-
 export default router;
