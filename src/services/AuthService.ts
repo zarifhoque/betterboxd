@@ -67,6 +67,7 @@ export class AuthService {
       name: user.name,
       email: user.email,
       role: user.role,
+      joinDate: user.joinDate,
     };
 
     const token = jwt.sign(payload, ENV.JWT_SECRET, {
