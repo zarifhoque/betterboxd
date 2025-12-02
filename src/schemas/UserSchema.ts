@@ -16,8 +16,8 @@ export const userCreateSchema = z
       .max(100, { error: 'Name must be at most 100 characters long' }),
     bio: z
       .string()
-      .min(1, 'Body is required')
-      .max(10000, 'Body must be at most 10000 characters long'),
+      .min(1, 'Bio is required')
+      .max(10000, 'Bio must be at most 10000 characters long'),
     email: z
       .email({ error: 'Invalid email address' })
       .max(100, { error: 'Email must be at most 100 characters long' }),
@@ -39,6 +39,10 @@ export const userUpdateSchema = z
       .min(1, { error: 'Name is required' })
       .max(100, { error: 'Name must be at most 100 characters long' }),
     role: z.enum(UserRole).optional(),
+    bio: z
+      .string()
+      .min(1, 'Bio is required')
+      .max(10000, 'Bio must be at most 10000 characters long'),
   })
   .partial()
   .strict();

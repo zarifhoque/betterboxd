@@ -57,9 +57,7 @@ const basePaginationSchema = z
     startAfter: z.uuid(),
     search: z.string(),
   })
-  .partial()
-  .strict();
-
+  .partial();
 // Refine with pagination validation
 export const paginationSchema = basePaginationSchema.refine(paginationLogic, {
   message: paginationError,

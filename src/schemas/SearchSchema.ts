@@ -10,8 +10,7 @@ export const userSearchSchema = z
       .email({ error: 'Invalid email address' })
       .max(100, { error: 'Email must be at most 100 characters long' }),
   })
-  .partial()
-  .strict();
+  .partial();
 
 // Story search schema
 export const storySearchSchema = z
@@ -29,7 +28,6 @@ export const storySearchSchema = z
       message: 'createdBefore must be a valid datetime if provided',
     }),
   })
-  .strict()
   .partial();
 
 // Type export

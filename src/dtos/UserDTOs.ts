@@ -4,7 +4,7 @@ export interface UserCreateDTO {
   username: string;
   name: string;
   email: string;
-  bio: string;
+  bio?: string;
   joinDate?: Date;
   profile?: string;
 }
@@ -12,7 +12,7 @@ export interface UserCreateDTO {
 export interface UserUpdateDTO {
   username?: string;
   name?: string;
-  bio: string;
+  bio?: string;
   role?: UserRole;
   profile?: string;
 }
