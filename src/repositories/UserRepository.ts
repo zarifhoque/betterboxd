@@ -5,7 +5,6 @@ import { applyPagination } from '../utils/Pagination';
 import { UserQueryType } from '../schemas/QuerySchema';
 import { USER_FUZZY_THRESHOLDS } from '../constants/SearchConstants';
 
-
 export class UserRepository {
   private userRepository = AppDataSource.getRepository(User);
 
