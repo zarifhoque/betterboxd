@@ -6,13 +6,13 @@ import { createError } from '../errors/ErrorFactory';
 import { UserQueryType } from '../schemas/QuerySchema';
 import * as bcrypt from 'bcrypt';
 import { ENV } from '../config/Env';
-import { AuthRepository } from '../repositories/AuthRepository';
 import { AppDataSource } from '../database/DataSource';
 import { Auth } from '../entities/Auth';
 import { User } from '../entities/User';
+import { AuthService } from './AuthService';
 export class UserService {
   private userRepository = new UserRepository();
-  private authRepository = new AuthRepository();
+  private authService = new AuthService();
 
   async getAllUsers(queryParams: UserQueryType): Promise<UserResponse[]> {
     const users = await this.userRepository.getAllUsers(queryParams);
@@ -54,25 +54,15 @@ export class UserService {
     if (existingUserByUsername) {
       throw createError('Conflict', 'A user with this username already exists');
     }
-    const hashedPassword = await bcrypt.hash(userData.password!, ENV.SALT_ROUNDS);
+    const password = await bcrypt.hash(userData.password!, ENV.SALT_ROUNDS);
 
     const newUser = await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
-      // Await the creation if createUser is async
-      const userEntity = await this.userRepository.createUser({
-        username: userData.username,
-        name: userData.name,
-        email: userData.email,
-        role: userData.role,
-      });
-
-      // Save using transactional entity manager
+      const userEntity = await this.userRepository.createUser(userData);
       const savedUser = await transactionalEntityManager.getRepository(User).save(userEntity);
-
-      // Create Auth entity
-      const authEntity = await this.authRepository.createAuth({
+      const authEntity = await this.authService.createAuth({
         username: savedUser.username,
         email: savedUser.email,
-        hashedPassword,
+        hashedPassword: password,
         userByUsername: savedUser,
         userByEmail: savedUser,
         passwordLastModificationTime: new Date(),

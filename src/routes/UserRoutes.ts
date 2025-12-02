@@ -2,8 +2,7 @@ import { Router } from 'express';
 import { UserController } from '../controllers/UserController';
 import { validationHandler } from '../middlewares/ValidationHandler';
 import { loggerHandler } from '../middlewares/LoggerHandler';
-// import { userCreateSchema } from '../schemas/UserSchema';
-import { userSignupSchema, userUpdateSchema } from '../schemas/UserSchema';
+import { userUpdateSchema } from '../schemas/UserSchema';
 import { paginationSchema } from '../schemas/PaginationSchema';
 import { userSearchSchema } from '../schemas/SearchSchema';
 
@@ -32,14 +31,5 @@ router.put(
   userController.updateUser.bind(userController),
 );
 router.delete('/:id', loggerHandler, userController.deleteUser.bind(userController));
-
-router.post(
-  '/auth/signup',
-  loggerHandler,
-  validationHandler(userSignupSchema),
-  userController.signupUser.bind(userController),
-);
-
-router.post('/auth/login', loggerHandler, userController.loginUser.bind(userController));
 
 export default router;

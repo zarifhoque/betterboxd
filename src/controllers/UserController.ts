@@ -60,26 +60,4 @@ export class UserController {
       next(error);
     }
   }
-
-  async signupUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const userData: UserSignupDTO = req.body;
-      const newUser = await userService.signupUser(userData);
-      res
-        .status(201)
-        .json({ success: true, data: newUser, message: 'User signed up successfully' });
-    } catch (error: unknown) {
-      next(error);
-    }
-  }
-
-  async loginUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      // const userData: UserCreateDTO = req.body;
-      // const newUser = await userService.createUser(userData);
-      // res.status(201).json({ success: true, data: newUser, message: 'User created successfully' });
-    } catch (error: unknown) {
-      next(error);
-    }
-  }
 }
