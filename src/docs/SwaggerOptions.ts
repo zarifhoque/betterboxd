@@ -1,6 +1,6 @@
 export const swaggerOptions = {
   definition: {
-    openapi: '3.1.0', 
+    openapi: '3.1.0',
     info: {
       title: 'BetterBoxd API',
       version: '1.0.0',
