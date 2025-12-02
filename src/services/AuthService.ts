@@ -1,8 +1,13 @@
 import { AuthRepository } from '../repositories/AuthRepository';
 import { Auth } from '../entities/Auth';
 import { instanceToPlain } from 'class-transformer';
-import { z } from 'zod';
 import { createError } from '../errors/ErrorFactory';
+import { UserSigninDTO } from '../dtos/UserDTOs';
+import { ENV } from '../config/Env';
+import bcrypt from 'bcrypt';
+import { LoginResponseDTO } from '../dtos/AuthDTOs';
+import jwt from 'jsonwebtoken';
+import { logger } from '../config/Logger';
 
 export class AuthService {
   private authRepository = new AuthRepository();
@@ -31,10 +36,43 @@ export class AuthService {
     return instanceToPlain(newAuth) as Auth;
   }
 
-  // async signin()
+  // // Update password by auth ID
+  // async updatePassword(authId: string, hashedPassword: string): Promise<void> {
+  //   // TODO: will be implemented
+  // }
 
-  // Update password by auth ID
-  async updatePassword(authId: string, hashedPassword: string): Promise<void> {
-    // TODO: will be implemented
+  async login(credentials: UserSigninDTO): Promise<LoginResponseDTO> {
+    const auth = await this.authRepository.getByEmail(credentials.email);
+
+    if (!auth) {
+      throw createError('Unauthorized', 'Invalid email or password');
+    }
+
+    const passwordMatch = await bcrypt.compare(credentials.password, auth.hashedPassword);
+
+    if (!passwordMatch) {
+      throw createError('Unauthorized', 'Invalid email or password');
+    }
+
+    const user = auth.userByUsername;
+    logger.debug(JSON.stringify(auth));
+
+    if (!user) {
+      throw createError('Unauthorized', 'User record missing');
+    }
+
+    const payload = {
+      userId: user.userId,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+
+    const token = jwt.sign(payload, ENV.JWT_SECRET, {
+      expiresIn: '30d', // default 1 month
+    });
+
+    return { token, user: payload };
   }
 }

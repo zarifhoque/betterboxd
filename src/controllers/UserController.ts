@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../services/UserService';
-import { UserCreateDTO, UserUpdateDTO, UserSignupDTO } from '../dtos/UserDTOs';
+import { UserCreateDTO, UserUpdateDTO } from '../dtos/UserDTOs';
 import { z } from 'zod';
 import { UserQueryType } from '../schemas/QuerySchema';
 

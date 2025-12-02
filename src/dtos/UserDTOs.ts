@@ -6,7 +6,6 @@ export interface UserCreateDTO {
   email: string;
   role?: UserRole;
   joinDate?: Date;
-  profile?: string;
 }
 
 export interface UserUpdateDTO {
@@ -14,10 +13,9 @@ export interface UserUpdateDTO {
   name?: string;
   email?: string;
   role?: UserRole;
-  profile?: string;
 }
 
-export type UserResponse = {
+export type UserResponseDTO = {
   userId: string;
   username: string;
   name: string;
@@ -31,15 +29,10 @@ export interface UserSignupDTO {
   name: string;
   email: string;
   joinDate?: Date;
-  profile?: string;
   password?: string;
 }
 
 export interface UserSigninDTO {
-  username: string;
-  name: string;
   email: string;
-  joinDate?: Date;
-  profile?: string;
-  password?: string;
+  password: string;
 }

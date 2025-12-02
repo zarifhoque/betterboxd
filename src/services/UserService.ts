@@ -1,5 +1,5 @@
 import { UserRepository } from '../repositories/UserRepository';
-import { UserCreateDTO, UserResponse, UserSignupDTO, UserUpdateDTO } from '../dtos/UserDTOs';
+import { UserCreateDTO, UserResponseDTO, UserSignupDTO, UserUpdateDTO } from '../dtos/UserDTOs';
 import { instanceToPlain } from 'class-transformer';
 import { z } from 'zod';
 import { createError } from '../errors/ErrorFactory';
@@ -14,21 +14,21 @@ export class UserService {
   private userRepository = new UserRepository();
   private authService = new AuthService();
 
-  async getAllUsers(queryParams: UserQueryType): Promise<UserResponse[]> {
+  async getAllUsers(queryParams: UserQueryType): Promise<UserResponseDTO[]> {
     const users = await this.userRepository.getAllUsers(queryParams);
-    return instanceToPlain(users) as UserResponse[];
+    return instanceToPlain(users) as UserResponseDTO[];
   }
 
-  async getUserById(userId: string): Promise<UserResponse> {
+  async getUserById(userId: string): Promise<UserResponseDTO> {
     z.uuid().parse(userId);
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
       throw createError('NotFound', `User with the id ${userId} not found`);
     }
-    return instanceToPlain(user) as UserResponse;
+    return instanceToPlain(user) as UserResponseDTO;
   }
 
-  async createUser(userData: UserCreateDTO): Promise<UserResponse> {
+  async createUser(userData: UserCreateDTO): Promise<UserResponseDTO> {
     const existingUserByEmail = await this.userRepository.getUserByEmail(userData.email);
     if (existingUserByEmail) {
       throw createError('Conflict', 'A user with this email already exists');
@@ -41,10 +41,10 @@ export class UserService {
 
     const newUser = await this.userRepository.createUser(userData);
 
-    return instanceToPlain(newUser) as UserResponse;
+    return instanceToPlain(newUser) as UserResponseDTO;
   }
 
-  async signupUser(userData: UserSignupDTO): Promise<UserResponse> {
+  async signupUser(userData: UserSignupDTO): Promise<UserResponseDTO> {
     const existingUserByEmail = await this.userRepository.getUserByEmail(userData.email);
     if (existingUserByEmail) {
       throw createError('Conflict', 'A user with this email already exists');
@@ -73,7 +73,7 @@ export class UserService {
       return savedUser;
     });
 
-    return instanceToPlain(newUser) as UserResponse;
+    return instanceToPlain(newUser) as UserResponseDTO;
   }
 
   async updateUser(userId: string, userData: UserUpdateDTO): Promise<void> {

@@ -9,7 +9,11 @@ export class AuthRepository {
   }
 
   async getByEmail(email: string): Promise<Auth | null> {
-    return this.authRepository.findOne({ where: { email } });
+    return this.authRepository
+      .createQueryBuilder('auth')
+      .leftJoinAndSelect('auth.userByUsername', 'user')
+      .where('auth.email = :email', { email })
+      .getOne();
   }
 
   async createAuth(authData: Partial<Auth>): Promise<Auth> {

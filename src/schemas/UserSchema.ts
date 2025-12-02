@@ -18,6 +18,23 @@ export const userCreateSchema = z
   })
   .strict();
 
+export const userUpdateSchema = z
+  .object({
+    username: z
+      .string()
+      .min(3, { error: 'Username must be at least 3 characters long' })
+      .max(50, { error: 'Username can be at most 50 characters long' }),
+    name: z
+      .string()
+      .min(1, { error: 'Name is required' })
+      .max(100, { error: 'Name must be at most 100 characters long' }),
+    email: z
+      .email({ error: 'Invalid email address' })
+      .max(100, { error: 'Email must be at most 100 characters long' }),
+    role: z.enum(UserRole).optional(),
+  })
+  .partial();
+
 export const userSignupSchema = z
   .object({
     username: z
@@ -40,22 +57,17 @@ export const userSignupSchema = z
   })
   .strict();
 
-export const userUpdateSchema = z
+export const userLoginSchema = z
   .object({
-    username: z
-      .string()
-      .min(3, { error: 'Username must be at least 3 characters long' })
-      .max(50, { error: 'Username can be at most 50 characters long' }),
-    name: z
-      .string()
-      .min(1, { error: 'Name is required' })
-      .max(100, { error: 'Name must be at most 100 characters long' }),
     email: z
       .email({ error: 'Invalid email address' })
       .max(100, { error: 'Email must be at most 100 characters long' }),
-    role: z.enum(UserRole).optional(),
+    password: z
+      .string()
+      .min(6, { error: 'Password should have been at least 6 characters long' })
+      .max(128, { error: 'Password should have been be at most 128 characters long' }),
   })
-  .partial();
+  .strict();
 
 export type UserCreateSchemaType = z.infer<typeof userCreateSchema>;
 export type UserUpdateSchemaType = z.infer<typeof userUpdateSchema>;

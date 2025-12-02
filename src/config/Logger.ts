@@ -7,7 +7,7 @@ const logFormat = printf(({ level, message, timestamp, stack }) => {
 });
 
 export const logger = createLogger({
-  level: 'info', // default log level
+  level: 'debug', // default log level
   format: combine(
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.errors({ stack: true }), // show stack trace for errors

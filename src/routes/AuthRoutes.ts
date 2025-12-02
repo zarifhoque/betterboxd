@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { userSignupSchema } from '../schemas/UserSchema';
+import { userLoginSchema, userSignupSchema } from '../schemas/UserSchema';
 import { AuthController } from '../controllers/AuthController';
 import { loggerHandler } from '../middlewares/LoggerHandler';
 import { validationHandler } from '../middlewares/ValidationHandler';
@@ -16,6 +16,6 @@ router.post(
 );
 
 // login route (example)
-router.post('/login', loggerHandler, authController.loginUser);
+router.post('/login', loggerHandler, validationHandler(userLoginSchema), authController.loginUser);
 
 export default router;
