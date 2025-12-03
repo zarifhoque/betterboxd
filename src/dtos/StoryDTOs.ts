@@ -1,3 +1,6 @@
+import { Expose, Transform } from 'class-transformer';
+import { Story } from '../entities/Story';
+
 export interface StoryCreateDTO {
   title: string;
   body: string;
@@ -9,10 +12,18 @@ export interface StoryUpdateDTO {
   body?: string;
 }
 
-export type StoryResponse = {
-  storyId: string;
-  userId: string;
-  title: string;
-  body: string;
-  updatedAt: Date;
-};
+export class StoryResponse {
+  @Expose()
+  storyId!: string;
+  @Expose()
+  userId!: string;
+  @Expose()
+  title!: string;
+  @Expose()
+  body!: string;
+  @Expose()
+  updatedAt!: Date;
+  @Expose()
+  @Transform(({ obj }: { obj: Story }) => obj.userByUserId?.username ?? null)
+  username!: string;
+}

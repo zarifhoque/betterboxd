@@ -1,16 +1,15 @@
 import { UserRepository } from '../repositories/UserRepository';
 import { UserCreateDTO, UserResponse, UserUpdateDTO } from '../dtos/UserDTOs';
-
 import { instanceToPlain } from 'class-transformer';
 import { z } from 'zod';
 import { createError } from '../errors/ErrorFactory';
-import { QueryParamsSchema } from '../schemas/QuerySchema';
+import { UserQueryType } from '../schemas/QuerySchema';
 
 export class UserService {
   private userRepository = new UserRepository();
 
-  async getAllUsers(paginationOptions: QueryParamsSchema): Promise<UserResponse[]> {
-    const users = await this.userRepository.getAllUsers(paginationOptions);
+  async getAllUsers(queryParams: UserQueryType): Promise<UserResponse[]> {
+    const users = await this.userRepository.getAllUsers(queryParams);
     return instanceToPlain(users) as UserResponse[];
   }
 

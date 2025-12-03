@@ -1,16 +1,43 @@
 import { AppDataSource } from '../database/DataSource';
 import { User } from '../entities/User';
 import { UserCreateDTO, UserUpdateDTO } from '../dtos/UserDTOs';
-import { QueryParamsSchema } from '../schemas/QuerySchema';
 import { applyPagination } from '../utils/Pagination';
+import { UserQueryType } from '../schemas/QuerySchema';
+import { USER_FUZZY_THRESHOLDS } from '../constants/SearchConstants';
 
 export class UserRepository {
   private userRepository = AppDataSource.getRepository(User);
 
   // Get all users
-  async getAllUsers(options: QueryParamsSchema = {}): Promise<User[]> {
+  async getAllUsers(queryParams: UserQueryType): Promise<User[]> {
     const query = this.userRepository.createQueryBuilder('user');
-    return applyPagination(query, options, 'user').getMany();
+    const { name, email } = queryParams;
+    const whereParts: string[] = [];
+    const parameters: Record<string, string | number> = {};
+
+    if (name) {
+      whereParts.push('similarity(user.name, :name) > :nameThreshold');
+      parameters.name = name;
+      parameters.nameThreshold = USER_FUZZY_THRESHOLDS.NAME_THRESHOLD;
+    }
+
+    if (email) {
+      whereParts.push('similarity(user.email, :email) > :emailThreshold');
+      parameters.email = email;
+      parameters.emailThreshold = USER_FUZZY_THRESHOLDS.EMAIL_THRESHOLD;
+    }
+
+    if (whereParts.length > 0) {
+      query.andWhere(whereParts.join(' OR '), parameters);
+
+      const orderExpressions: string[] = [];
+      if (name) orderExpressions.push('similarity(user.name, :name)');
+      if (email) orderExpressions.push('similarity(user.email, :email)');
+
+      query.orderBy(`GREATEST(${orderExpressions.join(', ')})`, 'DESC');
+    }
+
+    return applyPagination(query, queryParams, 'user').getMany();
   }
 
   // Get user by ID
