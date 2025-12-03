@@ -41,7 +41,7 @@ export class StoryService {
     if (!user) {
       throw createError('NotFound', `User with the id ${userId} not found`);
     }
-    const newStory = await this.storyRepository.createStory(story);
+    const newStory = await this.storyRepository.createStory(story, userId);
     return plainToInstance(StoryResponse, newStory, { excludeExtraneousValues: true });
   }
 

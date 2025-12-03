@@ -5,6 +5,7 @@ import { StoryUpdateDTO } from '../dtos/StoryDTOs';
 import z from 'zod';
 import { StoryQueryType } from '../schemas/QuerySchema';
 import { AuthRequest } from '../types/AuthTypes';
+import { logger } from '../config/Logger';
 
 const storyService = new StoryService();
 

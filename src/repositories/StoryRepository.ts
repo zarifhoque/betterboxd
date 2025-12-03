@@ -67,10 +67,10 @@ export class StoryRepository {
   }
 
   // Create a new story
-  async createStory(story: StoryCreateDTO): Promise<Story> {
+  async createStory(story: StoryCreateDTO, userId: string): Promise<Story> {
     const newStory = this.storyRepository.create({
       ...story,
-      userByUserId: { userId: story.userByUserId },
+      userByUserId: { userId: userId },
     });
     const saved = await this.storyRepository.save(newStory);
     return this.storyRepository.findOne({
