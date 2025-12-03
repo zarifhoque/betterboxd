@@ -8,7 +8,6 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "format": "prettier --write . && eslint . --ext .ts,.tsx,.js --fix",
     "swagger": "ts-node src/docs/Swagger.ts"
-
   },
   "keywords": [],
   "author": "",

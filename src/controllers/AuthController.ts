@@ -20,7 +20,6 @@ export class AuthController {
   async loginUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const credentials: UserSigninDTO = req.body;
-      // const user = await
       const { token, user } = await authService.login(credentials);
       res
         .status(200)

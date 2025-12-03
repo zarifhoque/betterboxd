@@ -21,9 +21,7 @@
       "description": "Story-related endpoints"
     }
   ],
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "paths": {
     "/api/v1/health": {
       "get": {

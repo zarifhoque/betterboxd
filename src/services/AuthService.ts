@@ -2,12 +2,13 @@ import { AuthRepository } from '../repositories/AuthRepository';
 import { Auth } from '../entities/Auth';
 import { instanceToPlain } from 'class-transformer';
 import { createError } from '../errors/ErrorFactory';
-import { UserSigninDTO } from '../dtos/UserDTOs';
+import { UserResponseDTO, UserSigninDTO } from '../dtos/UserDTOs';
 import { ENV } from '../config/Env';
 import bcrypt from 'bcrypt';
 import { LoginResponseDTO } from '../dtos/AuthDTOs';
 import jwt from 'jsonwebtoken';
 import { logger } from '../config/Logger';
+import { JwtPayload } from '../types/AuthTypes';
 
 export class AuthService {
   private authRepository = new AuthRepository();
@@ -61,7 +62,7 @@ export class AuthService {
       throw createError('Unauthorized', 'User record missing');
     }
 
-    const payload = {
+    const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
       userId: user.userId,
       username: user.username,
       name: user.name,
@@ -71,9 +72,9 @@ export class AuthService {
     };
 
     const token = jwt.sign(payload, ENV.JWT_SECRET, {
-      expiresIn: '30d', // default 1 month
+      expiresIn: '30d',
     });
 
-    return { token, user: payload };
+    return { token, user: payload as UserResponseDTO };
   }
 }
