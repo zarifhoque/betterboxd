@@ -1,7 +1,7 @@
 export interface StoryCreateDTO {
   title: string;
   body: string;
-  userByUserId: string;
+  // userByUserId: string; // no longer can be provided directly by the user
 }
 
 export interface StoryUpdateDTO {
