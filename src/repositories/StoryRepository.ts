@@ -1,4 +1,5 @@
 // repositories/StoryRepository.ts
+import { STORY_FUZZY_THRESHOLDS } from '../constants/SearchConstants';
 import { AppDataSource } from '../database/DataSource';
 import { StoryCreateDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
 import { Story } from '../entities/Story';
@@ -14,30 +15,42 @@ export class StoryRepository {
       .createQueryBuilder('story')
       .leftJoinAndSelect('story.userByUserId', 'user');
 
-    const { title, author, createdAfter, createdBefore, fuzzy } = options;
+    const { title, author, createdAfter, createdBefore } = options;
+    const whereParts: string[] = [];
+    const parameters: Record<string, string | Date | number> = {};
 
     if (title) {
-      if (fuzzy) {
-        query.andWhere('story.title ILIKE :title', { title: `%${title}%` });
-      } else {
-        query.andWhere('story.title = :title', { title });
-      }
+      whereParts.push('similarity(story.title, :title) > :titleThreshold');
+      parameters.title = title;
+      parameters.titleThreshold = STORY_FUZZY_THRESHOLDS.TITLE_THRESHOLD;
     }
 
     if (author) {
-      if (fuzzy) {
-        query.andWhere('user.name ILIKE :author', { author: `%${author}%` });
-      } else {
-        query.andWhere('user.name = :author', { author });
-      }
+      whereParts.push('similarity(user.name, :author) > :authorThreshold');
+      parameters.author = author;
+      parameters.authorThreshold = STORY_FUZZY_THRESHOLDS.AUTHOR_THRESHOLD;
     }
 
     if (createdAfter) {
-      query.andWhere('story.createdAt >= :createdAfter', { createdAfter });
+      whereParts.push('story.createdAt >= :createdAfter');
+      parameters.createdAfter = new Date(createdAfter);
     }
 
     if (createdBefore) {
-      query.andWhere('story.createdAt <= :createdBefore', { createdBefore });
+      whereParts.push('story.createdAt <= :createdBefore');
+      parameters.createdBefore = new Date(createdBefore);
+    }
+
+    if (whereParts.length > 0) {
+      query.andWhere(whereParts.join(' AND '), parameters);
+
+      const orderExpressions: string[] = [];
+      if (title) orderExpressions.push('similarity(story.title, :title)');
+      if (author) orderExpressions.push('similarity(user.name, :author)');
+
+      if (orderExpressions.length > 0) {
+        query.orderBy(`GREATEST(${orderExpressions.join(', ')})`, 'DESC');
+      }
     }
 
     return applyPagination(query, options, 'story').getMany();
@@ -45,7 +58,7 @@ export class StoryRepository {
 
   // Get story by ID
   async getStoryById(storyId: string): Promise<Story | null> {
-    return this.storyRepository.findOne({ where: { storyId } });
+    return this.storyRepository.findOne({ where: { storyId }, relations: ['userByUserId'] });
   }
 
   // Get Stories by User ID
@@ -59,7 +72,11 @@ export class StoryRepository {
       ...story,
       userByUserId: { userId: story.userByUserId },
     });
-    return this.storyRepository.save(newStory);
+    const saved = await this.storyRepository.save(newStory);
+    return this.storyRepository.findOne({
+      where: { storyId: saved.storyId },
+      relations: ['userByUserId'],
+    }) as Promise<Story>;
   }
 
   // Update an existing story

@@ -3,19 +3,19 @@ import { StoryRepository } from '../repositories/StoryRepository';
 import { Story } from '../entities/Story';
 import { z } from 'zod';
 import { StoryCreateDTO, StoryResponse, StoryUpdateDTO } from '../dtos/StoryDTOs';
-import { instanceToPlain } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { createError } from '../errors/ErrorFactory';
-import { UserRepository } from '../repositories/UserRepository';
 import { StoryQueryType } from '../schemas/QuerySchema';
+import { UserService } from './UserService';
 
 export class StoryService {
   private storyRepository = new StoryRepository();
-  private userRepository = new UserRepository();
+  private userService = new UserService();
 
   // Get all stories
   async getAllStories(queryParams: StoryQueryType): Promise<StoryResponse[]> {
     const stories = await this.storyRepository.getAllStories(queryParams);
-    return instanceToPlain(stories) as StoryResponse[];
+    return plainToInstance(StoryResponse, stories, { excludeExtraneousValues: true });
   }
 
   // Get story by ID
@@ -25,7 +25,7 @@ export class StoryService {
     if (!story) {
       throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
-    return instanceToPlain(story) as StoryResponse;
+    return plainToInstance(StoryResponse, story, { excludeExtraneousValues: true });
   }
 
   // Get all stories by user ID
@@ -37,12 +37,12 @@ export class StoryService {
 
   // Create a new story
   async createStory(story: StoryCreateDTO): Promise<StoryResponse> {
-    const user = await this.userRepository.getUserById(story.userByUserId);
+    const user = await this.userService.getUserById(story.userByUserId);
     if (!user) {
       throw createError('NotFound', `User with the id ${story.userByUserId} not found`);
     }
     const newStory = await this.storyRepository.createStory(story);
-    return instanceToPlain(newStory) as StoryResponse;
+    return plainToInstance(StoryResponse, newStory, { excludeExtraneousValues: true });
   }
 
   // Update an existing story

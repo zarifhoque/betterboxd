@@ -5,13 +5,13 @@ import {
   DEFAULT_LIMIT,
   DEFAULT_OFFSET,
 } from '../constants/PaginationConstants';
-import { UserQueryType } from '../schemas/QuerySchema';
+import { StoryQueryType, UserQueryType } from '../schemas/QuerySchema';
 
-export function applyPagination<T extends ObjectLiteral>(
+export const applyPagination = <T extends ObjectLiteral>(
   query: SelectQueryBuilder<T>,
-  options: UserQueryType,
+  options: UserQueryType | StoryQueryType,
   alias: string,
-): SelectQueryBuilder<T> {
+): SelectQueryBuilder<T> => {
   // StartAfter-based pagination
   if (options.startAfter !== undefined) {
     const limit = options.limit ?? DEFAULT_LIMIT;
@@ -34,4 +34,4 @@ export function applyPagination<T extends ObjectLiteral>(
   }
 
   return query;
-}
+};

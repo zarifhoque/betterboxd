@@ -27,6 +27,9 @@ export class User {
   @Column({ unique: true, type: 'varchar', length: 100 })
   email!: string;
   @Expose()
+  @Column({ type: 'text', nullable: true })
+  bio!: string;
+  @Expose()
   @CreateDateColumn({ type: 'timestamp' })
   joinDate!: Date;
   @Expose()
