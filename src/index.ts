@@ -7,7 +7,7 @@ import storyRoutes from './routes/StoryRoutes';
 import authRoutes from './routes/AuthRoutes';
 import { errorHandler } from './middlewares/ErrorHandler';
 import { logger } from './config/Logger';
-import { swaggerOptions } from './docs/SwaggerOptions';
+import swaggerFile from './docs/swagger-output.json';
 
 AppDataSource.initialize()
   .then(() => {
@@ -26,7 +26,7 @@ if (isNaN(PORT)) {
 
 app.use(express.json());
 app.use(cors());
-app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerOptions));
+app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/stories', storyRoutes);
 app.use('/api/v1/auth', authRoutes);
