@@ -4,6 +4,7 @@ import { StoryService } from '../services/StoryService';
 import { StoryUpdateDTO } from '../dtos/StoryDTOs';
 import z from 'zod';
 import { StoryQueryType } from '../schemas/QuerySchema';
+import { AuthRequest } from '../types/AuthTypes';
 
 const storyService = new StoryService();
 
@@ -29,9 +30,10 @@ export class StoryController {
     }
   }
 
-  static async createStory(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async createStory(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const story = await storyService.createStory(req.body);
+      const userId: string = req.user!.userId;
+      const story = await storyService.createStory(req.body, userId);
       res.status(201).json({ success: true, data: story, message: 'Story created successfully' });
     } catch (error) {
       next(error);

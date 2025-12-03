@@ -36,10 +36,10 @@ export class StoryService {
   }
 
   // Create a new story
-  async createStory(story: StoryCreateDTO): Promise<StoryResponse> {
-    const user = await this.userService.getUserById(story.userByUserId);
+  async createStory(story: StoryCreateDTO, userId: string): Promise<StoryResponse> {
+    const user = await this.userService.getUserById(userId);
     if (!user) {
-      throw createError('NotFound', `User with the id ${story.userByUserId} not found`);
+      throw createError('NotFound', `User with the id ${userId} not found`);
     }
     const newStory = await this.storyRepository.createStory(story);
     return plainToInstance(StoryResponse, newStory, { excludeExtraneousValues: true });
