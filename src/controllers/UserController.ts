@@ -55,7 +55,7 @@ export class UserController {
       const userId: string = req.params.id;
       z.uuid().parse(userId);
       await userService.deleteUser(userId);
-      res.status(204).json({ success: true, message: 'User soft-deleted successfully' });
+      res.status(204).json({ success: true, message: 'User deleted successfully' });
     } catch (error: unknown) {
       next(error);
     }

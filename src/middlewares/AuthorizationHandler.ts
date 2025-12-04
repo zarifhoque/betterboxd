@@ -4,7 +4,6 @@ import { StoryService } from '../services/StoryService';
 import { AuthRequest } from '../types/AuthTypes';
 import { UserRole } from '../entities/User';
 import { logger } from '../config/Logger';
-import { log } from 'console';
 
 const storyService = new StoryService();
 

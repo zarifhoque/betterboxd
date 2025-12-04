@@ -3,7 +3,6 @@ import { createError } from '../errors/ErrorFactory';
 import { AuthRequest, JwtPayload } from '../types/AuthTypes';
 import jwt from 'jsonwebtoken';
 import { ENV } from '../config/Env';
-import { logger } from '../config/Logger';
 
 export const authenticateJWTHandler = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
