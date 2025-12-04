@@ -6,6 +6,7 @@ import {
   UnauthorizedError,
   UnauthenticatedError,
   InternalServerError,
+  ForbiddenError,
 } from './AppErrors';
 
 type ErrorType =
@@ -14,7 +15,8 @@ type ErrorType =
   | 'Conflict'
   | 'Unauthorized'
   | 'Unauthenticated'
-  | 'InternalServerError';
+  | 'InternalServerError'
+  | 'Forbidden';
 
 export const createError = (type: ErrorType, message: string, details?: string[]): AppError => {
   switch (type) {
@@ -30,6 +32,8 @@ export const createError = (type: ErrorType, message: string, details?: string[]
       return new UnauthenticatedError(message);
     case 'InternalServerError':
       return new InternalServerError(message);
+    case 'Forbidden':
+      return new ForbiddenError(message);
     default:
       return new AppError(message, 500);
   }

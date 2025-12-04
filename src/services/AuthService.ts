@@ -44,12 +44,15 @@ export class AuthService {
 
   async login(credentials: UserSigninDTO): Promise<LoginResponseDTO> {
     const auth = await this.authRepository.getByEmail(credentials.email);
+    logger.debug(JSON.stringify(credentials));
 
     if (!auth) {
-      throw createError('Unauthorized', 'Invalid email or password');
+      throw createError('Unauthorized', 'Missing email or password');
     }
 
     const passwordMatch = await bcrypt.compare(credentials.password, auth.hashedPassword);
+    logger.debug(await bcrypt.hash(credentials.password, 10));
+    logger.debug(auth.hashedPassword);
 
     if (!passwordMatch) {
       throw createError('Unauthorized', 'Invalid email or password');

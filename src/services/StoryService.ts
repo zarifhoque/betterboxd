@@ -2,30 +2,31 @@
 import { StoryRepository } from '../repositories/StoryRepository';
 import { Story } from '../entities/Story';
 import { z } from 'zod';
-import { StoryCreateDTO, StoryResponse, StoryUpdateDTO } from '../dtos/StoryDTOs';
+import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
 import { plainToInstance } from 'class-transformer';
 import { createError } from '../errors/ErrorFactory';
 import { StoryQueryType } from '../schemas/QuerySchema';
 import { UserService } from './UserService';
+import { logger } from '../config/Logger';
 
 export class StoryService {
   private storyRepository = new StoryRepository();
   private userService = new UserService();
 
   // Get all stories
-  async getAllStories(queryParams: StoryQueryType): Promise<StoryResponse[]> {
+  async getAllStories(queryParams: StoryQueryType): Promise<StoryResponseDTO[]> {
     const stories = await this.storyRepository.getAllStories(queryParams);
-    return plainToInstance(StoryResponse, stories, { excludeExtraneousValues: true });
+    return plainToInstance(StoryResponseDTO, stories, { excludeExtraneousValues: true });
   }
 
   // Get story by ID
-  async getStoryById(storyId: string): Promise<StoryResponse> {
+  async getStoryById(storyId: string): Promise<StoryResponseDTO> {
     z.uuid().parse(storyId);
     const story = await this.storyRepository.getStoryById(storyId);
     if (!story) {
       throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
-    return plainToInstance(StoryResponse, story, { excludeExtraneousValues: true });
+    return plainToInstance(StoryResponseDTO, story, { excludeExtraneousValues: true });
   }
 
   // Get all stories by user ID
@@ -36,19 +37,22 @@ export class StoryService {
   }
 
   // Create a new story
-  async createStory(story: StoryCreateDTO, userId: string): Promise<StoryResponse> {
+  async createStory(story: StoryCreateDTO, userId: string): Promise<StoryResponseDTO> {
     const user = await this.userService.getUserById(userId);
     if (!user) {
       throw createError('NotFound', `User with the id ${userId} not found`);
     }
     const newStory = await this.storyRepository.createStory(story, userId);
-    return plainToInstance(StoryResponse, newStory, { excludeExtraneousValues: true });
+    return plainToInstance(StoryResponseDTO, newStory, { excludeExtraneousValues: true });
   }
 
   // Update an existing story
   async updateStory(storyId: string, story: StoryUpdateDTO): Promise<void> {
+    logger.debug(typeof storyId);
     const existingStory = await this.storyRepository.getStoryById(storyId);
     if (!existingStory) {
+      // logger.debug('We are not');
+      // logger.debug(storyId);
       throw createError('NotFound', `Story with the id ${storyId} not found`);
     }
 
@@ -70,5 +74,14 @@ export class StoryService {
     if (!deleted) {
       throw createError('Conflict', `Failed to delete story with id ${storyId}`);
     }
+  }
+
+  async getOwnerId(storyId: string): Promise<string> {
+    const userId = await this.storyRepository.getUserIdByStoryId(storyId);
+    logger.debug(userId);
+    if (!userId) {
+      throw createError('NotFound', `Story with ID ${storyId} not found`);
+    }
+    return userId;
   }
 }

@@ -3,6 +3,7 @@ import { createError } from '../errors/ErrorFactory';
 import { AuthRequest, JwtPayload } from '../types/AuthTypes';
 import jwt from 'jsonwebtoken';
 import { ENV } from '../config/Env';
+import { logger } from '../config/Logger';
 
 export const authenticateJWTHandler = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -12,5 +13,6 @@ export const authenticateJWTHandler = (req: AuthRequest, res: Response, next: Ne
   const token = authHeader.split(' ')[1];
   const payload = jwt.verify(token, ENV.JWT_SECRET) as JwtPayload;
   req.user = payload;
+
   next();
 };

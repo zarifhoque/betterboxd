@@ -90,4 +90,14 @@ export class StoryRepository {
     const result = await this.storyRepository.softDelete(storyId);
     return (result.affected ?? 0) > 0; // safe nullish handling
   }
+  // Get userid by userid
+  async getUserIdByStoryId(storyId: string): Promise<string | null> {
+    const story = await this.storyRepository
+      .createQueryBuilder('story')
+      .leftJoinAndSelect('story.userByUserId', 'user')
+      .where('story.storyId = :storyId', { storyId })
+      .getOne();
+
+    return story?.userByUserId?.userId ?? null;
+  }
 }

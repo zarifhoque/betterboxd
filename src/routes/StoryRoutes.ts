@@ -34,6 +34,12 @@ router.put(
   validationHandler(storyUpdateSchema),
   StoryController.updateStory,
 );
-router.delete('/:id', loggerHandler, modifyStoryAccessHandler, StoryController.deleteStory);
+router.delete(
+  '/:id',
+  loggerHandler,
+  authenticateJWTHandler,
+  modifyStoryAccessHandler,
+  StoryController.deleteStory,
+);
 
 export default router;

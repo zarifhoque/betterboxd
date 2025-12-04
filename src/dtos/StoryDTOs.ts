@@ -12,7 +12,7 @@ export interface StoryUpdateDTO {
   body?: string;
 }
 
-export class StoryResponse {
+export class StoryResponseDTO {
   @Expose()
   storyId!: string;
   @Expose()

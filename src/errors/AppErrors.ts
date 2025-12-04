@@ -44,6 +44,13 @@ export class UnauthenticatedError extends AppError {
   }
 }
 
+export class ForbiddenError extends AppError {
+  constructor(message: string) {
+    super(message, 403);
+    this.name = 'ForbiddenError';
+  }
+}
+
 export class InternalServerError extends AppError {
   constructor(message: string) {
     super(message, 500);
