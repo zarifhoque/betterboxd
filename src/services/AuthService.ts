@@ -1,23 +1,36 @@
 import { AuthRepository } from '../repositories/AuthRepository';
 import { Auth } from '../entities/Auth';
 import { instanceToPlain } from 'class-transformer';
-import { createError } from '../errors/ErrorFactory';
-import { UserResponseDTO, UserSigninDTO } from '../dtos/UserDTOs';
+import { UserResponseDTO, UserSigninDTO, UserSignupDTO } from '../dtos/UserDTOs';
 import { ENV } from '../config/Env';
 import bcrypt from 'bcrypt';
 import { LoginResponseDTO } from '../dtos/AuthDTOs';
-import jwt from 'jsonwebtoken';
-import { logger } from '../config/Logger';
-import { JwtPayload } from '../types/AuthTypes';
-
+import { JwtPayloadUnsigned } from '../types/AuthTypes';
+import { ErrorFactory } from '../errors/ErrorFactory';
+import { AppDataSource } from '../database/DataSource';
+import { User } from '../entities/User';
+import { UserService } from './UserService';
+import {
+  buildAuthEntity,
+  createJwtUnsignedPayload,
+  generateToken,
+  verifyPassword,
+} from '../utils/Auth';
+import { injectable } from 'tsyringe';
+@injectable()
 export class AuthService {
-  private authRepository = new AuthRepository();
+  // private authRepository = new AuthRepository();
+  // private userService = new UserService();
+  constructor(
+    private authRepository: AuthRepository,
+    private userService: UserService,
+  ) {}
 
   // Get auth record by username
   async getByUsername(username: string): Promise<Auth> {
     const auth = await this.authRepository.getByUsername(username);
     if (!auth) {
-      throw createError('NotFound', `Auth record for username "${username}" not found`);
+      throw ErrorFactory.notFound(`Auth record for username "${username}" not found`);
     }
     return auth;
   }
@@ -26,7 +39,7 @@ export class AuthService {
   async getByEmail(email: string): Promise<Auth> {
     const auth = await this.authRepository.getByEmail(email);
     if (!auth) {
-      throw createError('NotFound', `Auth record for email "${email}" not found`);
+      throw ErrorFactory.notFound(`Auth record for email "${email}" not found`);
     }
     return auth;
   }
@@ -42,42 +55,55 @@ export class AuthService {
   //   // TODO: will be implemented
   // }
 
-  async login(credentials: UserSigninDTO): Promise<LoginResponseDTO> {
-    const auth = await this.authRepository.getByEmail(credentials.email);
-    logger.debug(JSON.stringify(credentials));
-
-    if (!auth) {
-      throw createError('Unauthorized', 'Missing email or password');
+  async signupUser(userData: UserSignupDTO): Promise<UserResponseDTO> {
+    const emailExists = await this.userService.doesUserExistByEmail(userData.email);
+    if (emailExists) {
+      throw ErrorFactory.conflict('A user with this email already exists');
     }
 
-    const passwordMatch = await bcrypt.compare(credentials.password, auth.hashedPassword);
-    logger.debug(await bcrypt.hash(credentials.password, 10));
-    logger.debug(auth.hashedPassword);
+    const usernameExists = await this.userService.doesUserExistByUsername(userData.username);
+    if (usernameExists) {
+      throw ErrorFactory.conflict('A user with this username already exists');
+    }
+    const hashedPassword = await bcrypt.hash(userData.password!, ENV.SALT_ROUNDS);
+
+    const newUser = await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
+      const userEntity = await this.userService.createUser(userData);
+      const savedUser = await transactionalEntityManager.getRepository(User).save(userEntity);
+      const authEntity = await this.authRepository.createAuth(
+        buildAuthEntity(savedUser, hashedPassword),
+      );
+
+      await transactionalEntityManager.getRepository(Auth).save(authEntity);
+
+      return savedUser;
+    });
+
+    return instanceToPlain(newUser) as UserResponseDTO;
+  }
+
+  async login(credentials: UserSigninDTO): Promise<LoginResponseDTO> {
+    const auth = await this.authRepository.getByEmail(credentials.email);
+
+    if (!auth) {
+      throw ErrorFactory.unauthorized('Missing email or password');
+    }
+
+    const passwordMatch = await verifyPassword(credentials.password, auth.hashedPassword);
 
     if (!passwordMatch) {
-      throw createError('Unauthorized', 'Invalid email or password');
+      throw ErrorFactory.unauthorized('Invalid email or password');
     }
 
     const user = auth.userByUsername;
-    logger.debug(JSON.stringify(auth));
-
     if (!user) {
-      throw createError('Unauthorized', 'User record missing');
+      throw ErrorFactory.unauthorized('User record missing');
     }
 
-    const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
-      userId: user.userId,
-      username: user.username,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      joinDate: user.joinDate,
-    };
+    const userPayload: JwtPayloadUnsigned = createJwtUnsignedPayload(user);
 
-    const token = jwt.sign(payload, ENV.JWT_SECRET, {
-      expiresIn: '30d',
-    });
+    const token = generateToken(userPayload);
 
-    return { token, user: payload as UserResponseDTO };
+    return { token, user: userPayload as UserResponseDTO };
   }
 }

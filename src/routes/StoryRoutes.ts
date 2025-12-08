@@ -6,9 +6,12 @@ import { storyCreateSchema, storyUpdateSchema } from '../schemas/StorySchema';
 import { paginationSchema } from '../schemas/PaginationSchema';
 import { storySearchSchema } from '../schemas/SearchSchema';
 import { authenticateJWTHandler } from '../middlewares/AuthenticationHandler';
-import { modifyStoryAccessHandler } from '../middlewares/AuthorizationHandler';
+import { AuthorizationMiddleware } from '../middlewares/AuthorizationHandler';
+import { container } from 'tsyringe';
 
 const router = Router();
+const storyController = container.resolve(StoryController);
+const authorizationMiddleware = container.resolve(AuthorizationMiddleware);
 
 router.get(
   '/',
@@ -16,30 +19,33 @@ router.get(
   authenticateJWTHandler,
   validationHandler(paginationSchema, { source: 'query' }),
   validationHandler(storySearchSchema, { source: 'query' }),
-  StoryController.getAllStories,
+  storyController.getAllStories.bind(storyController),
 );
-router.get('/:id', loggerHandler, authenticateJWTHandler, StoryController.getStoryById);
+router.get('/:id', loggerHandler, authenticateJWTHandler, storyController.getStoryById);
 router.post(
   '/',
   loggerHandler,
   authenticateJWTHandler,
   validationHandler(storyCreateSchema),
-  StoryController.createStory,
+  // storyController.createStory,
+  storyController.createStory.bind(storyController),
 );
 router.put(
   '/:id',
   loggerHandler,
   authenticateJWTHandler,
-  modifyStoryAccessHandler,
+  authorizationMiddleware.modifyStoryAccessHandler,
   validationHandler(storyUpdateSchema),
-  StoryController.updateStory,
+  // storyController.updateStory,
+  storyController.updateStory.bind(storyController),
 );
 router.delete(
   '/:id',
   loggerHandler,
   authenticateJWTHandler,
-  modifyStoryAccessHandler,
-  StoryController.deleteStory,
+  authorizationMiddleware.modifyStoryAccessHandler,
+  // storyController.deleteStory,
+  storyController.deleteStory.bind(storyController),
 );
 
 export default router;

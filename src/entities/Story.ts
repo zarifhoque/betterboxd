@@ -32,6 +32,10 @@ export class Story {
   @Expose()
   body!: string;
 
+  @Column({ type: 'text', nullable: true })
+  @Expose()
+  aiSummary?: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @Expose()
   createdAt!: Date;

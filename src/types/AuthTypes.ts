@@ -2,7 +2,7 @@
 import { Request } from 'express';
 import { UserRole } from '../entities/User';
 
-export interface JwtPayload {
+export type JwtPayload = {
   userId: string;
   username: string;
   name: string;
@@ -11,7 +11,9 @@ export interface JwtPayload {
   joinDate: Date;
   iat: number;
   exp: number;
-}
+};
+
+export type JwtPayloadUnsigned = Omit<JwtPayload, 'iat' | 'exp'>;
 
 export interface AuthRequest extends Request {
   user?: JwtPayload;

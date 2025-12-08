@@ -61,10 +61,12 @@ export class UserRepository {
     return this.userRepository.save(user);
   }
 
-  // Update user by ID
-  async updateUser(userId: string, userData: UserUpdateDTO): Promise<boolean> {
-    const result = await this.userRepository.update(userId, userData);
-    return (result.affected ?? 0) > 0;
+  // Update user by ID and return the updated user
+  async updateUser(userId: string, userData: UserUpdateDTO): Promise<User | null> {
+    await this.userRepository.update(userId, userData);
+
+    // Fetch and return the updated user
+    return this.userRepository.findOne({ where: { userId } });
   }
 
   // Soft delete user by ID

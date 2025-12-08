@@ -12,7 +12,7 @@ export interface UserUpdateDTO {
   username?: string;
   name?: string;
   bio?: string;
-  role?: UserRole;
+  // role?: UserRole;
 }
 
 export type UserResponseDTO = {
@@ -36,4 +36,9 @@ export interface UserSignupDTO {
 export interface UserSigninDTO {
   email: string;
   password: string;
+}
+
+export interface UserUpdateRoleDTO {
+  userId: string;
+  role: UserRole;
 }

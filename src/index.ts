@@ -1,3 +1,5 @@
+import { logger } from './config/Logger';
+import 'reflect-metadata';
 import express, { Request, Response } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
@@ -6,7 +8,6 @@ import userRoutes from './routes/UserRoutes';
 import storyRoutes from './routes/StoryRoutes';
 import authRoutes from './routes/AuthRoutes';
 import { errorHandler } from './middlewares/ErrorHandler';
-import { logger } from './config/Logger';
 import swaggerFile from './docs/swagger-output.json';
 
 AppDataSource.initialize()

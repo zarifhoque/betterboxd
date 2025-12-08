@@ -1,9 +1,10 @@
-import { AppDataSource } from '../database/DataSource';
+import { injectable } from 'tsyringe';
 import { Auth } from '../entities/Auth';
+import { AppDataSource } from '../database/DataSource';
 
+@injectable()
 export class AuthRepository {
   private authRepository = AppDataSource.getRepository(Auth);
-
   async getByUsername(username: string): Promise<Auth | null> {
     return this.authRepository.findOne({ where: { username } });
   }

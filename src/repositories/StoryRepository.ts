@@ -80,9 +80,11 @@ export class StoryRepository {
   }
 
   // Update an existing story
-  async updateStory(storyId: string, story: StoryUpdateDTO): Promise<boolean> {
-    const result = await this.storyRepository.update(storyId, story);
-    return (result.affected ?? 0) > 0;
+  async updateStory(storyId: string, story: StoryUpdateDTO): Promise<Story | null> {
+    await this.storyRepository.update(storyId, story); // perform the update
+    // fetch and return the updated story
+    const updatedStory = await this.storyRepository.findOne({ where: { storyId } });
+    return updatedStory ?? null;
   }
 
   // Soft delete a story

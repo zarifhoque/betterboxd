@@ -1,18 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserService } from '../services/UserService';
 import { UserSigninDTO, UserSignupDTO } from '../dtos/UserDTOs';
 import { AuthService } from '../services/AuthService';
+import { handleResponse } from '../utils/Response';
+import { ERROR_DEFINITIONS } from '../constants/HTTPConstants';
+import { injectable } from 'tsyringe';
 
-const userService = new UserService();
-const authService = new AuthService();
+// const authService = new AuthService();
+@injectable()
 export class AuthController {
+  constructor(private authService: AuthService) {}
   async signupUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userData = req.body as unknown as UserSignupDTO;
-      const newUser = await userService.signupUser(userData);
-      res
-        .status(201)
-        .json({ success: true, data: newUser, message: 'User signed up successfully' });
+      const newUser = await this.authService.signupUser(userData);
+      handleResponse(res, newUser, {
+        status: ERROR_DEFINITIONS.CREATED.status,
+        message: 'User signed up successfully',
+      });
     } catch (error: unknown) {
       next(error);
     }
@@ -20,10 +24,15 @@ export class AuthController {
   async loginUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const credentials: UserSigninDTO = req.body;
-      const { token, user } = await authService.login(credentials);
-      res
-        .status(200)
-        .json({ success: true, data: { token, user }, message: 'User logged in successfully' });
+      const { token, user } = await this.authService.login(credentials);
+      handleResponse(
+        res,
+        { token, user },
+        {
+          status: ERROR_DEFINITIONS.OK.status,
+          message: 'User logged in successfully',
+        },
+      );
     } catch (error: unknown) {
       next(error);
     }
