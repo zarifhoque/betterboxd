@@ -8,8 +8,8 @@ import {
 import { Expose, Exclude } from 'class-transformer';
 
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
+  ADMIN,
+  USER,
 }
 
 @Entity()
@@ -42,4 +42,12 @@ export class User {
   @Exclude()
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt!: Date | null;
+
+  @Exclude()
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  emailConfirmationToken?: string;
+
+  @Exclude()
+  @Column({ type: 'boolean', default: false })
+  isEmailConfirmed!: boolean;
 }

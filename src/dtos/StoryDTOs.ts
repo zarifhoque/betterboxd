@@ -4,7 +4,7 @@ import { Story } from '../entities/Story';
 export interface StoryCreateDTO {
   title: string;
   body: string;
-  userByUserId: string;
+  // userByUserId: string; // no longer can be provided directly by the user
 }
 
 export interface StoryUpdateDTO {
@@ -12,7 +12,7 @@ export interface StoryUpdateDTO {
   body?: string;
 }
 
-export class StoryResponse {
+export class StoryResponseDTO {
   @Expose()
   storyId!: string;
   @Expose()

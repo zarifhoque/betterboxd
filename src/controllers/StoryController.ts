@@ -4,57 +4,81 @@ import { StoryService } from '../services/StoryService';
 import { StoryUpdateDTO } from '../dtos/StoryDTOs';
 import z from 'zod';
 import { StoryQueryType } from '../schemas/QuerySchema';
+import { AuthRequest } from '../types/AuthTypes';
+import { ERROR_DEFINITIONS } from '../constants/HTTPConstants';
+import { handleResponse } from '../utils/Response';
+import { injectable } from 'tsyringe';
 
-const storyService = new StoryService();
-
+@injectable()
 export class StoryController {
-  static async getAllStories(req: Request, res: Response, next: NextFunction): Promise<void> {
+  constructor(private storyService: StoryService) {}
+  async getAllStories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const queryParams = req.query as unknown as StoryQueryType;
-      const stories = await storyService.getAllStories(queryParams);
-      res.json({ success: true, data: stories, message: 'Stories fetched successfully' });
+      const stories = await this.storyService.getAllStories(queryParams);
+      // res.json({ success: true, data: stories, message: 'Stories fetched successfully' });
+      handleResponse(res, stories, {
+        status: ERROR_DEFINITIONS.OK.status,
+        message: 'Stories fetched successfully',
+      });
     } catch (error: unknown) {
       next(error);
     }
   }
 
-  static async getStoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getStoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const storyId = req.params.id;
       z.uuid().parse(storyId);
-      const story = await storyService.getStoryById(storyId);
-      res.json({ success: true, data: story, message: 'Story fetched successfully' });
+      const story = await this.storyService.getStoryById(storyId);
+      // res.json({ success: true, data: story, message: 'Story fetched successfully' });
+      handleResponse(res, story, {
+        status: ERROR_DEFINITIONS.OK.status,
+        message: 'Story fetched successfully',
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  static async createStory(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async createStory(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const story = await storyService.createStory(req.body);
-      res.status(201).json({ success: true, data: story, message: 'Story created successfully' });
+      const userId: string = req.user!.userId;
+      const story = await this.storyService.createStory(req.body, userId);
+      // res.status(201).json({ success: true, data: story, message: 'Story created successfully' });
+      handleResponse(res, story, {
+        status: ERROR_DEFINITIONS.CREATED.status,
+        message: 'Story created successfully',
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  static async updateStory(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async updateStory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const storyId = req.params.id;
       z.uuid().parse(storyId);
       const storyData: StoryUpdateDTO = req.body;
-      await storyService.updateStory(storyId, storyData);
-      res.status(204).json({ success: true, message: 'Story updated succesfully' });
+      const updatedStory = await this.storyService.updateStory(storyId, storyData);
+      handleResponse(res, updatedStory, {
+        status: ERROR_DEFINITIONS.OK.status,
+        message: 'Story updated successfully',
+      });
     } catch (error) {
       next(error);
     }
   }
-  static async deleteStory(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async deleteStory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const storyId = req.params.id;
       z.uuid().parse(storyId);
-      await storyService.deleteStory(storyId);
-      res.status(204).json({ success: true, message: 'Story deleted successfully' });
+      await this.storyService.deleteStory(storyId);
+      // res.status(204).json({ success: true, message: 'Story deleted successfully' });
+      handleResponse(res, null, {
+        status: ERROR_DEFINITIONS.OK.status,
+        message: 'Story deleted successfully',
+      });
     } catch (error) {
       next(error);
     }

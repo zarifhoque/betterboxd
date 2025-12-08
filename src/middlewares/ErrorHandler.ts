@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { AppError } from '../errors/AppErrors';
 import { isDev, isProd } from '../config/Env';
-import { createError } from '../errors/ErrorFactory';
+import { ErrorFactory } from '../errors/ErrorFactory';
 import { logger } from '../config/Logger';
 
 interface ErrorResponse {
@@ -23,26 +23,29 @@ export const errorHandler = (
 
   if (err instanceof ZodError) {
     const formattedMessage = err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
-    error = createError('BadRequest', formattedMessage);
+    error = ErrorFactory.badRequest(
+      formattedMessage,
+      err.issues.map((i) => i.message),
+    );
     errorDetails = err.issues;
   } else if (err instanceof AppError) {
     error = err;
   } else if (err instanceof SyntaxError && 'body' in err) {
-    error = createError('BadRequest', 'Invalid JSON syntax in request body');
+    error = ErrorFactory.badRequest('Invalid JSON syntax in request body');
     errorDetails = {
       message: err.message,
       stack: isDev ? err.stack : undefined,
     };
   } else if (err instanceof Error) {
-    error = createError('InternalServerError', err.message);
+    error = ErrorFactory.internal(err.message);
     errorDetails = {
       name: err.name,
       stack: isDev ? err.stack : undefined,
     };
   } else if (typeof err === 'string') {
-    error = createError('InternalServerError', err);
+    error = ErrorFactory.internal(err);
   } else {
-    error = createError('InternalServerError', 'An unknown error occurred');
+    error = ErrorFactory.internal('An unknown error occurred');
     errorDetails = isDev ? err : undefined;
   }
 
@@ -60,6 +63,5 @@ export const errorHandler = (
   }
 
   res.locals = { ...res.locals, errorMessage: error.message };
-
   res.status(error.statusCode).json(response);
 };

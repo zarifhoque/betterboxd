@@ -67,10 +67,10 @@ export class StoryRepository {
   }
 
   // Create a new story
-  async createStory(story: StoryCreateDTO): Promise<Story> {
+  async createStory(story: StoryCreateDTO, userId: string): Promise<Story> {
     const newStory = this.storyRepository.create({
       ...story,
-      userByUserId: { userId: story.userByUserId },
+      userByUserId: { userId: userId },
     });
     const saved = await this.storyRepository.save(newStory);
     return this.storyRepository.findOne({
@@ -80,14 +80,26 @@ export class StoryRepository {
   }
 
   // Update an existing story
-  async updateStory(storyId: string, story: StoryUpdateDTO): Promise<boolean> {
-    const result = await this.storyRepository.update(storyId, story);
-    return (result.affected ?? 0) > 0;
+  async updateStory(storyId: string, story: StoryUpdateDTO): Promise<Story | null> {
+    await this.storyRepository.update(storyId, story); // perform the update
+    // fetch and return the updated story
+    const updatedStory = await this.storyRepository.findOne({ where: { storyId } });
+    return updatedStory ?? null;
   }
 
   // Soft delete a story
   async softDeleteStory(storyId: string): Promise<boolean> {
     const result = await this.storyRepository.softDelete(storyId);
     return (result.affected ?? 0) > 0; // safe nullish handling
+  }
+  // Get userid by userid
+  async getUserIdByStoryId(storyId: string): Promise<string | null> {
+    const story = await this.storyRepository
+      .createQueryBuilder('story')
+      .leftJoinAndSelect('story.userByUserId', 'user')
+      .where('story.storyId = :storyId', { storyId })
+      .getOne();
+
+    return story?.userByUserId?.userId ?? null;
   }
 }
