@@ -18,11 +18,14 @@ import { UserService } from './UserService';
 import {
   buildAuthEntity,
   createJwtUnsignedPayload,
+  generateEmailConfirmationToken,
   generateToken,
+  verifyEmailConfirmationToken,
   verifyPassword,
 } from '../utils/Auth';
 import { injectable } from 'tsyringe';
 import { logger } from '../config/Logger';
+import { sendConfirmationEmail } from '../utils/Mailer';
 @injectable()
 export class AuthService {
   // private authRepository = new AuthRepository();
@@ -83,7 +86,8 @@ export class AuthService {
       );
 
       await transactionalEntityManager.getRepository(Auth).save(authEntity);
-
+      const emaiilToken = generateEmailConfirmationToken(savedUser.userId);
+      await sendConfirmationEmail(savedUser.email, emaiilToken);
       return savedUser;
     });
 
@@ -108,10 +112,25 @@ export class AuthService {
       throw ErrorFactory.unauthorized('User record missing');
     }
 
+    if (!user.isEmailConfirmed) {
+      throw ErrorFactory.unauthorized('Please confirm your email before logging in');
+    }
+
     const userPayload: JwtPayloadUnsigned = createJwtUnsignedPayload(user);
 
     const token = generateToken(userPayload);
 
     return { token, user: userPayload as UserResponseDTO } as UserSigninResponseDTO;
+  }
+
+  async confirmEmail(token: string) {
+    let userId: string;
+    try {
+      const payload = verifyEmailConfirmationToken(token);
+      userId = payload.userId;
+    } catch {
+      throw ErrorFactory.badRequest('Invalid or expired email confirmation token');
+    }
+    await this.userService.confirmUserEmail(userId);
   }
 }

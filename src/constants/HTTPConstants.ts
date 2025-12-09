@@ -43,4 +43,8 @@ export const ERROR_DEFINITIONS = {
     status: 204,
     name: 'NoContent',
   },
+  BAD_GATEWAY: {
+    status: 502,
+    name: 'BadGateway',
+  },
 } as const;

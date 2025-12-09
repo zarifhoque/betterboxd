@@ -15,7 +15,7 @@ export class AuthController {
       const newUser = await this.authService.signupUser(userData);
       handleResponse(res, newUser, {
         status: ERROR_DEFINITIONS.CREATED.status,
-        message: 'User signed up successfully',
+        message: 'User signed up successfully. Please check your email to confirm your account. ',
       });
     } catch (error: unknown) {
       next(error);
@@ -33,6 +33,16 @@ export class AuthController {
           message: 'User logged in successfully',
         },
       );
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+  async confirmUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { token } = req.params;
+
+      await this.authService.confirmEmail(token);
+      return res.redirect(`${process.env.FRONTEND_URL}/email-confirmed`);
     } catch (error: unknown) {
       next(error);
     }

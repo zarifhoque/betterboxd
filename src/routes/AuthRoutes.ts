@@ -32,4 +32,15 @@ router.post(
   authController.loginUser.bind(authController),
 );
 
+// GET /api/auth/confirm-email/:token
+router.get(
+  'confirm-email',
+  loggerHandler, // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Confirm user email using the token sent via email'
+  // #swagger.parameters['token'] = { description: 'Email confirmation JWT token', in: 'path', required: true, type: 'string' }
+  // #swagger.responses[200] = { description: 'Email confirmed successfully' }
+  // #swagger.responses[400] = { description: 'Invalid or expired token' }
+  authController.confirmUser.bind(authController),
+);
+
 export default router;

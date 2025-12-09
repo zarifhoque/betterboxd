@@ -33,3 +33,15 @@ export const buildAuthEntity = (user: User, hashedPassword: string): Auth => {
   auth.passwordLastModificationTime = new Date();
   return auth;
 };
+
+export const generateEmailConfirmationToken = (userId: string): string => {
+  return jwt.sign({ userId }, ENV.JWT_SECRET, { expiresIn: '1h' });
+};
+
+export const verifyEmailConfirmationToken = (token: string): { userId: string } => {
+  try {
+    return jwt.verify(token, ENV.JWT_SECRET) as { userId: string };
+  } catch (err: unknown) {
+    throw new Error('Invalid or expired token');
+  }
+};
