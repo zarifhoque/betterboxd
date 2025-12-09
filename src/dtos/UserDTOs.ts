@@ -42,3 +42,8 @@ export interface UserUpdateRoleDTO {
   userId: string;
   role: UserRole;
 }
+
+export interface UserSigninResponseDTO {
+  token: string;
+  user: UserResponseDTO;
+}

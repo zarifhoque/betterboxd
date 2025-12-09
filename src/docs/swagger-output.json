@@ -2,11 +2,11 @@
   "swagger": "2.0",
   "info": {
     "title": "BetterBoxd API",
-    "description": "Auto-generated Swagger documentation",
+    "description": "This will list of all the API exposed by this backend",
     "version": "1.0.0"
   },
   "host": "localhost:3000",
-  "basePath": "/api/v1",
+  "basePath": "/",
   "tags": [
     {
       "name": "Auth",
@@ -24,6 +24,14 @@
   "schemes": [
     "http"
   ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter 'Bearer <token>'"
+    }
+  },
   "paths": {
     "/api/v1/health": {
       "get": {
@@ -38,28 +46,6 @@
     "/": {
       "get": {
         "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      },
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
         "responses": {
           "default": {
             "description": ""
@@ -69,65 +55,169 @@
     },
     "/api/v1/users/": {
       "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get all users with optional pagination and search",
         "description": "",
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "name": "page",
+            "description": "Page number",
+            "type": "integer",
+            "in": "query",
+            "required": false
+          },
+          {
+            "name": "itemsPerPage",
+            "description": "Number of items per page",
+            "type": "integer",
+            "in": "query",
+            "required": false
+          },
+          {
+            "name": "name",
+            "description": "Filter by user name",
+            "type": "string",
+            "in": "query",
+            "required": false
+          },
+          {
+            "name": "email",
+            "description": "Filter by user email",
+            "type": "string",
+            "in": "query",
+            "required": false
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "List of users",
+            "schema": {
+              "$ref": "#/definitions/UserResponseDTO"
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/users/{id}": {
       "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get a single user by ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "type": "string",
+            "description": "User ID"
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "User details",
+            "schema": {
+              "$ref": "#/definitions/UserResponseDTO"
+            }
+          },
+          "404": {
+            "description": "User not found"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update a user by ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "User ID"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "name": "body",
+            "description": "User data to update",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserUpdateDTO"
+            }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "User updated successfully",
+            "schema": {
+              "$ref": "#/definitions/UserResponseDTO"
+            }
+          },
+          "403": {
+            "description": "Unauthorized to update this user"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Deactivate a user (delete)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deactivated successfully"
+          },
+          "403": {
+            "description": "Unauthorized to delete this user"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/users/{id}/role": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Change a user role (Admin only)",
         "description": "",
         "parameters": [
           {
@@ -137,216 +227,268 @@
             "type": "string"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "name": "body",
+            "description": "Role data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserUpdateRoleDTO"
+            }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "User role updated",
+            "schema": {
+              "$ref": "#/definitions/UserResponseDTO"
+            }
+          },
+          "403": {
+            "description": "Only admins can change roles"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/stories/": {
       "get": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "Get all stories with optional pagination and search",
         "description": "",
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "name": "page",
+            "description": "Page number",
+            "type": "integer",
+            "in": "query",
+            "required": false
+          },
+          {
+            "name": "itemsPerPage",
+            "description": "Number of items per page",
+            "type": "integer",
+            "in": "query",
+            "required": false
+          },
+          {
+            "name": "title",
+            "description": "Filter by story title",
+            "type": "string",
+            "in": "query",
+            "required": false
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "List of stories",
+            "schema": {
+              "$ref": "#/definitions/StoryResponseDTO"
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "post": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "Create a new story",
         "description": "",
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "name": "body",
+            "description": "Story data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/StoryCreateDTO"
+            }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "201": {
+            "description": "Story created successfully",
+            "schema": {
+              "$ref": "#/definitions/StoryResponseDTO"
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/stories/{id}": {
       "get": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "Get a single story by ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "type": "string",
+            "description": "Story ID"
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "Story details",
+            "schema": {
+              "$ref": "#/definitions/StoryResponseDTO"
+            }
+          },
+          "404": {
+            "description": "Story not found"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "put": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "Update a story by ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Story ID"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "name": "body",
+            "description": "Story data to update",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/StoryUpdateDTO"
+            }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "Story updated successfully",
+            "schema": {
+              "$ref": "#/definitions/StoryResponseDTO"
+            }
+          },
+          "403": {
+            "description": "Unauthorized to update this story"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "delete": {
+        "tags": [
+          "Stories"
+        ],
+        "summary": "Delete a story by ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "type": "string",
+            "description": "Story ID"
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "Story deleted successfully"
+          },
+          "403": {
+            "description": "Unauthorized to delete this story"
+          },
+          "404": {
+            "description": "Story not found"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/v1/auth/signup": {
       "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register a new user",
         "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Signup data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserSignupDTO"
+            }
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "201": {
+            "description": "User created successfully",
+            "schema": {
+              "$ref": "#/definitions/UserResponseDTO"
+            }
           }
         }
       }
     },
     "/api/v1/auth/login": {
       "post": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/{id}": {
-      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login a user",
         "description": "",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
+            "name": "body",
+            "description": "Login credentials",
+            "in": "body",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "schema": {
+              "$ref": "#/definitions/UserSigninDTO"
+            }
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      },
-      "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      },
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/signup": {
-      "post": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/login": {
-      "post": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "$ref": "#/definitions/UserSigninResponseDTO"
+            }
           }
         }
       }
@@ -377,13 +519,9 @@
     "UserUpdateDTO": {
       "type": "object",
       "properties": {
-        "username": {
+        "name": {
           "type": "string",
-          "example": "new_username"
-        },
-        "email": {
-          "type": "string",
-          "example": "new_email@example.com"
+          "example": "new name"
         }
       }
     },
@@ -395,6 +533,99 @@
           "example": "ADMIN"
         }
       }
+    },
+    "UserSignupDTO": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "example": "exampleUsername"
+        },
+        "name": {
+          "type": "string",
+          "example": "Example Name"
+        },
+        "email": {
+          "type": "string",
+          "example": "example-mail@gmail.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "strongPass@123"
+        }
+      }
+    },
+    "UserSigninDTO": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "example-mail@yahoo.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "StrongPassword@123"
+        }
+      }
+    },
+    "UserSigninResponseDTO": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "example": "Bearer <<tokenval>>"
+        },
+        "user": {
+          "$ref": "#/definitions/UserResponseDTO"
+        }
+      }
+    },
+    "StoryResponseDTO": {
+      "type": "object",
+      "properties": {
+        "storyId": {
+          "type": "string",
+          "example": "uuid"
+        },
+        "userId": {
+          "type": "string",
+          "example": "uuid"
+        },
+        "title": {
+          "type": "string",
+          "example": "Title Name"
+        },
+        "body": {
+          "type": "string",
+          "example": "Some Body Text"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "Some Date"
+        },
+        "username": {
+          "type": "string",
+          "example": "Username"
+        }
+      }
+    },
+    "StoryCreateDTO": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Title Name"
+        },
+        "body": {
+          "type": "string",
+          "example": "Some Body Text"
+        }
+      }
     }
-  }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
 }

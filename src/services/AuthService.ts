@@ -1,7 +1,12 @@
 import { AuthRepository } from '../repositories/AuthRepository';
 import { Auth } from '../entities/Auth';
 import { instanceToPlain } from 'class-transformer';
-import { UserResponseDTO, UserSigninDTO, UserSignupDTO } from '../dtos/UserDTOs';
+import {
+  UserResponseDTO,
+  UserSigninDTO,
+  UserSigninResponseDTO,
+  UserSignupDTO,
+} from '../dtos/UserDTOs';
 import { ENV } from '../config/Env';
 import bcrypt from 'bcrypt';
 import { LoginResponseDTO } from '../dtos/AuthDTOs';
@@ -17,6 +22,7 @@ import {
   verifyPassword,
 } from '../utils/Auth';
 import { injectable } from 'tsyringe';
+import { logger } from '../config/Logger';
 @injectable()
 export class AuthService {
   // private authRepository = new AuthRepository();
@@ -57,11 +63,13 @@ export class AuthService {
 
   async signupUser(userData: UserSignupDTO): Promise<UserResponseDTO> {
     const emailExists = await this.userService.doesUserExistByEmail(userData.email);
+    logger.debug(`${emailExists} the user with this email exists`);
     if (emailExists) {
       throw ErrorFactory.conflict('A user with this email already exists');
     }
 
     const usernameExists = await this.userService.doesUserExistByUsername(userData.username);
+    logger.debug(`${usernameExists} the user with this username exists`);
     if (usernameExists) {
       throw ErrorFactory.conflict('A user with this username already exists');
     }
@@ -104,6 +112,6 @@ export class AuthService {
 
     const token = generateToken(userPayload);
 
-    return { token, user: userPayload as UserResponseDTO };
+    return { token, user: userPayload as UserResponseDTO } as UserSigninResponseDTO;
   }
 }
