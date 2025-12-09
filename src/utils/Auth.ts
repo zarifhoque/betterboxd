@@ -29,8 +29,7 @@ export const buildAuthEntity = (user: User, hashedPassword: string): Auth => {
   auth.username = user.username;
   auth.email = user.email;
   auth.hashedPassword = hashedPassword;
-  auth.userByUsername = user;
-  auth.userByEmail = user;
+  auth.userByUserId = user;
   auth.passwordLastModificationTime = new Date();
   return auth;
 };

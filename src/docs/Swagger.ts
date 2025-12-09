@@ -62,6 +62,10 @@ const doc = {
       title: 'Title Name',
       body: 'Some Body Text',
     },
+    StoryUpdateDTO: {
+      title: 'Title Name',
+      body: 'Some Body Text',
+    },
   },
 };
 

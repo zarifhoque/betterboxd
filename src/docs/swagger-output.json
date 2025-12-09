@@ -621,6 +621,19 @@
           "example": "Some Body Text"
         }
       }
+    },
+    "StoryUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Title Name"
+        },
+        "body": {
+          "type": "string",
+          "example": "Some Body Text"
+        }
+      }
     }
   },
   "security": [

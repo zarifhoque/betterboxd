@@ -18,13 +18,13 @@ export class User {
   @Expose()
   userId!: string;
   @Expose()
-  @Column({ unique: true, type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   username!: string;
   @Expose()
   @Column({ type: 'varchar', length: 100 })
   name!: string;
   @Expose()
-  @Column({ unique: true, type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100 })
   email!: string;
   @Expose()
   @Column({ type: 'text', nullable: true })

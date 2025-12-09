@@ -41,7 +41,7 @@ router.get(
   // #swagger.responses[200] = { description: 'Story details', schema: { $ref: '#/definitions/StoryResponseDTO' } }
   // #swagger.responses[404] = { description: 'Story not found' }
   /* #swagger.security = [{ "bearerAuth": [] }] */
-  storyController.getStoryById,
+  storyController.getStoryById.bind(storyController),
 );
 
 // POST /api/stories

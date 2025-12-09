@@ -32,14 +32,14 @@ export class AuthService {
     private userService: UserService,
   ) {}
 
-  // Get auth record by username
-  async getByUsername(username: string): Promise<Auth> {
-    const auth = await this.authRepository.getByUsername(username);
-    if (!auth) {
-      throw ErrorFactory.notFound(`Auth record for username "${username}" not found`);
-    }
-    return auth;
-  }
+  // // Get auth record by username
+  // async getByUsername(username: string): Promise<Auth> {
+  //   const auth = await this.authRepository.getByUsername(username);
+  //   if (!auth) {
+  //     throw ErrorFactory.notFound(`Auth record for username "${username}" not found`);
+  //   }
+  //   return auth;
+  // }
 
   // Get auth record by email
   async getByEmail(email: string): Promise<Auth> {
@@ -103,7 +103,7 @@ export class AuthService {
       throw ErrorFactory.unauthorized('Invalid email or password');
     }
 
-    const user = auth.userByUsername;
+    const user = auth.userByUserId;
     if (!user) {
       throw ErrorFactory.unauthorized('User record missing');
     }
