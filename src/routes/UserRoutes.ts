@@ -1,5 +1,7 @@
 import { Router } from 'express';
+
 import { UserController } from '../controllers/UserController';
+
 import { validationHandler } from '../middlewares/ValidationHandler';
 import { loggerHandler } from '../middlewares/LoggerHandler';
 import { userUpdateRoleSchema, userUpdateSchema } from '../schemas/UserSchema';

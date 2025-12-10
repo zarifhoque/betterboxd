@@ -15,7 +15,6 @@ const EnvSchema = z.object({
   DB_NAME: z.string(),
   // JWT
   JWT_SECRET: z.string(),
-  // Bcrypt
   SALT_ROUNDS: z.coerce
     .number()
     .int()
