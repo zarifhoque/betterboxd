@@ -29,7 +29,6 @@ export class StoryService {
     z.uuid().parse(storyId);
     const story = await this.storyRepository.getStoryById(storyId);
     if (!story) {
-      // throw createError('NotFound', `Story with the id ${storyId} not found`);
       throw ErrorFactory.notFound(`Story with the id ${storyId} not found`);
     }
     return plainToInstance(StoryResponseDTO, story, { excludeExtraneousValues: true });
@@ -46,7 +45,6 @@ export class StoryService {
   async createStory(story: StoryCreateDTO, userId: string): Promise<StoryResponseDTO> {
     const user = await this.userService.getUserById(userId);
     if (!user) {
-      // throw createError('NotFound', `User with the id ${userId} not found`);
       throw ErrorFactory.notFound(`User with the id ${userId} not found`);
     }
     const newStory = await this.storyRepository.createStory(story, userId);
@@ -58,15 +56,11 @@ export class StoryService {
     logger.debug(typeof storyId);
     const existingStory = await this.storyRepository.getStoryById(storyId);
     if (!existingStory) {
-      // logger.debug('We are not');
-      // logger.debug(storyId);
-      // throw createError('NotFound', `Story with the id ${storyId} not found`);
       throw ErrorFactory.notFound(`Story with the id ${storyId} not found`);
     }
 
     const updatedStory = await this.storyRepository.updateStory(storyId, story);
     if (!updatedStory) {
-      // throw createError('Conflict', `Failed to update story with id ${storyId}`);
       throw ErrorFactory.conflict(`Failed to update story with id ${storyId}`);
     }
     return instanceToPlain(updatedStory) as StoryResponseDTO;
@@ -77,13 +71,11 @@ export class StoryService {
     z.uuid().parse(storyId);
     const existingStory = await this.storyRepository.getStoryById(storyId);
     if (!existingStory) {
-      // throw createError('NotFound', `Story with the id ${storyId} not found`);
       throw ErrorFactory.notFound(`Story with the id ${storyId} not found`);
     }
 
     const deleted = await this.storyRepository.softDeleteStory(storyId);
     if (!deleted) {
-      // throw createError('Conflict', `Failed to delete story with id ${storyId}`);
       throw ErrorFactory.conflict(`Failed to delete story with id ${storyId}`);
     }
   }
@@ -92,7 +84,6 @@ export class StoryService {
     const userId = await this.storyRepository.getUserIdByStoryId(storyId);
     logger.debug(userId);
     if (!userId) {
-      // throw createError('NotFound', `Story with ID ${storyId} not found`);
       throw ErrorFactory.notFound(`Story with ID ${storyId} not found`);
     }
     return userId;

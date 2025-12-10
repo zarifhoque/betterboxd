@@ -1,6 +1,5 @@
 import { injectable } from 'tsyringe';
 import { CategoryRepository } from '../repositories/CategoryRepository';
-import { logger } from '../config/Logger';
 
 @injectable()
 export class CategoryService {

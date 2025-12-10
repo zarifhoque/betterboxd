@@ -57,14 +57,17 @@ const doc = {
       body: 'Some Body Text',
       updatedAt: 'Some Date',
       username: 'Username',
+      categoryNames: ['Technology', 'Science', 'Art', 'Health'],
     },
     StoryCreateDTO: {
       title: 'Title Name',
       body: 'Some Body Text',
+      categoryNames: ['Technology', 'Science', 'Art', 'Health'],
     },
     StoryUpdateDTO: {
       title: 'Title Name',
       body: 'Some Body Text',
+      categoryNames: ['Technology', 'Science', 'Art', 'Health'],
     },
   },
 };
