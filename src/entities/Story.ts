@@ -54,4 +54,4 @@ export class Story {
   @ManyToMany(() => Category, (category) => category.storiesByStoryId, { cascade: true })
   @JoinTable()
   categoriesByCategoryId!: Category[];
-}
+ }
