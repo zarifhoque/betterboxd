@@ -5,9 +5,12 @@ import {
   ManyToOne,
   JoinColumn,
   DeleteDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { User } from './User';
 import { Exclude, Expose } from 'class-transformer';
+import { Category } from './Category';
 
 @Entity()
 export class Story {
@@ -47,4 +50,8 @@ export class Story {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   @Exclude()
   deletedAt!: Date | null;
+
+  @ManyToMany(() => Category, (category) => category.storiesByStoryId, { cascade: true })
+  @JoinTable()
+  categoriesByCategoryId!: Category[];
 }
