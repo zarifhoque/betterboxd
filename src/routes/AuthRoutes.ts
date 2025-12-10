@@ -34,7 +34,7 @@ router.post(
 
 // GET /api/auth/confirm-email/:token
 router.get(
-  'confirm-email',
+  '/confirm-email/:token',
   loggerHandler, // #swagger.tags = ['Auth']
   // #swagger.summary = 'Confirm user email using the token sent via email'
   // #swagger.parameters['token'] = { description: 'Email confirmation JWT token', in: 'path', required: true, type: 'string' }

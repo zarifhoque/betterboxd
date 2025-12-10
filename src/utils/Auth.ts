@@ -4,6 +4,7 @@ import { JwtPayload, JwtPayloadUnsigned } from '../types/AuthTypes';
 import { ENV } from '../config/Env';
 import { User } from '../entities/User';
 import { Auth } from '../entities/Auth';
+import { logger } from '../config/Logger';
 
 export const verifyPassword = async (plain: string, hashed: string): Promise<boolean> => {
   return bcrypt.compare(plain, hashed);
@@ -34,13 +35,20 @@ export const buildAuthEntity = (user: User, hashedPassword: string): Auth => {
   return auth;
 };
 
-export const generateEmailConfirmationToken = (userId: string): string => {
-  return jwt.sign({ userId }, ENV.JWT_SECRET, { expiresIn: '1h' });
+export const generateEmailConfirmationToken = (userEmail: string): string => {
+  return jwt.sign({ userEmail }, ENV.JWT_SECRET, { expiresIn: '1h' });
 };
 
-export const verifyEmailConfirmationToken = (token: string): { userId: string } => {
+export const verifyEmailConfirmationToken = (token: string): { email: string } => {
   try {
-    return jwt.verify(token, ENV.JWT_SECRET) as { userId: string };
+    logger.debug('Trying to verify with jwt token');
+    logger.debug('Token to verify: ' + token);
+    const payload = jwt.verify(token, ENV.JWT_SECRET) as { userEmail?: string };
+    logger.debug(`The payload is ${JSON.stringify(payload)}`);
+    if (!payload.userEmail) {
+      throw new Error('Token payload missing email');
+    }
+    return { email: payload.userEmail };
   } catch (err: unknown) {
     throw new Error('Invalid or expired token');
   }

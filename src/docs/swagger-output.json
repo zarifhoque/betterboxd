@@ -492,6 +492,32 @@
           }
         }
       }
+    },
+    "/api/v1/auth/confirm-email/{token}": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Confirm user email using the token sent via email",
+        "description": "",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Email confirmation JWT token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email confirmed successfully"
+          },
+          "400": {
+            "description": "Invalid or expired token"
+          }
+        }
+      }
     }
   },
   "definitions": {

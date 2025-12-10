@@ -65,29 +65,22 @@ export class AuthService {
   // }
 
   async signupUser(userData: UserSignupDTO): Promise<UserResponseDTO> {
-    const emailExists = await this.userService.doesUserExistByEmail(userData.email);
-    logger.debug(`${emailExists} the user with this email exists`);
-    if (emailExists) {
-      throw ErrorFactory.conflict('A user with this email already exists');
-    }
-
-    const usernameExists = await this.userService.doesUserExistByUsername(userData.username);
-    logger.debug(`${usernameExists} the user with this username exists`);
-    if (usernameExists) {
-      throw ErrorFactory.conflict('A user with this username already exists');
-    }
     const hashedPassword = await bcrypt.hash(userData.password!, ENV.SALT_ROUNDS);
+    const emailToken = generateEmailConfirmationToken(userData.email);
+    const mailSent = await sendConfirmationEmail(userData.email, emailToken);
+    if (!mailSent) {
+      throw ErrorFactory.badGateway('Email Failed to send');
+    }
 
     const newUser = await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
       const userEntity = await this.userService.createUser(userData);
+
       const savedUser = await transactionalEntityManager.getRepository(User).save(userEntity);
       const authEntity = await this.authRepository.createAuth(
         buildAuthEntity(savedUser, hashedPassword),
       );
-
       await transactionalEntityManager.getRepository(Auth).save(authEntity);
-      const emaiilToken = generateEmailConfirmationToken(savedUser.userId);
-      await sendConfirmationEmail(savedUser.email, emaiilToken);
+
       return savedUser;
     });
 
@@ -122,15 +115,18 @@ export class AuthService {
 
     return { token, user: userPayload as UserResponseDTO } as UserSigninResponseDTO;
   }
-
   async confirmEmail(token: string) {
-    let userId: string;
+    let email: string;
     try {
+      logger.debug('Verifying email confirmation token...');
       const payload = verifyEmailConfirmationToken(token);
-      userId = payload.userId;
-    } catch {
+      email = payload.email;
+      logger.debug('Email from token: ' + email);
+    } catch (err) {
+      logger.error('Email confirmation failed', err);
       throw ErrorFactory.badRequest('Invalid or expired email confirmation token');
     }
-    await this.userService.confirmUserEmail(userId);
+
+    await this.userService.confirmUserEmailByEmail(email);
   }
 }

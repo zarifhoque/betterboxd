@@ -92,10 +92,15 @@ export class UserService {
     return instanceToPlain(updatedUser);
   }
 
-  async confirmUserEmail(userId: string): Promise<void> {
-    const user = await this.getUserById(userId);
+  async confirmUserEmailByEmail(email: string): Promise<void> {
+    const user = await this.userRepository.getUserByEmail(email);
+    if (!user) {
+      throw ErrorFactory.notFound(`User with email ${email} not found`);
+    }
+
     if (user.isEmailConfirmed) return;
+
     user.isEmailConfirmed = true;
-    await this.userRepository.updateUser(userId, user);
+    await this.userRepository.updateUser(user.userId, user);
   }
 }

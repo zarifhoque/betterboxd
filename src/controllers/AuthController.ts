@@ -42,7 +42,14 @@ export class AuthController {
       const { token } = req.params;
 
       await this.authService.confirmEmail(token);
-      return res.redirect(`${process.env.FRONTEND_URL}/email-confirmed`);
+      handleResponse(
+        res,
+        {},
+        {
+          status: ERROR_DEFINITIONS.OK.status,
+          message: 'User confirmed in the backend',
+        },
+      );
     } catch (error: unknown) {
       next(error);
     }
