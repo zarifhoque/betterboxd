@@ -8,7 +8,6 @@ import { UserRole } from '../entities/User';
 import { injectable } from 'tsyringe';
 @injectable()
 export class UserService {
-  // private userRepository = new UserRepository();
   constructor(private userRepository: UserRepository) {}
   async getAllUsers(queryParams: UserQueryType): Promise<UserResponseDTO[]> {
     const users = await this.userRepository.getAllUsers(queryParams);

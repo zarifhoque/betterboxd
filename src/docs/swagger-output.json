@@ -21,7 +21,9 @@
       "description": "Story-related endpoints"
     }
   ],
-  "schemes": ["http"],
+  "schemes": [
+    "http"
+  ],
   "securityDefinitions": {
     "bearerAuth": {
       "type": "apiKey",
@@ -53,7 +55,9 @@
     },
     "/api/v1/users/": {
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Get all users with optional pagination and search",
         "description": "",
         "parameters": [
@@ -103,7 +107,9 @@
     },
     "/api/v1/users/{id}": {
       "get": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Get a single user by ID",
         "description": "",
         "parameters": [
@@ -133,7 +139,9 @@
         ]
       },
       "put": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Update a user by ID",
         "description": "",
         "parameters": [
@@ -172,7 +180,9 @@
         ]
       },
       "delete": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Deactivate a user (delete)",
         "description": "",
         "parameters": [
@@ -204,7 +214,9 @@
     },
     "/api/v1/users/{id}/role": {
       "put": {
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Change a user role (Admin only)",
         "description": "",
         "parameters": [
@@ -244,7 +256,9 @@
     },
     "/api/v1/stories/": {
       "get": {
-        "tags": ["Stories"],
+        "tags": [
+          "Stories"
+        ],
         "summary": "Get all stories with optional pagination and search",
         "description": "",
         "parameters": [
@@ -285,7 +299,9 @@
         ]
       },
       "post": {
-        "tags": ["Stories"],
+        "tags": [
+          "Stories"
+        ],
         "summary": "Create a new story",
         "description": "",
         "parameters": [
@@ -316,7 +332,9 @@
     },
     "/api/v1/stories/{id}": {
       "get": {
-        "tags": ["Stories"],
+        "tags": [
+          "Stories"
+        ],
         "summary": "Get a single story by ID",
         "description": "",
         "parameters": [
@@ -346,7 +364,9 @@
         ]
       },
       "put": {
-        "tags": ["Stories"],
+        "tags": [
+          "Stories"
+        ],
         "summary": "Update a story by ID",
         "description": "",
         "parameters": [
@@ -385,7 +405,9 @@
         ]
       },
       "delete": {
-        "tags": ["Stories"],
+        "tags": [
+          "Stories"
+        ],
         "summary": "Delete a story by ID",
         "description": "",
         "parameters": [
@@ -417,7 +439,9 @@
     },
     "/api/v1/auth/signup": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Register a new user",
         "description": "",
         "parameters": [
@@ -443,7 +467,9 @@
     },
     "/api/v1/auth/login": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Login a user",
         "description": "",
         "parameters": [
@@ -469,7 +495,9 @@
     },
     "/api/v1/auth/confirm-email/{token}": {
       "get": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Confirm user email using the token sent via email",
         "description": "",
         "parameters": [
@@ -604,6 +632,18 @@
         "username": {
           "type": "string",
           "example": "Username"
+        },
+        "categoryNames": {
+          "type": "array",
+          "example": [
+            "Technology",
+            "Science",
+            "Art",
+            "Health"
+          ],
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -617,6 +657,18 @@
         "body": {
           "type": "string",
           "example": "Some Body Text"
+        },
+        "categoryNames": {
+          "type": "array",
+          "example": [
+            "Technology",
+            "Science",
+            "Art",
+            "Health"
+          ],
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -630,6 +682,18 @@
         "body": {
           "type": "string",
           "example": "Some Body Text"
+        },
+        "categoryNames": {
+          "type": "array",
+          "example": [
+            "Technology",
+            "Science",
+            "Art",
+            "Health"
+          ],
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

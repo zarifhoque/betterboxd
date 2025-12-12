@@ -4,14 +4,24 @@ import { CategoryService } from '../services/CategoryService';
 import { logger } from '../config/Logger';
 import { AppDataSource } from '../database/DataSource';
 
-const categories = ['Technology', 'Science', 'Art', 'Health'];
+const categories = [
+  'Technology',
+  'Science',
+  'Art',
+  'Health',
+  'Travel',
+  'Education',
+  'Sports',
+  'Entertainment',
+  'Business',
+];
 
 const seedCategories = async () => {
   logger.debug('This is being reached');
   try {
     await AppDataSource.initialize();
     const categoryService = container.resolve(CategoryService);
-    await categoryService.seedCategories(categories);
+    await categoryService.ensureCategories(categories);
     logger.info('Seeding succesful!');
     await AppDataSource.destroy();
   } catch (error) {
