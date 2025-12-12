@@ -9,13 +9,14 @@ import { StoryQueryType } from '../schemas/QuerySchema';
 import { UserService } from './UserService';
 import { logger } from '../config/Logger';
 import { injectable } from 'tsyringe';
+import { AppDataSource } from '../database/DataSource';
+import { CategoryService } from './CategoryService';
 @injectable()
 export class StoryService {
-  // private storyRepository = new StoryRepository();
-  // private userService = new UserService();
   constructor(
     private storyRepository: StoryRepository,
     private userService: UserService,
+    private categoryService: CategoryService,
   ) {}
 
   // Get all stories
@@ -34,35 +35,40 @@ export class StoryService {
     return plainToInstance(StoryResponseDTO, story, { excludeExtraneousValues: true });
   }
 
-  // Get all stories by user ID
-  async getStoriesByUserId(userId: string): Promise<Story[]> {
-    z.uuid().parse(userId);
-    const stories = await this.storyRepository.getStoriesByUserId(userId);
-    return stories;
-  }
-
   // Create a new story
   async createStory(story: StoryCreateDTO, userId: string): Promise<StoryResponseDTO> {
-    const user = await this.userService.getUserById(userId);
-    if (!user) {
-      throw ErrorFactory.notFound(`User with the id ${userId} not found`);
-    }
-    const newStory = await this.storyRepository.createStory(story, userId);
+    const newStory = await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
+      const storyEntity = transactionalEntityManager.getRepository(Story).create({
+        ...story,
+        userByUserId: { userId },
+      });
+
+      const categories = await this.categoryService.ensureCategories(story.categoryNames);
+      storyEntity.categoriesByCategoryId = categories;
+
+      return transactionalEntityManager.getRepository(Story).save(storyEntity);
+    });
+
     return plainToInstance(StoryResponseDTO, newStory, { excludeExtraneousValues: true });
   }
 
   // Update an existing story
   async updateStory(storyId: string, story: StoryUpdateDTO): Promise<StoryResponseDTO> {
-    logger.debug(typeof storyId);
+    z.uuid().parse(storyId);
     const existingStory = await this.storyRepository.getStoryById(storyId);
     if (!existingStory) {
       throw ErrorFactory.notFound(`Story with the id ${storyId} not found`);
     }
+    const updatedStory = await AppDataSource.manager.transaction(
+      async (transactionalEntityManager) => {
+        existingStory.title = story.title ?? existingStory.title;
+        existingStory.body = story.body ?? existingStory.body;
 
-    const updatedStory = await this.storyRepository.updateStory(storyId, story);
-    if (!updatedStory) {
-      throw ErrorFactory.conflict(`Failed to update story with id ${storyId}`);
-    }
+        const categories = await this.categoryService.ensureCategories(story.categoryNames);
+        existingStory.categoriesByCategoryId = categories;
+        return transactionalEntityManager.getRepository(Story).save(existingStory);
+      },
+    );
     return instanceToPlain(updatedStory) as StoryResponseDTO;
   }
 

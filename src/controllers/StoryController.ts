@@ -16,7 +16,6 @@ export class StoryController {
     try {
       const queryParams = req.query as unknown as StoryQueryType;
       const stories = await this.storyService.getAllStories(queryParams);
-      // res.json({ success: true, data: stories, message: 'Stories fetched successfully' });
       handleResponse(res, stories, {
         status: ERROR_DEFINITIONS.OK.status,
         message: 'Stories fetched successfully',
@@ -31,7 +30,6 @@ export class StoryController {
       const storyId = req.params.id;
       z.uuid().parse(storyId);
       const story = await this.storyService.getStoryById(storyId);
-      // res.json({ success: true, data: story, message: 'Story fetched successfully' });
       handleResponse(res, story, {
         status: ERROR_DEFINITIONS.OK.status,
         message: 'Story fetched successfully',
@@ -45,7 +43,6 @@ export class StoryController {
     try {
       const userId: string = req.user!.userId;
       const story = await this.storyService.createStory(req.body, userId);
-      // res.status(201).json({ success: true, data: story, message: 'Story created successfully' });
       handleResponse(res, story, {
         status: ERROR_DEFINITIONS.CREATED.status,
         message: 'Story created successfully',
@@ -74,7 +71,6 @@ export class StoryController {
       const storyId = req.params.id;
       z.uuid().parse(storyId);
       await this.storyService.deleteStory(storyId);
-      // res.status(204).json({ success: true, message: 'Story deleted successfully' });
       handleResponse(res, null, {
         status: ERROR_DEFINITIONS.OK.status,
         message: 'Story deleted successfully',

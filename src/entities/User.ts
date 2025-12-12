@@ -8,8 +8,8 @@ import {
 import { Expose, Exclude } from 'class-transformer';
 
 export enum UserRole {
-  ADMIN,
-  USER,
+  ADMIN = 'ADMIN',
+  USER = 'USER',
 }
 
 @Entity()
