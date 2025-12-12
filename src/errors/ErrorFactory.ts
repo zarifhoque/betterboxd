@@ -6,6 +6,7 @@ import {
   ConflictError,
   InternalServerError,
   BadGatewayError,
+  UnauthenticatedError,
 } from './AppErrors';
 
 export class ErrorFactory {
@@ -17,8 +18,8 @@ export class ErrorFactory {
     return new UnauthorizedError(message);
   }
 
-  static forbidden(message: string) {
-    return new ForbiddenError(message);
+  static unauthenticated(message: string) {
+    return new UnauthenticatedError(message);
   }
 
   static notFound(message: string) {

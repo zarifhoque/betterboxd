@@ -4,11 +4,7 @@ import { UserRole } from '../entities/User';
 
 export type JwtPayload = {
   userId: string;
-  username: string;
-  name: string;
-  email: string;
   role: UserRole;
-  joinDate: Date;
   iat: number;
   exp: number;
 };

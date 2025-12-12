@@ -103,4 +103,10 @@ export class UserService {
     user.isEmailConfirmed = true;
     await this.userRepository.updateUser(user.userId, user);
   }
+
+  async findTokenByEmail(email: string): Promise<string | null> {
+    const user = await this.userRepository.getUserByEmail(email);
+    if (!user) return null;
+    return user.emailConfirmationToken;
+  }
 }

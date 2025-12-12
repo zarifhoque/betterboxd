@@ -8,13 +8,10 @@ export const ERROR_DEFINITIONS = {
     name: 'UnauthorizedError',
   },
   UNAUTHENTICATED: {
-    status: 401,
+    status: 403,
     name: 'UnauthenticatedError',
   },
-  FORBIDDEN: {
-    status: 403,
-    name: 'ForbiddenError',
-  },
+
   NOT_FOUND: {
     status: 404,
     name: 'NotFoundError',
