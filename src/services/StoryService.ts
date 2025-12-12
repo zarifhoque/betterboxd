@@ -9,6 +9,9 @@ import { StoryQueryType } from '../schemas/QuerySchema';
 import { UserService } from './UserService';
 import { logger } from '../config/Logger';
 import { injectable } from 'tsyringe';
+import { AppDataSource } from '../database/DataSource';
+import { CategoryService } from './CategoryService';
+import { generateSummary } from '../utils/AISummarization';
 @injectable()
 export class StoryService {
   constructor(
@@ -34,12 +37,20 @@ export class StoryService {
 
   // Create a new story
   async createStory(story: StoryCreateDTO, userId: string): Promise<StoryResponseDTO> {
-    const user = await this.userService.getUserById(userId);
-    if (!user) {
-      // throw createError('NotFound', `User with the id ${userId} not found`);
-      throw ErrorFactory.notFound(`User with the id ${userId} not found`);
-    }
-    const newStory = await this.storyRepository.createStory(story, userId);
+    const newStory = await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
+      const summary = await generateSummary(story.body);
+      const storyEntity = transactionalEntityManager.getRepository(Story).create({
+        ...story,
+        userByUserId: { userId },
+        aiSummary: summary,
+      });
+
+      const categories = await this.categoryService.ensureCategories(story.categoryNames);
+      storyEntity.categoriesByCategoryId = categories;
+
+      return transactionalEntityManager.getRepository(Story).save(storyEntity);
+    });
+
     return plainToInstance(StoryResponseDTO, newStory, { excludeExtraneousValues: true });
   }
 
@@ -53,6 +64,22 @@ export class StoryService {
       // throw createError('NotFound', `Story with the id ${storyId} not found`);
       throw ErrorFactory.notFound(`Story with the id ${storyId} not found`);
     }
+    const updatedStory = await AppDataSource.manager.transaction(
+      async (transactionalEntityManager) => {
+        const summary =
+          existingStory.body !== story.body
+            ? await generateSummary(story.body!)
+            : existingStory.aiSummary;
+        existingStory.title = story.title ?? existingStory.title;
+        existingStory.body = story.body ?? existingStory.body;
+        existingStory.aiSummary = summary;
+
+        const categories = await this.categoryService.ensureCategories(story.categoryNames);
+        existingStory.categoriesByCategoryId = categories;
+        return transactionalEntityManager.getRepository(Story).save(existingStory);
+      },
+    );
+    return instanceToPlain(updatedStory) as StoryResponseDTO;
   }
 
   // Soft delete a story

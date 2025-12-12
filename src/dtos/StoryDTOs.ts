@@ -31,4 +31,6 @@ export class StoryResponseDTO {
     ({ obj }: { obj: Story }) => obj.categoriesByCategoryId?.map((category) => category.name) ?? [],
   )
   categoryNames!: string[];
+  @Expose()
+  aiSummary?: string;
 }
