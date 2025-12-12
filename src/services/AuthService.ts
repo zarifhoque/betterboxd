@@ -1,13 +1,7 @@
 import { AuthRepository } from '../repositories/AuthRepository';
 import { Auth } from '../entities/Auth';
 import { instanceToPlain } from 'class-transformer';
-import {
-  UserResponseDTO,
-  UserSessionDTO,
-  UserSigninDTO,
-  UserSigninResponseDTO,
-  UserSignupDTO,
-} from '../dtos/UserDTOs';
+import { UserResponseDTO, UserSessionDTO, UserSigninDTO, UserSignupDTO } from '../dtos/UserDTOs';
 import { ENV } from '../config/Env';
 import bcrypt from 'bcrypt';
 import { LoginResponseDTO } from '../dtos/AuthDTOs';
@@ -17,9 +11,9 @@ import { AppDataSource } from '../database/DataSource';
 import { User } from '../entities/User';
 import { UserService } from './UserService';
 import { injectable } from 'tsyringe';
-import { logger } from '../config/Logger';
 import { sendConfirmationEmail } from '../utils/Mailer';
 import { AuthUtils } from '../utils/AuthUtils';
+import jwt from 'jsonwebtoken';
 @injectable()
 export class AuthService {
   constructor(
@@ -43,6 +37,14 @@ export class AuthService {
     return instanceToPlain(newAuth) as Auth;
   }
 
+  async getStoredConfirmationToken(email: string): Promise<string | null> {
+    const auth = await this.authRepository.getByEmail(email);
+    if (!auth) {
+      throw ErrorFactory.notFound(`Auth record for email "${email}" not found`);
+    }
+    return auth.emailConfirmationToken;
+  }
+
   async signupUser(userData: UserSignupDTO): Promise<UserResponseDTO> {
     const hashedPassword = await bcrypt.hash(userData.password!, ENV.SALT_ROUNDS);
     const emailToken = this.authUtils.generateEmailConfirmationToken(userData.email);
@@ -56,7 +58,7 @@ export class AuthService {
 
       const savedUser = await transactionalEntityManager.getRepository(User).save(userEntity);
       const authEntity = await this.authRepository.createAuth(
-        this.authUtils.buildAuthEntity(savedUser, hashedPassword),
+        this.authUtils.buildAuthEntity(savedUser, hashedPassword, emailToken),
       );
       await transactionalEntityManager.getRepository(Auth).save(authEntity);
 
@@ -98,16 +100,12 @@ export class AuthService {
     return { token, user: userPayload as UserSessionDTO } as LoginResponseDTO;
   }
   async confirmEmail(token: string) {
-    let email: string;
-    try {
-      logger.debug('Verifying email confirmation token...');
-      const payload = await this.authUtils.verifyEmailConfirmationToken(token);
-      email = payload.email;
-      logger.debug('Email from token: ' + email);
-    } catch (err) {
-      logger.error('Email confirmation failed', err);
-      throw ErrorFactory.badRequest('Invalid or expired email confirmation token');
+    const payload = jwt.verify(token, ENV.JWT_SECRET) as { email?: string };
+    const storedConfirmationToken = await this.getStoredConfirmationToken(payload.email!);
+    if (storedConfirmationToken !== token) {
+      throw new Error('Token does not match stored token');
     }
+    const email = payload.email!;
 
     await this.userService.confirmUserEmailByEmail(email);
   }

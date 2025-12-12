@@ -44,10 +44,6 @@ export class User {
   deletedAt!: Date | null;
 
   @Exclude()
-  @Column({ type: 'text', nullable: true })
-  emailConfirmationToken!: string;
-
-  @Exclude()
   @Column({ type: 'boolean', default: false })
   isEmailConfirmed!: boolean;
 }

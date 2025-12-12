@@ -3,15 +3,14 @@ export const ERROR_DEFINITIONS = {
     status: 400,
     name: 'BadRequest',
   },
-  UNAUTHORIZED: {
-    status: 401,
-    name: 'UnauthorizedError',
-  },
   UNAUTHENTICATED: {
-    status: 403,
+    status: 401,
     name: 'UnauthenticatedError',
   },
-
+  UNAUTHORIZED: {
+    status: 403,
+    name: 'UnauthorizedError',
+  },
   NOT_FOUND: {
     status: 404,
     name: 'NotFoundError',

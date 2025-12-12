@@ -26,33 +26,18 @@ export class AuthUtils {
     };
   };
 
-  buildAuthEntity = (user: User, hashedPassword: string): Auth => {
+  buildAuthEntity = (user: User, hashedPassword: string, emailToken: string): Auth => {
     const auth = new Auth();
     auth.username = user.username;
     auth.email = user.email;
     auth.hashedPassword = hashedPassword;
     auth.userByUserId = user;
     auth.passwordLastModificationTime = new Date();
+    auth.emailConfirmationToken = emailToken;
     return auth;
   };
 
   generateEmailConfirmationToken = (userEmail: string): string => {
     return jwt.sign({ userEmail }, ENV.JWT_SECRET, { expiresIn: '1h' });
-  };
-
-  verifyEmailConfirmationToken = async (token: string): Promise<{ email: string }> => {
-    try {
-      const payload = jwt.verify(token, ENV.JWT_SECRET) as { userEmail?: string };
-      const storedToken = await this.userService.findTokenByEmail(payload.userEmail!);
-      if (!payload.userEmail) {
-        throw new Error('Token payload missing email');
-      }
-      if (storedToken !== token) {
-        throw new Error('Token does not match stored token');
-      }
-      return { email: payload.userEmail };
-    } catch (err: unknown) {
-      throw new Error('Invalid or expired token');
-    }
   };
 }
