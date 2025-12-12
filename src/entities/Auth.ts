@@ -12,17 +12,24 @@ export class Auth {
   @Column({ type: 'timestamp', nullable: true })
   passwordLastModificationTime!: Date;
 
-  @Column({ unique: true, type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   username!: string;
 
-  @OneToOne(() => User)
-  @JoinColumn({ name: 'username', referencedColumnName: 'username' })
-  userByUsername!: User;
+  // @OneToOne(() => User)
+  // @JoinColumn({ name: 'username', referencedColumnName: 'username' })
+  // userByUsername!: User;
 
-  @Column({ unique: true, type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100 })
   email!: string;
 
+  // @OneToOne(() => User)
+  // @JoinColumn({ name: 'email', referencedColumnName: 'email' })
+  // userByEmail!: User;
+
+  @Column({ type: 'uuid' })
+  userId!: string;
+
   @OneToOne(() => User)
-  @JoinColumn({ name: 'email', referencedColumnName: 'email' })
-  userByEmail!: User;
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
+  userByUserId!: User;
 }

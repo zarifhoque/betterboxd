@@ -39,6 +39,10 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
   });
 });
 app.use((req: Request, res: Response) => {
+  // #swagger.tags = ['Health']
+  // #swagger.summary = 'Check if the server is running'
+  // #swagger.responses[200] = { description: 'Server is healthy', schema: { status: 'ok', message: 'Server is healthy', timestamp: '2025-12-09T00:00:00.000Z' } }
+
   res.status(404).json({
     status: 'error',
     message: 'Endpoint not found',

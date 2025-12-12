@@ -23,6 +23,7 @@ export type UserResponseDTO = {
   email: string;
   role: UserRole;
   joinDate: Date;
+  isEmailConfirmed: boolean;
 };
 
 export interface UserSignupDTO {
@@ -41,4 +42,9 @@ export interface UserSigninDTO {
 export interface UserUpdateRoleDTO {
   userId: string;
   role: UserRole;
+}
+
+export interface UserSigninResponseDTO {
+  token: string;
+  user: UserResponseDTO;
 }

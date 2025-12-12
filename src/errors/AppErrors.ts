@@ -59,3 +59,10 @@ export class InternalServerError extends AppError {
     this.name = ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.name;
   }
 }
+
+export class BadGatewayError extends AppError {
+  constructor(message: string) {
+    super(message, ERROR_DEFINITIONS.BAD_GATEWAY.status);
+    this.name = ERROR_DEFINITIONS.BAD_GATEWAY.name;
+  }
+}

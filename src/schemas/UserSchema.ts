@@ -40,7 +40,6 @@ export const userUpdateSchema = z
       .string()
       .min(1, { error: 'Name is required' })
       .max(100, { error: 'Name must be at most 100 characters long' }),
-    // role: z.enum(UserRole).optional(),
     bio: z
       .string()
       .min(1, 'Bio is required')
@@ -66,11 +65,14 @@ export const userSignupSchema = z
       .email({ error: 'Invalid email address' })
       .max(100, { error: 'Email must be at most 100 characters long' }),
     joinDate: z.date().optional(),
-    // role: z.enum(UserRole).optional(),
     password: z
       .string()
       .min(6, { error: 'Password must be at least 6 characters long' })
-      .max(128, { error: 'Password can be at most 128 characters long' }),
+      .max(128, { error: 'Password can be at most 128 characters long' })
+      .regex(/[A-Z]/, { message: 'Password must contain at least one uppercase letter' })
+      .regex(/[a-z]/, { message: 'Password must contain at least one lowercase letter' })
+      .regex(/[0-9]/, { message: 'Password must contain at least one number' })
+      .regex(/[^A-Za-z0-9]/, { message: 'Password must contain at least one special character' }),
   })
   .strict();
 
@@ -87,7 +89,6 @@ export const userLoginSchema = z
   .strict();
 
 export const userUpdateRoleSchema = z.object({
-  userId: z.uuid({ message: 'Invalid user ID' }),
   role: z.enum(UserRole),
 });
 

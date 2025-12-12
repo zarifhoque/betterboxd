@@ -5,6 +5,7 @@ import {
   NotFoundError,
   ConflictError,
   InternalServerError,
+  BadGatewayError,
 } from './AppErrors';
 
 export class ErrorFactory {
@@ -30,5 +31,9 @@ export class ErrorFactory {
 
   static internal(message: string) {
     return new InternalServerError(message);
+  }
+
+  static badGateway(message: string) {
+    return new BadGatewayError(message);
   }
 }

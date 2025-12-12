@@ -36,7 +36,7 @@ export class UserService {
     }
 
     const newUser = await this.userRepository.createUser(userData);
-
+    newUser.isEmailConfirmed = false;
     return instanceToPlain(newUser) as UserResponseDTO;
   }
 
@@ -90,5 +90,17 @@ export class UserService {
     userData.role = newRole;
     const updatedUser = await this.userRepository.updateUser(userId, userData);
     return instanceToPlain(updatedUser);
+  }
+
+  async confirmUserEmailByEmail(email: string): Promise<void> {
+    const user = await this.userRepository.getUserByEmail(email);
+    if (!user) {
+      throw ErrorFactory.notFound(`User with email ${email} not found`);
+    }
+
+    if (user.isEmailConfirmed) return;
+
+    user.isEmailConfirmed = true;
+    await this.userRepository.updateUser(user.userId, user);
   }
 }

@@ -18,13 +18,13 @@ export class User {
   @Expose()
   userId!: string;
   @Expose()
-  @Column({ unique: true, type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   username!: string;
   @Expose()
   @Column({ type: 'varchar', length: 100 })
   name!: string;
   @Expose()
-  @Column({ unique: true, type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100 })
   email!: string;
   @Expose()
   @Column({ type: 'text', nullable: true })
@@ -42,10 +42,6 @@ export class User {
   @Exclude()
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt!: Date | null;
-
-  @Exclude()
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  emailConfirmationToken?: string;
 
   @Exclude()
   @Column({ type: 'boolean', default: false })

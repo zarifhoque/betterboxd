@@ -1,7 +1,12 @@
 import { AuthRepository } from '../repositories/AuthRepository';
 import { Auth } from '../entities/Auth';
 import { instanceToPlain } from 'class-transformer';
-import { UserResponseDTO, UserSigninDTO, UserSignupDTO } from '../dtos/UserDTOs';
+import {
+  UserResponseDTO,
+  UserSigninDTO,
+  UserSigninResponseDTO,
+  UserSignupDTO,
+} from '../dtos/UserDTOs';
 import { ENV } from '../config/Env';
 import bcrypt from 'bcrypt';
 import { LoginResponseDTO } from '../dtos/AuthDTOs';
@@ -13,10 +18,14 @@ import { UserService } from './UserService';
 import {
   buildAuthEntity,
   createJwtUnsignedPayload,
+  generateEmailConfirmationToken,
   generateToken,
+  verifyEmailConfirmationToken,
   verifyPassword,
 } from '../utils/Auth';
 import { injectable } from 'tsyringe';
+import { logger } from '../config/Logger';
+import { sendConfirmationEmail } from '../utils/Mailer';
 @injectable()
 export class AuthService {
   // private authRepository = new AuthRepository();
@@ -26,14 +35,14 @@ export class AuthService {
     private userService: UserService,
   ) {}
 
-  // Get auth record by username
-  async getByUsername(username: string): Promise<Auth> {
-    const auth = await this.authRepository.getByUsername(username);
-    if (!auth) {
-      throw ErrorFactory.notFound(`Auth record for username "${username}" not found`);
-    }
-    return auth;
-  }
+  // // Get auth record by username
+  // async getByUsername(username: string): Promise<Auth> {
+  //   const auth = await this.authRepository.getByUsername(username);
+  //   if (!auth) {
+  //     throw ErrorFactory.notFound(`Auth record for username "${username}" not found`);
+  //   }
+  //   return auth;
+  // }
 
   // Get auth record by email
   async getByEmail(email: string): Promise<Auth> {
@@ -56,24 +65,20 @@ export class AuthService {
   // }
 
   async signupUser(userData: UserSignupDTO): Promise<UserResponseDTO> {
-    const emailExists = await this.userService.doesUserExistByEmail(userData.email);
-    if (emailExists) {
-      throw ErrorFactory.conflict('A user with this email already exists');
-    }
-
-    const usernameExists = await this.userService.doesUserExistByUsername(userData.username);
-    if (usernameExists) {
-      throw ErrorFactory.conflict('A user with this username already exists');
-    }
     const hashedPassword = await bcrypt.hash(userData.password!, ENV.SALT_ROUNDS);
+    const emailToken = generateEmailConfirmationToken(userData.email);
+    const mailSent = await sendConfirmationEmail(userData.email, emailToken);
+    if (!mailSent) {
+      throw ErrorFactory.badGateway('Email Failed to send');
+    }
 
     const newUser = await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
       const userEntity = await this.userService.createUser(userData);
+
       const savedUser = await transactionalEntityManager.getRepository(User).save(userEntity);
       const authEntity = await this.authRepository.createAuth(
         buildAuthEntity(savedUser, hashedPassword),
       );
-
       await transactionalEntityManager.getRepository(Auth).save(authEntity);
 
       return savedUser;
@@ -95,15 +100,33 @@ export class AuthService {
       throw ErrorFactory.unauthorized('Invalid email or password');
     }
 
-    const user = auth.userByUsername;
+    const user = auth.userByUserId;
     if (!user) {
       throw ErrorFactory.unauthorized('User record missing');
+    }
+
+    if (!user.isEmailConfirmed) {
+      throw ErrorFactory.unauthorized('Please confirm your email before logging in');
     }
 
     const userPayload: JwtPayloadUnsigned = createJwtUnsignedPayload(user);
 
     const token = generateToken(userPayload);
 
-    return { token, user: userPayload as UserResponseDTO };
+    return { token, user: userPayload as UserResponseDTO } as UserSigninResponseDTO;
+  }
+  async confirmEmail(token: string) {
+    let email: string;
+    try {
+      logger.debug('Verifying email confirmation token...');
+      const payload = verifyEmailConfirmationToken(token);
+      email = payload.email;
+      logger.debug('Email from token: ' + email);
+    } catch (err) {
+      logger.error('Email confirmation failed', err);
+      throw ErrorFactory.badRequest('Invalid or expired email confirmation token');
+    }
+
+    await this.userService.confirmUserEmailByEmail(email);
   }
 }

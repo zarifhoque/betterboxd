@@ -20,8 +20,7 @@ export class AuthorizationMiddleware {
 
     // Delete check
     if (isDelete && !(currentUser.role === UserRole.ADMIN || isOwner)) {
-      // throw createError('Forbidden', 'You do not have permission to delete this user');
-      ErrorFactory.unauthorized('You do not have permission to delete this user');
+      throw ErrorFactory.unauthorized('You do not have permission to delete this user');
     }
 
     // Update check

@@ -6,9 +6,9 @@ export const userSearchSchema = z
     name: z
       .string()
       .refine((v) => !v || v.length > 0, { message: 'Name must not be empty if provided' }),
-    email: z
-      .email({ error: 'Invalid email address' })
-      .max(100, { error: 'Email must be at most 100 characters long' }),
+    email: z // the email validation is not used since we are allowing for fuzzy search
+      .string()
+      .refine((v) => !v || v.length > 0, { message: 'Email must not be empty if provided' }),
   })
   .partial();
 
