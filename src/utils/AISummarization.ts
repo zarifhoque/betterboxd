@@ -1,22 +1,35 @@
-import { TextServiceClient } from '@google-ai/generativelanguage';
+import OpenAI from 'openai';
 import { logger } from '../config/Logger';
 
-const client = new TextServiceClient({
-  apiKey: process.env.GOOGLE_API_KEY!,
+const openai = new OpenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
 });
 
-/**
- * Generates a summary for a given text using Gemini.
- */
 export const generateSummary = async (text: string): Promise<string> => {
   if (!text.trim()) return '';
-  logger.info('Generating summary for text of length:', text.length);
-  const response = await client.generateText({
-    model: 'gemini-mini',
-    prompt: `Summarize the following text in 1-2 sentences. You must ensure that the output remains smaller than the input text:\n\n${text}`,
-    maxOutputTokens: 150,
-  });
+  logger.info('Generating summary for text length:', text.length);
 
-  const summary = response.output?.[0]?.content;
-  return summary ?? '';
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gemini-2', // Use a valid Gemini model code name
+      messages: [
+        {
+          role: 'system',
+          content:
+            'Summarize the following text in 2-3 sentences, highlighting key events. Do not just repeat the title.',
+        },
+        {
+          role: 'user',
+          content: text,
+        },
+      ],
+      max_tokens: 150,
+    });
+
+    return response.choices?.[0]?.message?.content ?? '';
+  } catch (error) {
+    logger.error('Error generating summary:', error);
+    return '';
+  }
 };

@@ -37,21 +37,25 @@ export class StoryService {
 
   // Create a new story
   async createStory(story: StoryCreateDTO, userId: string): Promise<StoryResponseDTO> {
-    const newStory = await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
-      const summary = await generateSummary(story.body);
-      const storyEntity = transactionalEntityManager.getRepository(Story).create({
-        ...story,
-        userByUserId: { userId },
-        aiSummary: summary,
-      });
+    const createdStoryId = await AppDataSource.manager.transaction(
+      async (transactionalEntityManager) => {
+        const summary = await generateSummary(story.body);
+        const storyEntity = transactionalEntityManager.getRepository(Story).create({
+          ...story,
+          userByUserId: { userId },
+          aiSummary: summary,
+        });
 
-      const categories = await this.categoryService.ensureCategories(story.categoryNames);
-      storyEntity.categoriesByCategoryId = categories;
+        const categories = await this.categoryService.ensureCategories(story.categoryNames);
+        storyEntity.categoriesByCategoryId = categories;
 
-      return transactionalEntityManager.getRepository(Story).save(storyEntity);
+        return (await transactionalEntityManager.getRepository(Story).save(storyEntity)).storyId;
+      },
+    );
+
+    return plainToInstance(StoryResponseDTO, this.storyRepository.getStoryById(createdStoryId), {
+      excludeExtraneousValues: true,
     });
-
-    return plainToInstance(StoryResponseDTO, newStory, { excludeExtraneousValues: true });
   }
 
   // Update an existing story
@@ -64,7 +68,7 @@ export class StoryService {
       // throw createError('NotFound', `Story with the id ${storyId} not found`);
       throw ErrorFactory.notFound(`Story with the id ${storyId} not found`);
     }
-    const updatedStory = await AppDataSource.manager.transaction(
+    const updatedStoryId = await AppDataSource.manager.transaction(
       async (transactionalEntityManager) => {
         const summary =
           existingStory.body !== story.body
@@ -76,10 +80,12 @@ export class StoryService {
 
         const categories = await this.categoryService.ensureCategories(story.categoryNames);
         existingStory.categoriesByCategoryId = categories;
-        return transactionalEntityManager.getRepository(Story).save(existingStory);
+        return (await transactionalEntityManager.getRepository(Story).save(existingStory)).storyId;
       },
     );
-    return instanceToPlain(updatedStory) as StoryResponseDTO;
+    return plainToInstance(StoryResponseDTO, this.storyRepository.getStoryById(updatedStoryId), {
+      excludeExtraneousValues: true,
+    });
   }
 
   // Soft delete a story
