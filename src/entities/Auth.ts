@@ -15,16 +15,8 @@ export class Auth {
   @Column({ type: 'varchar', length: 50 })
   username!: string;
 
-  // @OneToOne(() => User)
-  // @JoinColumn({ name: 'username', referencedColumnName: 'username' })
-  // userByUsername!: User;
-
   @Column({ type: 'varchar', length: 100 })
   email!: string;
-
-  // @OneToOne(() => User)
-  // @JoinColumn({ name: 'email', referencedColumnName: 'email' })
-  // userByEmail!: User;
 
   @Column({ type: 'uuid' })
   userId!: string;
@@ -32,4 +24,7 @@ export class Auth {
   @OneToOne(() => User)
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   userByUserId!: User;
+
+  @Column({ type: 'text', nullable: true })
+  emailConfirmationToken!: string;
 }

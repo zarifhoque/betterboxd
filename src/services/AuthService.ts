@@ -1,12 +1,7 @@
 import { AuthRepository } from '../repositories/AuthRepository';
 import { Auth } from '../entities/Auth';
 import { instanceToPlain } from 'class-transformer';
-import {
-  UserResponseDTO,
-  UserSigninDTO,
-  UserSigninResponseDTO,
-  UserSignupDTO,
-} from '../dtos/UserDTOs';
+import { UserResponseDTO, UserSessionDTO, UserSigninDTO, UserSignupDTO } from '../dtos/UserDTOs';
 import { ENV } from '../config/Env';
 import bcrypt from 'bcrypt';
 import { LoginResponseDTO } from '../dtos/AuthDTOs';
@@ -15,34 +10,17 @@ import { ErrorFactory } from '../errors/ErrorFactory';
 import { AppDataSource } from '../database/DataSource';
 import { User } from '../entities/User';
 import { UserService } from './UserService';
-import {
-  buildAuthEntity,
-  createJwtUnsignedPayload,
-  generateEmailConfirmationToken,
-  generateToken,
-  verifyEmailConfirmationToken,
-  verifyPassword,
-} from '../utils/Auth';
 import { injectable } from 'tsyringe';
-import { logger } from '../config/Logger';
 import { sendConfirmationEmail } from '../utils/Mailer';
+import { AuthUtils } from '../utils/AuthUtils';
+import jwt from 'jsonwebtoken';
 @injectable()
 export class AuthService {
-  // private authRepository = new AuthRepository();
-  // private userService = new UserService();
   constructor(
     private authRepository: AuthRepository,
     private userService: UserService,
+    private authUtils: AuthUtils,
   ) {}
-
-  // // Get auth record by username
-  // async getByUsername(username: string): Promise<Auth> {
-  //   const auth = await this.authRepository.getByUsername(username);
-  //   if (!auth) {
-  //     throw ErrorFactory.notFound(`Auth record for username "${username}" not found`);
-  //   }
-  //   return auth;
-  // }
 
   // Get auth record by email
   async getByEmail(email: string): Promise<Auth> {
@@ -59,14 +37,17 @@ export class AuthService {
     return instanceToPlain(newAuth) as Auth;
   }
 
-  // // Update password by auth ID
-  // async updatePassword(authId: string, hashedPassword: string): Promise<void> {
-  //   // TODO: will be implemented
-  // }
+  async getStoredConfirmationToken(email: string): Promise<string | null> {
+    const auth = await this.authRepository.getByEmail(email);
+    if (!auth) {
+      throw ErrorFactory.notFound(`Auth record for email "${email}" not found`);
+    }
+    return auth.emailConfirmationToken;
+  }
 
   async signupUser(userData: UserSignupDTO): Promise<UserResponseDTO> {
     const hashedPassword = await bcrypt.hash(userData.password!, ENV.SALT_ROUNDS);
-    const emailToken = generateEmailConfirmationToken(userData.email);
+    const emailToken = this.authUtils.generateEmailConfirmationToken(userData.email);
     const mailSent = await sendConfirmationEmail(userData.email, emailToken);
     if (!mailSent) {
       throw ErrorFactory.badGateway('Email Failed to send');
@@ -77,7 +58,7 @@ export class AuthService {
 
       const savedUser = await transactionalEntityManager.getRepository(User).save(userEntity);
       const authEntity = await this.authRepository.createAuth(
-        buildAuthEntity(savedUser, hashedPassword),
+        this.authUtils.buildAuthEntity(savedUser, hashedPassword, emailToken),
       );
       await transactionalEntityManager.getRepository(Auth).save(authEntity);
 
@@ -91,41 +72,40 @@ export class AuthService {
     const auth = await this.authRepository.getByEmail(credentials.email);
 
     if (!auth) {
-      throw ErrorFactory.unauthorized('Missing email or password');
+      throw ErrorFactory.unauthenticated('Missing email or password');
     }
 
-    const passwordMatch = await verifyPassword(credentials.password, auth.hashedPassword);
+    const passwordMatch = await this.authUtils.verifyPassword(
+      credentials.password,
+      auth.hashedPassword,
+    );
 
     if (!passwordMatch) {
-      throw ErrorFactory.unauthorized('Invalid email or password');
+      throw ErrorFactory.unauthenticated('Invalid email or password');
     }
 
     const user = auth.userByUserId;
     if (!user) {
-      throw ErrorFactory.unauthorized('User record missing');
+      throw ErrorFactory.unauthenticated('User record missing');
     }
 
     if (!user.isEmailConfirmed) {
-      throw ErrorFactory.unauthorized('Please confirm your email before logging in');
+      throw ErrorFactory.unauthenticated('Please confirm your email before logging in');
     }
 
-    const userPayload: JwtPayloadUnsigned = createJwtUnsignedPayload(user);
+    const userPayload: JwtPayloadUnsigned = this.authUtils.createJwtUnsignedPayload(user);
 
-    const token = generateToken(userPayload);
+    const token = this.authUtils.generateToken(userPayload);
 
-    return { token, user: userPayload as UserResponseDTO } as UserSigninResponseDTO;
+    return { token, user: userPayload as UserSessionDTO } as LoginResponseDTO;
   }
   async confirmEmail(token: string) {
-    let email: string;
-    try {
-      logger.debug('Verifying email confirmation token...');
-      const payload = verifyEmailConfirmationToken(token);
-      email = payload.email;
-      logger.debug('Email from token: ' + email);
-    } catch (err) {
-      logger.error('Email confirmation failed', err);
-      throw ErrorFactory.badRequest('Invalid or expired email confirmation token');
+    const payload = jwt.verify(token, ENV.JWT_SECRET) as { email?: string };
+    const storedConfirmationToken = await this.getStoredConfirmationToken(payload.email!);
+    if (storedConfirmationToken !== token) {
+      throw new Error('Token does not match stored token');
     }
+    const email = payload.email!;
 
     await this.userService.confirmUserEmailByEmail(email);
   }

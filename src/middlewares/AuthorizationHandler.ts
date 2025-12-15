@@ -45,13 +45,13 @@ export class AuthorizationMiddleware {
       // Admins can delete anything, owners can delete their own stories
       if (!(currentUser.role === UserRole.ADMIN || isOwner)) {
         // throw createError('Forbidden', 'You cannot delete this story');
-        throw ErrorFactory.forbidden('You cannot delete this story');
+        throw ErrorFactory.unauthorized('You cannot delete this story');
       }
     } else {
       // Updates: only owner can modify
       if (!isOwner) {
         // throw createError('Forbidden', 'You cannot update this story');
-        ErrorFactory.forbidden('You cannot update this story');
+        ErrorFactory.unauthorized('You cannot update this story');
       }
     }
 
@@ -63,7 +63,7 @@ export class AuthorizationMiddleware {
 
     if (currentUser.role !== UserRole.ADMIN) {
       // throw createError('Forbidden', 'Only admins can change user roles');
-      throw ErrorFactory.forbidden('Only admins can change user roles');
+      throw ErrorFactory.unauthorized('Only admins can change user roles');
     }
 
     next();

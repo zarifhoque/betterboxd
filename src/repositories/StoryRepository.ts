@@ -13,7 +13,8 @@ export class StoryRepository {
   async getAllStories(options: StoryQueryType): Promise<Story[]> {
     const query = this.storyRepository
       .createQueryBuilder('story')
-      .leftJoinAndSelect('story.userByUserId', 'user');
+      .leftJoinAndSelect('story.userByUserId', 'user')
+      .leftJoinAndSelect('story.categoriesByCategoryId', 'category');
 
     const { title, author, createdAfter, createdBefore } = options;
     const whereParts: string[] = [];
@@ -58,7 +59,10 @@ export class StoryRepository {
 
   // Get story by ID
   async getStoryById(storyId: string): Promise<Story | null> {
-    return this.storyRepository.findOne({ where: { storyId }, relations: ['userByUserId'] });
+    return this.storyRepository.findOne({
+      where: { storyId },
+      relations: ['userByUserId', 'categoriesByCategoryId'],
+    });
   }
 
   // Get Stories by User ID

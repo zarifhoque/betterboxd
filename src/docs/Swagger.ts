@@ -13,6 +13,7 @@ const doc = {
     { name: 'Auth', description: 'Authentication endpoints' },
     { name: 'Users', description: 'User-related endpoints' },
     { name: 'Stories', description: 'Story-related endpoints' },
+    { name: 'Categories', description: 'Category-related endpoints' },
   ],
   securityDefinitions: {
     bearerAuth: {
@@ -57,6 +58,7 @@ const doc = {
       body: 'Some Body Text',
       updatedAt: 'Some Date',
       username: 'Username',
+      categoryNames: ['Technology', 'Science', 'Art', 'Health'],
     },
     StoryCreateDTO: {
       title: 'Title Name',

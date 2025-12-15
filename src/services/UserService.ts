@@ -8,7 +8,6 @@ import { UserRole } from '../entities/User';
 import { injectable } from 'tsyringe';
 @injectable()
 export class UserService {
-  // private userRepository = new UserRepository();
   constructor(private userRepository: UserRepository) {}
   async getAllUsers(queryParams: UserQueryType): Promise<UserResponseDTO[]> {
     const users = await this.userRepository.getAllUsers(queryParams);
@@ -102,5 +101,11 @@ export class UserService {
 
     user.isEmailConfirmed = true;
     await this.userRepository.updateUser(user.userId, user);
+  }
+
+  async findTokenByEmail(email: string): Promise<string | null> {
+    const user = await this.userRepository.getUserByEmail(email);
+    if (!user) return null;
+    return user.emailConfirmationToken;
   }
 }

@@ -19,11 +19,13 @@
     {
       "name": "Stories",
       "description": "Story-related endpoints"
+    },
+    {
+      "name": "Categories",
+      "description": "Category-related endpoints"
     }
   ],
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "securityDefinitions": {
     "bearerAuth": {
       "type": "apiKey",
@@ -55,9 +57,7 @@
     },
     "/api/v1/users/": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Get all users with optional pagination and search",
         "description": "",
         "parameters": [
@@ -107,9 +107,7 @@
     },
     "/api/v1/users/{id}": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Get a single user by ID",
         "description": "",
         "parameters": [
@@ -139,9 +137,7 @@
         ]
       },
       "put": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Update a user by ID",
         "description": "",
         "parameters": [
@@ -180,9 +176,7 @@
         ]
       },
       "delete": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Deactivate a user (delete)",
         "description": "",
         "parameters": [
@@ -214,9 +208,7 @@
     },
     "/api/v1/users/{id}/role": {
       "put": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Change a user role (Admin only)",
         "description": "",
         "parameters": [
@@ -256,9 +248,7 @@
     },
     "/api/v1/stories/": {
       "get": {
-        "tags": [
-          "Stories"
-        ],
+        "tags": ["Stories"],
         "summary": "Get all stories with optional pagination and search",
         "description": "",
         "parameters": [
@@ -299,9 +289,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "Stories"
-        ],
+        "tags": ["Stories"],
         "summary": "Create a new story",
         "description": "",
         "parameters": [
@@ -332,9 +320,7 @@
     },
     "/api/v1/stories/{id}": {
       "get": {
-        "tags": [
-          "Stories"
-        ],
+        "tags": ["Stories"],
         "summary": "Get a single story by ID",
         "description": "",
         "parameters": [
@@ -364,9 +350,7 @@
         ]
       },
       "put": {
-        "tags": [
-          "Stories"
-        ],
+        "tags": ["Stories"],
         "summary": "Update a story by ID",
         "description": "",
         "parameters": [
@@ -405,9 +389,7 @@
         ]
       },
       "delete": {
-        "tags": [
-          "Stories"
-        ],
+        "tags": ["Stories"],
         "summary": "Delete a story by ID",
         "description": "",
         "parameters": [
@@ -439,9 +421,7 @@
     },
     "/api/v1/auth/signup": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Register a new user",
         "description": "",
         "parameters": [
@@ -467,9 +447,7 @@
     },
     "/api/v1/auth/login": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Login a user",
         "description": "",
         "parameters": [
@@ -495,9 +473,7 @@
     },
     "/api/v1/auth/confirm-email/{token}": {
       "get": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Confirm user email using the token sent via email",
         "description": "",
         "parameters": [
@@ -517,6 +493,101 @@
             "description": "Invalid or expired token"
           }
         }
+      }
+    },
+    "/api/v1/categories/stories/{storyId}/categories": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Get all tags for a story",
+        "description": "",
+        "parameters": [
+          {
+            "name": "storyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Story ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tags for the story",
+            "schema": {
+              "$ref": "#/definitions/CategoryResponseDTO"
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Categories"],
+        "summary": "Add a tag to a story",
+        "description": "",
+        "parameters": [
+          {
+            "name": "storyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Story ID"
+          },
+          {
+            "name": "body",
+            "description": "Tag to add",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AddCategoryDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag added successfully"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["Categories"],
+        "summary": "Remove a tag from a story",
+        "description": "",
+        "parameters": [
+          {
+            "name": "storyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Story ID"
+          },
+          {
+            "name": "body",
+            "description": "Tag to remove",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RemoveCategoryDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag removed successfully"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     }
   },
@@ -632,6 +703,13 @@
         "username": {
           "type": "string",
           "example": "Username"
+        },
+        "categoryNames": {
+          "type": "array",
+          "example": ["Technology", "Science", "Art", "Health"],
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

@@ -4,12 +4,12 @@ import { Story } from '../entities/Story';
 export interface StoryCreateDTO {
   title: string;
   body: string;
-  // userByUserId: string; // no longer can be provided directly by the user
 }
 
 export interface StoryUpdateDTO {
   title?: string;
   body?: string;
+  // categoryNames?: string[];
 }
 
 export class StoryResponseDTO {
@@ -26,4 +26,9 @@ export class StoryResponseDTO {
   @Expose()
   @Transform(({ obj }: { obj: Story }) => obj.userByUserId?.username ?? null)
   username!: string;
+  @Expose()
+  @Transform(
+    ({ obj }: { obj: Story }) => obj.categoriesByCategoryId?.map((category) => category.name) ?? [],
+  )
+  categoryNames!: string[];
 }

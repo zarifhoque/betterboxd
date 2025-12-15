@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "format": "prettier --write . && eslint . --ext .ts,.tsx,.js --fix",
-    "swagger": "ts-node src/docs/Swagger.ts"
+    "swagger": "ts-node src/docs/Swagger.ts",
+    "seed:categories": "ts-node src/seed/CategorySeed.ts",
+    "migration:run": "npx typeorm-ts-node-commonjs migration:run --dataSource src/data-source.ts"
   },
   "keywords": [],
   "author": "",

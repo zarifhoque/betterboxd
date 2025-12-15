@@ -4,8 +4,8 @@ import { User } from '../entities/User';
 import { Auth } from '../entities/Auth';
 import { Story } from '../entities/Story';
 import { ENV } from '../config/Env';
-import { logger } from '../config/Logger';
 import { EnablePgTrgmAndIndexes1764659135094 } from '../migration/1764659135094-TogglePgTrgmExtension';
+import { Category } from '../entities/Category';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -16,15 +16,7 @@ export const AppDataSource = new DataSource({
   database: ENV.DB_NAME,
   synchronize: true,
   logging: false,
-  entities: [User, Auth, Story],
+  entities: [User, Auth, Story, Category],
   migrations: [EnablePgTrgmAndIndexes1764659135094],
   subscribers: [],
 });
-
-AppDataSource.initialize()
-  .then(() => {
-    logger.info('Database connected successfully!');
-  })
-  .catch((err) => {
-    logger.error('Database connection error:', err);
-  });

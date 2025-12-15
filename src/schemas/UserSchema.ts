@@ -67,7 +67,7 @@ export const userSignupSchema = z
     joinDate: z.date().optional(),
     password: z
       .string()
-      .min(6, { error: 'Password must be at least 6 characters long' })
+      .min(6)
       .max(128, { error: 'Password can be at most 128 characters long' })
       .regex(/[A-Z]/, { message: 'Password must contain at least one uppercase letter' })
       .regex(/[a-z]/, { message: 'Password must contain at least one lowercase letter' })
@@ -83,7 +83,7 @@ export const userLoginSchema = z
       .max(100, { error: 'Email must be at most 100 characters long' }),
     password: z
       .string()
-      .min(6, { error: 'Password should have been at least 6 characters long' })
+      .min(6)
       .max(128, { error: 'Password should have been be at most 128 characters long' }),
   })
   .strict();

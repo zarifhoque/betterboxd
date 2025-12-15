@@ -26,6 +26,11 @@ export type UserResponseDTO = {
   isEmailConfirmed: boolean;
 };
 
+export type UserSessionDTO = {
+  userId: string;
+  role: UserRole;
+};
+
 export interface UserSignupDTO {
   username: string;
   name: string;
@@ -42,9 +47,4 @@ export interface UserSigninDTO {
 export interface UserUpdateRoleDTO {
   userId: string;
   role: UserRole;
-}
-
-export interface UserSigninResponseDTO {
-  token: string;
-  user: UserResponseDTO;
 }
