@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 export const addCategorySchema = z.object({
-  tag: z.preprocess(
-    (tag) => {
-      if (typeof tag === 'string') return tag.trim().toLowerCase();
-      return tag;
+  category: z.preprocess(
+    (category) => {
+      if (typeof category === 'string') return category.trim().toLowerCase();
+      return category;
     },
     z
       .string()
@@ -14,10 +14,10 @@ export const addCategorySchema = z.object({
 });
 
 export const removeCategorySchema = z.object({
-  tag: z.preprocess(
-    (tag) => {
-      if (typeof tag === 'string') return tag.trim().toLowerCase();
-      return tag;
+  category: z.preprocess(
+    (category) => {
+      if (typeof category === 'string') return category.trim().toLowerCase();
+      return category;
     },
     z
       .string()

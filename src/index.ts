@@ -7,6 +7,7 @@ import { AppDataSource } from './database/DataSource';
 import userRoutes from './routes/UserRoutes';
 import storyRoutes from './routes/StoryRoutes';
 import authRoutes from './routes/AuthRoutes';
+import categoryRoutes from './routes/CategoryRoutes';
 import { errorHandler } from './middlewares/ErrorHandler';
 import swaggerFile from './docs/swagger-output.json';
 
@@ -31,6 +32,7 @@ app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/stories', storyRoutes);
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/categories', categoryRoutes);
 app.get('/api/v1/health', (req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',

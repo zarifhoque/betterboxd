@@ -19,6 +19,10 @@
     {
       "name": "Stories",
       "description": "Story-related endpoints"
+    },
+    {
+      "name": "Categories",
+      "description": "Category-related endpoints"
     }
   ],
   "schemes": ["http"],
@@ -490,6 +494,101 @@
           }
         }
       }
+    },
+    "/api/v1/categories/stories/{storyId}/categories": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Get all tags for a story",
+        "description": "",
+        "parameters": [
+          {
+            "name": "storyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Story ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tags for the story",
+            "schema": {
+              "$ref": "#/definitions/CategoryResponseDTO"
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Categories"],
+        "summary": "Add a tag to a story",
+        "description": "",
+        "parameters": [
+          {
+            "name": "storyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Story ID"
+          },
+          {
+            "name": "body",
+            "description": "Tag to add",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AddCategoryDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag added successfully"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["Categories"],
+        "summary": "Remove a tag from a story",
+        "description": "",
+        "parameters": [
+          {
+            "name": "storyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Story ID"
+          },
+          {
+            "name": "body",
+            "description": "Tag to remove",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RemoveCategoryDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag removed successfully"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "definitions": {
@@ -624,13 +723,6 @@
         "body": {
           "type": "string",
           "example": "Some Body Text"
-        },
-        "categoryNames": {
-          "type": "array",
-          "example": ["Technology", "Science", "Art", "Health"],
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
@@ -644,13 +736,6 @@
         "body": {
           "type": "string",
           "example": "Some Body Text"
-        },
-        "categoryNames": {
-          "type": "array",
-          "example": ["Technology", "Science", "Art", "Health"],
-          "items": {
-            "type": "string"
-          }
         }
       }
     }

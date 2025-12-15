@@ -15,20 +15,11 @@ export class CategoryRepository {
     return this.categoryRepo.findOne({ where: { name } });
   }
 
-  async createTag(name: string): Promise<Tag> {
-    const tag = this.tagRepo.create({ name });
-    return this.tagRepo.save(tag);
+  async findById(categoryId: string): Promise<Category | null> {
+    return this.categoryRepo.findOne({ where: { categoryId } });
   }
 
-  async findTagByName(name: string): Promise<Tag | null> {
-    return this.tagRepo.findOne({ where: { name } });
-  }
-
-  async findTagById(tagId: string): Promise<Tag | null> {
-    return this.tagRepo.findOne({ where: { tagId } });
-  }
-
-  async findAllTags(): Promise<Tag[]> {
-    return this.tagRepo.find();
+  async findAll(): Promise<Category[]> {
+    return this.categoryRepo.find();
   }
 }

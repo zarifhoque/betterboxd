@@ -3,20 +3,17 @@ import { StoryRepository } from '../repositories/StoryRepository';
 import { Story } from '../entities/Story';
 import { z } from 'zod';
 import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
-import { instanceToPlain, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { ErrorFactory } from '../errors/ErrorFactory';
 import { StoryQueryType } from '../schemas/QuerySchema';
 import { UserService } from './UserService';
 import { logger } from '../config/Logger';
 import { injectable } from 'tsyringe';
-import { AppDataSource } from '../database/DataSource';
-import { CategoryService } from './CategoryService';
 @injectable()
 export class StoryService {
   constructor(
     private storyRepository: StoryRepository,
     private userService: UserService,
-    private categoryService: CategoryService,
   ) {}
 
   // Get all stories
@@ -37,39 +34,25 @@ export class StoryService {
 
   // Create a new story
   async createStory(story: StoryCreateDTO, userId: string): Promise<StoryResponseDTO> {
-    const newStory = await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
-      const storyEntity = transactionalEntityManager.getRepository(Story).create({
-        ...story,
-        userByUserId: { userId },
-      });
-
-      const categories = await this.categoryService.ensureCategories(story.categoryNames);
-      storyEntity.categoriesByCategoryId = categories;
-
-      return transactionalEntityManager.getRepository(Story).save(storyEntity);
-    });
-
+    const user = await this.userService.getUserById(userId);
+    if (!user) {
+      // throw createError('NotFound', `User with the id ${userId} not found`);
+      throw ErrorFactory.notFound(`User with the id ${userId} not found`);
+    }
+    const newStory = await this.storyRepository.createStory(story, userId);
     return plainToInstance(StoryResponseDTO, newStory, { excludeExtraneousValues: true });
   }
 
   // Update an existing story
   async updateStory(storyId: string, story: StoryUpdateDTO): Promise<StoryResponseDTO> {
-    z.uuid().parse(storyId);
+    logger.debug(typeof storyId);
     const existingStory = await this.storyRepository.getStoryById(storyId);
     if (!existingStory) {
+      // logger.debug('We are not');
+      // logger.debug(storyId);
+      // throw createError('NotFound', `Story with the id ${storyId} not found`);
       throw ErrorFactory.notFound(`Story with the id ${storyId} not found`);
     }
-    const updatedStory = await AppDataSource.manager.transaction(
-      async (transactionalEntityManager) => {
-        existingStory.title = story.title ?? existingStory.title;
-        existingStory.body = story.body ?? existingStory.body;
-
-        const categories = await this.categoryService.ensureCategories(story.categoryNames);
-        existingStory.categoriesByCategoryId = categories;
-        return transactionalEntityManager.getRepository(Story).save(existingStory);
-      },
-    );
-    return instanceToPlain(updatedStory) as StoryResponseDTO;
   }
 
   // Soft delete a story
@@ -93,5 +76,13 @@ export class StoryService {
       throw ErrorFactory.notFound(`Story with ID ${storyId} not found`);
     }
     return userId;
+  }
+
+  async getStoryEntityById(storyId: string): Promise<Story> {
+    const story = await this.storyRepository.getStoryById(storyId);
+    if (!story) {
+      throw ErrorFactory.notFound(`Story with ID ${storyId} not found`);
+    }
+    return story;
   }
 }

@@ -4,13 +4,12 @@ import { Story } from '../entities/Story';
 export interface StoryCreateDTO {
   title: string;
   body: string;
-  categoryNames?: string[];
 }
 
 export interface StoryUpdateDTO {
   title?: string;
   body?: string;
-  categoryNames?: string[];
+  // categoryNames?: string[];
 }
 
 export class StoryResponseDTO {

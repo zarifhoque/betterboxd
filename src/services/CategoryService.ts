@@ -1,8 +1,10 @@
 import { injectable } from 'tsyringe';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { Category } from '../entities/Category';
-import { ErrorFactory } from '../errors/ErrorFactory';
 import { StoryService } from './StoryService';
+import { AppDataSource } from '../database/DataSource';
+import { Story } from '../entities/Story';
+import { logger } from '../config/Logger';
 
 @injectable()
 export class CategoryService {
@@ -15,9 +17,8 @@ export class CategoryService {
     if (!names || names.length === 0) return [];
     const categories: Category[] = [];
     for (const name of names) {
-      const normalized = name.trim().toLowerCase();
-      let category = await this.categoryRepo.findByName(normalized);
-      if (!category) category = await this.categoryRepo.createCategory(normalized);
+      let category = await this.categoryRepo.findByName(name);
+      if (!category) category = await this.categoryRepo.createCategory(name);
       categories.push(category);
     }
     return categories;
@@ -25,31 +26,32 @@ export class CategoryService {
 
   async listCategoriesByStoryId(storyId: string): Promise<string[]> {
     const story = await this.storyService.getStoryById(storyId);
-    if (!story) throw ErrorFactory.notFound('Story not found');
     return story.categoryNames ?? [];
   }
 
   async addCategoryToStory(userId: string, storyId: string, categoryName: string): Promise<void> {
-    const story = await this.storyService.getStoryById(storyId);
+    logger.debug(`Adding category ${categoryName} to story ${storyId} by user ${userId}`);
+    await AppDataSource.manager.transaction(async (tx) => {
+      const [category] = await this.ensureCategories([categoryName]);
+      const story = await this.storyService.getStoryEntityById(storyId);
 
-    let category = await this.categoryRepo.findByName(categoryName);
-    if (!category) {
-      category = await this.categoryRepo.createCategory(categoryName);
-    }
-
-    const exists = story.categoryNames?.some((category) => category === categoryName);
-    if (!exists) {
-      story.categoryNames = story.categoryNames ? [...story.categoryNames, category] : [category];
-      await this.storyService.updateStory(userId, story);
-    }
+      if (!story.categoriesByCategoryId?.some((c) => c.categoryId === category.categoryId)) {
+        story.categoriesByCategoryId = [...(story.categoriesByCategoryId ?? []), category];
+        await tx.getRepository(Story).save(story);
+      }
+    });
   }
 
-  async removeTagFromStory(storyId: string, tagName: string): Promise<void> {
-    const story = await this.storyRepo.getStoryById(storyId, ['tags']);
-    if (!story) throw ErrorFactory.notFound('Story not found');
-
-    const normalized = tagName.trim().toLowerCase();
-    story.tags = story.tags.filter((t) => t.name !== normalized);
-    await this.storyRepo.save(story);
+  async removeCategoryFromStory(
+    userId: string,
+    storyId: string,
+    categoryName: string,
+  ): Promise<void> {
+    await AppDataSource.manager.transaction(async (tx) => {
+      const story = await this.storyService.getStoryEntityById(storyId);
+      story.categoriesByCategoryId =
+        story.categoriesByCategoryId?.filter((c) => c.name !== categoryName) ?? [];
+      await tx.getRepository(Story).save(story);
+    });
   }
 }
