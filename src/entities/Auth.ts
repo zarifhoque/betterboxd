@@ -12,9 +12,6 @@ export class Auth {
   @Column({ type: 'timestamp', nullable: true })
   passwordLastModificationTime!: Date;
 
-  @Column({ type: 'varchar', length: 50 })
-  username!: string;
-
   @Column({ type: 'varchar', length: 100 })
   email!: string;
 
