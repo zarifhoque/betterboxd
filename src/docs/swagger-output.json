@@ -318,6 +318,62 @@
         ]
       }
     },
+    "/api/v1/users/profile": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get the user profile",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "User profile fetched successfully",
+            "schema": {
+              "$ref": "#/definitions/UserResponseDTO"
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update a user",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "description": "User data to update",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserUpdateDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "schema": {
+              "$ref": "#/definitions/UserResponseDTO"
+            }
+          },
+          "403": {
+            "description": "Unauthorized to update this user"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/v1/stories/": {
       "get": {
         "tags": [

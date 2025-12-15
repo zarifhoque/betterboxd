@@ -22,6 +22,34 @@ const userController = container.resolve(UserController);
 const authorizationMiddleware = container.resolve(AuthorizationMiddleware);
 const authenticationMiddleWare = container.resolve(AuthenticationMiddleWare);
 
+// GET /api/users/profile
+router.get(
+  '/profile',
+  loggerHandler,
+  authenticationMiddleWare.authenticateJWTHandler,
+  /* #swagger.tags = ['Users'] */
+  /* #swagger.summary = 'Get the user profile' */
+  /* #swagger.responses[200] = { description: 'User profile fetched successfully', schema: { $ref: '#/definitions/UserResponseDTO' } } */
+  /* #swagger.security = [{ "bearerAuth": [] }] */
+  userController.getProfile.bind(userController),
+);
+
+// PUT /api/users/profile
+router.put(
+  '/profile',
+  loggerHandler,
+  authenticationMiddleWare.authenticateJWTHandler,
+  authorizationMiddleware.modifyUserAccessHandler,
+  validationHandler(userUpdateSchema),
+  /* #swagger.tags = ['Users'] */
+  /* #swagger.summary = 'Update a user */
+  /* #swagger.parameters['body'] = { description: 'User data to update', in: 'body', required: true, schema: { $ref: '#/definitions/UserUpdateDTO' } } */
+  /* #swagger.responses[200] = { description: 'User updated successfully', schema: { $ref: '#/definitions/UserResponseDTO' } } */
+  /* #swagger.responses[403] = { description: 'Unauthorized to update this user' } */
+  /* #swagger.security = [{ "bearerAuth": [] }] */
+  userController.updateProfile.bind(userController),
+);
+
 // GET /api/users
 router.get(
   '/',
@@ -102,6 +130,7 @@ router.delete(
   userController.deactivateUser.bind(userController),
 );
 
+// POST /api/users/change-password/request
 router.post(
   '/change-password/request',
   validationHandler(passwordChangeRequestSchema),
@@ -114,6 +143,7 @@ router.post(
   userController.changePasswordRequest.bind(userController),
 );
 
+// POST /api/users/change-password/confirm
 router.post(
   '/change-password/confirm',
   /* #swagger.tags = ['Users'] */

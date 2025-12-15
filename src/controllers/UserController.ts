@@ -8,15 +8,18 @@ import { ERROR_DEFINITIONS } from '../constants/HTTPConstants';
 import { injectable } from 'tsyringe';
 import { AuthRequest } from '../types/AuthTypes';
 import { AuthService } from '../services/AuthService';
+import { logger } from '../config/Logger';
 
 @injectable()
 export class UserController {
-  constructor(private userService: UserService, private authService: AuthService) {}
+  constructor(
+    private userService: UserService,
+    private authService: AuthService,
+  ) {}
   async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const queryParams = req.query as unknown as UserQueryType;
       const users = await this.userService.getAllUsers(queryParams);
-      // res.status(200).json({ success: true, data: users, message: 'Users fetched successfully' });
       handleResponse(res, users, {
         status: ERROR_DEFINITIONS.OK.status,
         message: 'Users fetched succesfully',
@@ -31,7 +34,6 @@ export class UserController {
       const userId: string = req.params.id;
       z.uuid().parse(userId);
       const user = await this.userService.getUserById(userId);
-      // res.status(200).json({ success: true, data: user, message: 'User fetched successfully' });
       handleResponse(res, user, {
         status: ERROR_DEFINITIONS.OK.status,
         message: 'User fetched succesfully',
@@ -47,7 +49,6 @@ export class UserController {
       z.uuid().parse(userId);
       const userData: UserUpdateDTO = req.body;
       const updatedUser = await this.userService.updateUser(userId, userData);
-      // res.status(204).json({ success: true, message: 'User updated successfully' });
       handleResponse(res, updatedUser, {
         status: ERROR_DEFINITIONS.OK.status,
         message: 'User updated successfully',
@@ -62,7 +63,6 @@ export class UserController {
       const userId: string = req.params.id;
       z.uuid().parse(userId);
       await this.userService.deactivateUser(userId);
-      // res.status(204).json({ success: true, message: 'User deleted successfully' });
       handleResponse(res, {
         status: ERROR_DEFINITIONS.OK.status,
         message: 'User deleted successfully',
@@ -111,4 +111,33 @@ export class UserController {
 
     handleResponse(res, null, { message: 'Password updated successfully' });
   };
+
+  async getProfile(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId: string = req.user!.userId;
+      z.uuid().parse(userId);
+      const user = await this.userService.getUserById(userId);
+      handleResponse(res, user, {
+        status: ERROR_DEFINITIONS.OK.status,
+        message: 'User fetched succesfully',
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  async updateProfile(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId: string = req.user!.userId;
+      z.uuid().parse(userId);
+      const userData: UserUpdateDTO = req.body;
+      const updatedUser = await this.userService.updateUser(userId, userData);
+      handleResponse(res, updatedUser, {
+        status: ERROR_DEFINITIONS.OK.status,
+        message: 'User updated successfully',
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
 }
