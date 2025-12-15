@@ -40,54 +40,40 @@ export class StoryService {
     const user = await this.userService.getUserById(userId);
     if (!user) throw ErrorFactory.notFound(`User with the id ${userId} not found`);
 
-    const createdStoryId = await AppDataSource.manager.transaction(async (tx) => {
-      const summary = await generateSummary(story.body);
+    const newStory = await AppDataSource.manager.transaction(async (tx) => {
+      const aiSummary = await generateSummary(story.body); // generate AI summary
 
       const storyEntity = tx.getRepository(Story).create({
         ...story,
         userByUserId: { userId },
-        aiSummary: summary,
+        aiSummary,
       });
 
-      const categories = await this.categoryService.ensureCategories(story.categoryNames);
-      storyEntity.categoriesByCategoryId = categories;
-
-      return (await tx.getRepository(Story).save(storyEntity)).storyId;
+      return await tx.getRepository(Story).save(storyEntity);
     });
 
-    return plainToInstance(
-      StoryResponseDTO,
-      await this.storyRepository.getStoryById(createdStoryId),
-      { excludeExtraneousValues: true },
-    );
+    return plainToInstance(StoryResponseDTO, newStory, { excludeExtraneousValues: true });
   }
 
-  // Update story with AI summary update if body changes
+  // Update an existing story and regenerate AI summary if body changes
   async updateStory(storyId: string, story: StoryUpdateDTO): Promise<StoryResponseDTO> {
     const existingStory = await this.storyRepository.getStoryById(storyId);
     if (!existingStory) throw ErrorFactory.notFound(`Story with the id ${storyId} not found`);
 
-    const updatedStoryId = await AppDataSource.manager.transaction(async (tx) => {
-      const summary =
-        story.body && story.body !== existingStory.body
-          ? await generateSummary(story.body)
-          : existingStory.aiSummary;
+    const updatedStory = await AppDataSource.manager.transaction(async (tx) => {
+      let aiSummary = existingStory.aiSummary;
+      if (story.body && story.body !== existingStory.body) {
+        aiSummary = await generateSummary(story.body); // regenerate summary if body changed
+      }
 
       existingStory.title = story.title ?? existingStory.title;
       existingStory.body = story.body ?? existingStory.body;
-      existingStory.aiSummary = summary;
+      existingStory.aiSummary = aiSummary;
 
-      const categories = await this.categoryService.ensureCategories(story.categoryNames);
-      existingStory.categoriesByCategoryId = categories;
-
-      return (await tx.getRepository(Story).save(existingStory)).storyId;
+      return await tx.getRepository(Story).save(existingStory);
     });
 
-    return plainToInstance(
-      StoryResponseDTO,
-      await this.storyRepository.getStoryById(updatedStoryId),
-      { excludeExtraneousValues: true },
-    );
+    return plainToInstance(StoryResponseDTO, updatedStory, { excludeExtraneousValues: true });
   }
   // Soft delete a story
   async deleteStory(storyId: string): Promise<void> {
