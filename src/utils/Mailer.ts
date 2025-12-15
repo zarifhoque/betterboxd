@@ -31,3 +31,19 @@ export const sendConfirmationEmail = async (to: string, token: string) => {
     return false;
   }
 };
+
+export const sendPasswordChangeEmail = async (to: string, token: string) => {
+  try {
+    const url = `${ENV.FRONTEND_URL}/api/user/change-password/${token}`;
+    await transporter.sendMail({
+      from: '"BetterBoxd" <no-reply@betterboxd.com>',
+      to,
+      subject: 'Change your password',
+      html: `<p>Click <a href="${url}">here</a> to change your password.</p>`,
+    });
+    return true;
+  } catch (err: unknown) {
+    logger.error('sendPasswordMail failed', err);
+    return false;
+  }
+};

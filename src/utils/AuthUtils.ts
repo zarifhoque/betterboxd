@@ -4,13 +4,10 @@ import { JwtPayload, JwtPayloadUnsigned } from '../types/AuthTypes';
 import { ENV } from '../config/Env';
 import { User } from '../entities/User';
 import { Auth } from '../entities/Auth';
-import { logger } from '../config/Logger';
 import { injectable } from 'tsyringe';
-import { UserService } from '../services/UserService';
 
 @injectable()
 export class AuthUtils {
-  constructor(private userService: UserService) {}
   verifyPassword = async (plain: string, hashed: string): Promise<boolean> => {
     return bcrypt.compare(plain, hashed);
   };
@@ -19,10 +16,14 @@ export class AuthUtils {
     return jwt.sign(userPayload as JwtPayload, ENV.JWT_SECRET, { expiresIn: '30d' });
   };
 
-  createJwtUnsignedPayload = (user: User): JwtPayloadUnsigned => {
+  createJwtUnsignedPayload = async (
+    user: User,
+    passwordLastModificationTime: number,
+  ): Promise<JwtPayloadUnsigned> => {
     return {
       userId: user.userId,
       role: user.role,
+      pwdlmod: passwordLastModificationTime,
     };
   };
 
