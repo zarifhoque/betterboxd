@@ -5,6 +5,7 @@ import { UserRole } from '../entities/User';
 export type JwtPayload = {
   userId: string;
   role: UserRole;
+  pwdlmod: number;
   iat: number;
   exp: number;
 };

@@ -92,6 +92,15 @@ export const userUpdateRoleSchema = z.object({
   role: z.enum(UserRole),
 });
 
+export const passwordChangeRequestSchema = z.object({
+  currentPassword: z.string().min(6),
+  newPassword: z.string().min(8),
+});
+
+export const passwordChangeConfirmSchema = z.object({
+  token: z.uuid(),
+});
+
 export type UserUpdateRoleSchemaType = z.infer<typeof userUpdateRoleSchema>;
 
 export type UserCreateSchemaType = z.infer<typeof userCreateSchema>;

@@ -4,16 +4,18 @@ import { instanceToPlain } from 'class-transformer';
 import { UserResponseDTO, UserSessionDTO, UserSigninDTO, UserSignupDTO } from '../dtos/UserDTOs';
 import { ENV } from '../config/Env';
 import bcrypt from 'bcrypt';
-import { LoginResponseDTO } from '../dtos/AuthDTOs';
+import { AuthDTO, LoginResponseDTO } from '../dtos/AuthDTOs';
 import { JwtPayloadUnsigned } from '../types/AuthTypes';
 import { ErrorFactory } from '../errors/ErrorFactory';
 import { AppDataSource } from '../database/DataSource';
 import { User } from '../entities/User';
 import { UserService } from './UserService';
 import { injectable } from 'tsyringe';
-import { sendConfirmationEmail } from '../utils/Mailer';
+import { sendConfirmationEmail, sendPasswordChangeEmail } from '../utils/Mailer';
 import { AuthUtils } from '../utils/AuthUtils';
 import jwt from 'jsonwebtoken';
+import { logger } from '../config/Logger';
+import { passwordResetTokenExpiryMs } from '../constants/TimeConstants';
 @injectable()
 export class AuthService {
   constructor(
@@ -35,6 +37,65 @@ export class AuthService {
   async createAuth(authData: Partial<Auth>): Promise<Auth> {
     const newAuth = await this.authRepository.createAuth(authData);
     return instanceToPlain(newAuth) as Auth;
+  }
+
+  async requestPasswordChange(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const auth = await this.getAuthByUserId(userId);
+    if (!auth) throw ErrorFactory.notFound('Auth record not found for user');
+
+    const match = await bcrypt.compare(currentPassword, auth.hashedPassword);
+    if (!match) throw ErrorFactory.unauthorized('Current password is incorrect');
+
+    // Generate a random token
+    const token = crypto.randomUUID();
+    const expires = new Date(Date.now() + passwordResetTokenExpiryMs);
+    const pendingPassword = await bcrypt.hash(newPassword, ENV.SALT_ROUNDS);
+
+    // Send password change confirmation email
+    const mailSent = await sendPasswordChangeEmail(auth.email, token);
+    if (!mailSent) {
+      throw ErrorFactory.badGateway('Failed to send password change email');
+    }
+
+    // Update Auth record with pending password info
+    const updatedAuth = {
+      ...auth,
+      passwordChangeToken: token,
+      passwordChangeExpires: expires,
+      pendingPasswordHash: pendingPassword,
+    };
+    await this.authRepository.updateAuth(updatedAuth);
+  }
+  async confirmPasswordChange(token: string): Promise<void> {
+    const auth = await this.authRepository.findByPasswordChangeToken(token);
+    if (!auth) {
+      throw ErrorFactory.notFound('Invalid password change token');
+    }
+
+    if (!auth.passwordChangeExpires || auth.passwordChangeExpires < new Date()) {
+      throw ErrorFactory.badRequest('Token expired');
+    }
+
+    if (!auth.pendingPasswordHash) {
+      throw ErrorFactory.badRequest('No pending password to apply');
+    }
+
+    await this.authRepository.updateAuth({
+      ...auth,
+      hashedPassword: auth.pendingPasswordHash,
+      passwordLastModificationTime: new Date(),
+      passwordChangeToken: null,
+      passwordChangeExpires: null,
+      pendingPasswordHash: null,
+    });
+  }
+
+  async getAuthByUserId(userId: string): Promise<Auth | null> {
+    return this.authRepository.getByUserId(userId);
   }
 
   async getStoredConfirmationToken(email: string): Promise<string | null> {
@@ -92,8 +153,13 @@ export class AuthService {
     if (!user.isEmailConfirmed) {
       throw ErrorFactory.unauthenticated('Please confirm your email before logging in');
     }
-
-    const userPayload: JwtPayloadUnsigned = this.authUtils.createJwtUnsignedPayload(user);
+    const passwordLastModificationTime = auth.passwordLastModificationTime
+      ? auth.passwordLastModificationTime.getTime()
+      : 0;
+    const userPayload: JwtPayloadUnsigned = await this.authUtils.createJwtUnsignedPayload(
+      user,
+      passwordLastModificationTime,
+    );
 
     const token = this.authUtils.generateToken(userPayload);
 
@@ -101,12 +167,12 @@ export class AuthService {
   }
   async confirmEmail(token: string) {
     const payload = jwt.verify(token, ENV.JWT_SECRET) as { email?: string };
+
     const storedConfirmationToken = await this.getStoredConfirmationToken(payload.email!);
     if (storedConfirmationToken !== token) {
       throw new Error('Token does not match stored token');
     }
     const email = payload.email!;
-
     await this.userService.confirmUserEmailByEmail(email);
   }
 }

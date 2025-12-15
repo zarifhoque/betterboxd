@@ -4,7 +4,12 @@ import { UserController } from '../controllers/UserController';
 
 import { validationHandler } from '../middlewares/ValidationHandler';
 import { loggerHandler } from '../middlewares/LoggerHandler';
-import { userUpdateRoleSchema, userUpdateSchema } from '../schemas/UserSchema';
+import {
+  passwordChangeConfirmSchema,
+  passwordChangeRequestSchema,
+  userUpdateRoleSchema,
+  userUpdateSchema,
+} from '../schemas/UserSchema';
 import { paginationSchema } from '../schemas/PaginationSchema';
 import { userSearchSchema } from '../schemas/SearchSchema';
 import { AuthenticationMiddleWare } from '../middlewares/AuthenticationHandler';
@@ -95,6 +100,29 @@ router.delete(
   /* #swagger.responses[404] = { description: 'User not found' } */
   /* #swagger.security = [{ "bearerAuth": [] }] */
   userController.deactivateUser.bind(userController),
+);
+
+router.post(
+  '/change-password/request',
+  validationHandler(passwordChangeRequestSchema),
+  authenticationMiddleWare.authenticateJWTHandler,
+  /* #swagger.tags = ['Users'] */
+  /* #swagger.summary = 'Request a password change' */
+  /* #swagger.parameters['body'] = { description: 'Password change request data', in: 'body', required: true, schema: { $ref: '#/definitions/PasswordChangeRequestDTO' } } */
+  /* #swagger.responses[200] = { description: 'Password change requested successfully' } */
+  /* #swagger.security = [{ "bearerAuth": [] }] */
+  userController.changePasswordRequest.bind(userController),
+);
+
+router.post(
+  '/change-password/confirm',
+  /* #swagger.tags = ['Users'] */
+  /* #swagger.summary = 'Confirm a password change' */
+  /* #swagger.parameters['body'] = { description: 'Password change confirmation data', in: 'body', required: true, schema: { $ref: '#/definitions/PasswordChangeConfirmDTO' } } */
+  /* #swagger.responses[200] = { description: 'Password changed successfully' } */
+  /* #swagger.security = [{ "bearerAuth": [] }] */
+  validationHandler(passwordChangeConfirmSchema),
+  userController.changePasswordConfirm.bind(userController),
 );
 
 export default router;

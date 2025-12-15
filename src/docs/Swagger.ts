@@ -68,6 +68,13 @@ const doc = {
       title: 'Title Name',
       body: 'Some Body Text',
     },
+    PasswordChangeRequestDTO: {
+      currentPassword: 'CurrentPass@123',
+      newPassword: 'NewPass@123',
+    },
+    PasswordChangeConfirmDTO: {
+      token: 'uuid-token-value',
+    },
   },
 };
 

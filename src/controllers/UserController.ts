@@ -6,10 +6,12 @@ import { UserQueryType } from '../schemas/QuerySchema';
 import { handleResponse } from '../utils/Response';
 import { ERROR_DEFINITIONS } from '../constants/HTTPConstants';
 import { injectable } from 'tsyringe';
+import { AuthRequest } from '../types/AuthTypes';
+import { AuthService } from '../services/AuthService';
 
 @injectable()
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private authService: AuthService) {}
   async getAllUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const queryParams = req.query as unknown as UserQueryType;
@@ -92,4 +94,21 @@ export class UserController {
       next(error);
     }
   }
+
+  changePasswordRequest = async (req: AuthRequest, res: Response) => {
+    const userId = req.user!.userId;
+    const { currentPassword, newPassword } = req.body;
+
+    await this.authService.requestPasswordChange(userId, currentPassword, newPassword);
+
+    handleResponse(res, null, { message: 'Confirmation code sent to email' });
+  };
+
+  changePasswordConfirm = async (req: Request, res: Response) => {
+    const { token } = req.body;
+
+    await this.authService.confirmPasswordChange(token);
+
+    handleResponse(res, null, { message: 'Password updated successfully' });
+  };
 }

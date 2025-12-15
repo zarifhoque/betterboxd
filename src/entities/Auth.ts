@@ -27,4 +27,13 @@ export class Auth {
 
   @Column({ type: 'text', nullable: true })
   emailConfirmationToken!: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  passwordChangeToken!: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  passwordChangeExpires!: Date | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  pendingPasswordHash!: string | null;
 }
