@@ -6,10 +6,7 @@ import { UserQueryType } from '../schemas/QuerySchema';
 import { ErrorFactory } from '../errors/ErrorFactory';
 import { UserRole } from '../entities/User';
 import { injectable } from 'tsyringe';
-import { AuthService } from './AuthService';
-import bcrypt from 'bcrypt';
-import crypto from 'crypto';
-import { passwordResetTokenExpiryMs } from '../constants/TimeConstants';
+
 @injectable()
 export class UserService {
   constructor(private userRepository: UserRepository) {}

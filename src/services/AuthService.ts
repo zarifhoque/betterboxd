@@ -4,7 +4,7 @@ import { instanceToPlain } from 'class-transformer';
 import { UserResponseDTO, UserSessionDTO, UserSigninDTO, UserSignupDTO } from '../dtos/UserDTOs';
 import { ENV } from '../config/Env';
 import bcrypt from 'bcrypt';
-import { AuthDTO, LoginResponseDTO } from '../dtos/AuthDTOs';
+import { LoginResponseDTO } from '../dtos/AuthDTOs';
 import { JwtPayloadUnsigned } from '../types/AuthTypes';
 import { ErrorFactory } from '../errors/ErrorFactory';
 import { AppDataSource } from '../database/DataSource';
@@ -14,7 +14,6 @@ import { injectable } from 'tsyringe';
 import { sendConfirmationEmail, sendPasswordChangeEmail } from '../utils/Mailer';
 import { AuthUtils } from '../utils/AuthUtils';
 import jwt from 'jsonwebtoken';
-import { logger } from '../config/Logger';
 import { passwordResetTokenExpiryMs } from '../constants/TimeConstants';
 @injectable()
 export class AuthService {
