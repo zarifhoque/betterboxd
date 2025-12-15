@@ -35,59 +35,60 @@ export class StoryService {
     return plainToInstance(StoryResponseDTO, story, { excludeExtraneousValues: true });
   }
 
-  // Create a new story
+  // Create a new story with AI summary
   async createStory(story: StoryCreateDTO, userId: string): Promise<StoryResponseDTO> {
-    const createdStoryId = await AppDataSource.manager.transaction(
-      async (transactionalEntityManager) => {
-        const summary = await generateSummary(story.body);
-        const storyEntity = transactionalEntityManager.getRepository(Story).create({
-          ...story,
-          userByUserId: { userId },
-          aiSummary: summary,
-        });
+    const user = await this.userService.getUserById(userId);
+    if (!user) throw ErrorFactory.notFound(`User with the id ${userId} not found`);
 
-        const categories = await this.categoryService.ensureCategories(story.categoryNames);
-        storyEntity.categoriesByCategoryId = categories;
+    const createdStoryId = await AppDataSource.manager.transaction(async (tx) => {
+      const summary = await generateSummary(story.body);
 
-        return (await transactionalEntityManager.getRepository(Story).save(storyEntity)).storyId;
-      },
-    );
+      const storyEntity = tx.getRepository(Story).create({
+        ...story,
+        userByUserId: { userId },
+        aiSummary: summary,
+      });
 
-    return plainToInstance(StoryResponseDTO, this.storyRepository.getStoryById(createdStoryId), {
-      excludeExtraneousValues: true,
+      const categories = await this.categoryService.ensureCategories(story.categoryNames);
+      storyEntity.categoriesByCategoryId = categories;
+
+      return (await tx.getRepository(Story).save(storyEntity)).storyId;
     });
+
+    return plainToInstance(
+      StoryResponseDTO,
+      await this.storyRepository.getStoryById(createdStoryId),
+      { excludeExtraneousValues: true },
+    );
   }
 
-  // Update an existing story
+  // Update story with AI summary update if body changes
   async updateStory(storyId: string, story: StoryUpdateDTO): Promise<StoryResponseDTO> {
-    logger.debug(typeof storyId);
     const existingStory = await this.storyRepository.getStoryById(storyId);
-    if (!existingStory) {
-      // logger.debug('We are not');
-      // logger.debug(storyId);
-      // throw createError('NotFound', `Story with the id ${storyId} not found`);
-      throw ErrorFactory.notFound(`Story with the id ${storyId} not found`);
-    }
-    const updatedStoryId = await AppDataSource.manager.transaction(
-      async (transactionalEntityManager) => {
-        const summary =
-          existingStory.body !== story.body
-            ? await generateSummary(story.body!)
-            : existingStory.aiSummary;
-        existingStory.title = story.title ?? existingStory.title;
-        existingStory.body = story.body ?? existingStory.body;
-        existingStory.aiSummary = summary;
+    if (!existingStory) throw ErrorFactory.notFound(`Story with the id ${storyId} not found`);
 
-        const categories = await this.categoryService.ensureCategories(story.categoryNames);
-        existingStory.categoriesByCategoryId = categories;
-        return (await transactionalEntityManager.getRepository(Story).save(existingStory)).storyId;
-      },
-    );
-    return plainToInstance(StoryResponseDTO, this.storyRepository.getStoryById(updatedStoryId), {
-      excludeExtraneousValues: true,
+    const updatedStoryId = await AppDataSource.manager.transaction(async (tx) => {
+      const summary =
+        story.body && story.body !== existingStory.body
+          ? await generateSummary(story.body)
+          : existingStory.aiSummary;
+
+      existingStory.title = story.title ?? existingStory.title;
+      existingStory.body = story.body ?? existingStory.body;
+      existingStory.aiSummary = summary;
+
+      const categories = await this.categoryService.ensureCategories(story.categoryNames);
+      existingStory.categoriesByCategoryId = categories;
+
+      return (await tx.getRepository(Story).save(existingStory)).storyId;
     });
-  }
 
+    return plainToInstance(
+      StoryResponseDTO,
+      await this.storyRepository.getStoryById(updatedStoryId),
+      { excludeExtraneousValues: true },
+    );
+  }
   // Soft delete a story
   async deleteStory(storyId: string): Promise<void> {
     z.uuid().parse(storyId);
