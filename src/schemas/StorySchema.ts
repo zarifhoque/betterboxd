@@ -35,18 +35,18 @@ export const storyUpdateSchema = z
       .string()
       .min(1, 'Body is required')
       .max(10000, 'Body must be at most 10000 characters long'),
-    categoryNames: z
-      .preprocess(
-        (categoryNames) => {
-          if (!Array.isArray(categoryNames)) return undefined;
-          const normalized = categoryNames.map((categoryName) =>
-            String(categoryName).trim().toLowerCase(),
-          );
-          return Array.from(new Set(normalized));
-        },
-        z.array(z.string().min(1)),
-      )
-      .optional(),
+    // categoryNames: z
+    //   .preprocess(
+    //     (categoryNames) => {
+    //       if (!Array.isArray(categoryNames)) return undefined;
+    //       const normalized = categoryNames.map((categoryName) =>
+    //         String(categoryName).trim().toLowerCase(),
+    //       );
+    //       return Array.from(new Set(normalized));
+    //     },
+    //     z.array(z.string().min(1)),
+    //   )
+    //   .optional(),
   })
   .partial()
   .refine((data) => Object.keys(data).length > 0, {
