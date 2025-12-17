@@ -12,11 +12,14 @@ export class AuthorizationMiddleware {
   constructor(private storyService: StoryService) {}
   modifyUserAccessHandler = (req: AuthRequest, res: Response, next: NextFunction) => {
     const currentUser = req.user!;
-    const targetUserId = req.params.id;
+    const targetUserId = req.params.id ?? currentUser.userId;
     const isDelete = req.method === 'DELETE';
     const isOwner = currentUser.userId === targetUserId;
     logger.debug(`${currentUser.userId} == ${targetUserId}`);
     const isModify = !isDelete;
+    logger.debug(
+      `currentUser : ${currentUser.userId}, targetUserId: ${targetUserId}, isOwner: ${isOwner}, isDelete: ${isDelete}, isModify: ${isModify}`,
+    );
 
     // Delete check
     if (isDelete && !(currentUser.role === UserRole.ADMIN || isOwner)) {

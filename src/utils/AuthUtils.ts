@@ -29,7 +29,6 @@ export class AuthUtils {
 
   buildAuthEntity = (user: User, hashedPassword: string, emailToken: string): Auth => {
     const auth = new Auth();
-    auth.username = user.username;
     auth.email = user.email;
     auth.hashedPassword = hashedPassword;
     auth.userByUserId = user;

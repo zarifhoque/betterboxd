@@ -12,7 +12,6 @@ export interface UserUpdateDTO {
   username?: string;
   name?: string;
   bio?: string;
-  // role?: UserRole;
 }
 
 export type UserResponseDTO = {
