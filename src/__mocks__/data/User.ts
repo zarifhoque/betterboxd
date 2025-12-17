@@ -1,4 +1,4 @@
-import { UserCreateDTO } from '../../dtos/UserDTOs';
+import { UserCreateDTO, UserResponseDTO } from '../../dtos/UserDTOs';
 import { User, UserRole } from '../../entities/User';
 
 export const firstMockUserData: User = {
@@ -31,3 +31,44 @@ export const userCreateDTOData: UserCreateDTO = {
   email: 'newuser@example.com',
   bio: 'I am a new user',
 };
+
+// Mock User Response DTOs (for controller tests)
+export const mockUserResponseDTO: UserResponseDTO = {
+  userId: '550e8400-e29b-41d4-a716-446655440001',
+  username: 'testuser',
+  name: 'Test User',
+  email: 'test@example.com',
+  bio: 'A test user bio',
+  role: UserRole.USER,
+  joinDate: new Date('2025-01-01'),
+  isEmailConfirmed: true,
+};
+
+export const mockUserResponseDTO2: UserResponseDTO = {
+  userId: '550e8400-e29b-41d4-a716-446655440002',
+  username: 'adminuser',
+  name: 'Admin User',
+  email: 'admin@example.com',
+  bio: 'An admin user',
+  role: UserRole.ADMIN,
+  joinDate: new Date('2024-12-01'),
+  isEmailConfirmed: true,
+};
+
+export const mockUserResponseDTO3: UserResponseDTO = {
+  userId: '550e8400-e29b-41d4-a716-446655440003',
+  username: 'newuser',
+  name: 'New User',
+  email: 'newuser@example.com',
+  bio: 'A new user',
+  role: UserRole.USER,
+  joinDate: new Date('2025-01-15'),
+  isEmailConfirmed: false,
+};
+
+// Mock Users Array (Response DTOs)
+export const mockUsersArray: UserResponseDTO[] = [
+  mockUserResponseDTO,
+  mockUserResponseDTO2,
+  mockUserResponseDTO3,
+];

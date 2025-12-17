@@ -1,6 +1,6 @@
 import { Story } from '../../entities/Story';
 import { User, UserRole } from '../../entities/User';
-import { StoryCreateDTO, StoryUpdateDTO } from '../../dtos/StoryDTOs';
+import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../../dtos/StoryDTOs';
 
 // Mock User Data
 export const mockUserData: User = {
@@ -73,4 +73,16 @@ export const storyCreateDTOData: StoryCreateDTO = {
 export const storyUpdateDTOData: StoryUpdateDTO = {
   title: 'The Adventure Continues',
   body: 'The hero discovered new allies and faced greater challenges on their quest to restore peace to the kingdom.',
+};
+
+// Story Response DTO
+export const mockStoryResponseDTO: StoryResponseDTO = {
+  storyId: '550e8400-e29b-41d4-a716-446655440010',
+  userId: '555e4567-e89b-12d3-a456-426614174000',
+  title: 'The Adventure Begins',
+  body: 'Once upon a time, in a land far away, there lived a brave hero who embarked on an epic journey to save the kingdom from darkness.',
+  updatedAt: new Date('2025-01-15'),
+  username: 'storyteller',
+  categoryNames: ['Fantasy', 'Adventure'],
+  aiSummary: 'A hero embarks on a journey to save a kingdom from darkness.',
 };

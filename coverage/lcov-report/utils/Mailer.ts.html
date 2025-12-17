@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">40% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>8/20</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>6/18</span>
             </div>
         
             
@@ -113,28 +113,28 @@
 <a name='L48'></a><a href='#L48'>48</a>
 <a name='L49'></a><a href='#L49'>49</a>
 <a name='L50'></a><a href='#L50'>50</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -146,7 +146,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -162,11 +162,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// utils/mailer.ts
-<span class="cstat-no" title="statement not covered" >import nodemailer from 'nodemailer';</span>
-<span class="cstat-no" title="statement not covered" >import { ENV } from '../config/Env';</span>
-<span class="cstat-no" title="statement not covered" >import { logger } from '../config/Logger';</span>
+import nodemailer from 'nodemailer';
+import { ENV } from '../config/Env';
+import { logger } from '../config/Logger';
 &nbsp;
-const transporter = <span class="cstat-no" title="statement not covered" >nodemailer.createTransport({</span>
+const transporter = nodemailer.createTransport({
   host: ENV.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
   secure: ENV.SMTP_SECURE,
@@ -179,7 +179,7 @@ const transporter = <span class="cstat-no" title="statement not covered" >nodema
   },
 });
 &nbsp;
-export const <span class="cstat-no" title="statement not covered" >sendConfirmationEmail = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >a</span>sync </span>(to: string, token: string) =&gt; {</span>
+export const sendConfirmationEmail = <span class="fstat-no" title="function not covered" >async </span>(to: string, token: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const url = <span class="cstat-no" title="statement not covered" >`${ENV.FRONTEND_URL}/api/auth/confirm-email/${token}`;</span>
 <span class="cstat-no" title="statement not covered" >    await transporter.sendMail({</span>
@@ -195,7 +195,7 @@ export const <span class="cstat-no" title="statement not covered" >sendConfirmat
   }
 };
 &nbsp;
-export const <span class="cstat-no" title="statement not covered" >sendPasswordChangeEmail = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >a</span>sync </span>(to: string, token: string) =&gt; {</span>
+export const sendPasswordChangeEmail = <span class="fstat-no" title="function not covered" >async </span>(to: string, token: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const url = <span class="cstat-no" title="statement not covered" >`${ENV.FRONTEND_URL}/api/user/change-password/${token}`;</span>
 <span class="cstat-no" title="statement not covered" >    await transporter.sendMail({</span>
@@ -217,7 +217,7 @@ export const <span class="cstat-no" title="statement not covered" >sendPasswordC
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-17T08:09:00.936Z
+                at 2025-12-17T09:00:05.654Z
             </div>
         <script src="../prettify.js"></script>
         <script>
