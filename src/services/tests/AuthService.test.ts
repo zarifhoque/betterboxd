@@ -12,7 +12,7 @@ import bcrypt from 'bcrypt';
 import * as Mailer from '../../utils/Mailer';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { passwordResetTokenExpiryMs } from '../../constants/TimeConstants';
+
 import {
   mockUserData,
   mockAuthData,
@@ -90,7 +90,7 @@ describe('AuthService', () => {
   });
 
   describe('requestPasswordChange', () => {
-    const userId = mockUserData.userId;
+    const queriedUserId = mockUserData.userId;
     const currentPassword = 'old-pass';
     const newPassword = 'new-pass';
 
@@ -104,7 +104,7 @@ describe('AuthService', () => {
         hashedPassword: 'hashed-new-pass',
       });
 
-      await authService.requestPasswordChange(userId, currentPassword, newPassword);
+      await authService.requestPasswordChange(queriedUserId, currentPassword, newPassword);
 
       expect(authRepository.updateAuth).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -119,7 +119,7 @@ describe('AuthService', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(
-        authService.requestPasswordChange(userId, currentPassword, newPassword),
+        authService.requestPasswordChange(queriedUserId, currentPassword, newPassword),
       ).rejects.toThrow(ErrorFactory.unauthorized('Current password is incorrect'));
     });
 
@@ -127,7 +127,7 @@ describe('AuthService', () => {
       authRepository.getByUserId.mockResolvedValue(null);
 
       await expect(
-        authService.requestPasswordChange(userId, currentPassword, newPassword),
+        authService.requestPasswordChange(queriedUserId, currentPassword, newPassword),
       ).rejects.toThrow(ErrorFactory.notFound('Auth record not found for user'));
     });
 
@@ -138,7 +138,7 @@ describe('AuthService', () => {
       (Mailer.sendPasswordChangeEmail as jest.Mock).mockResolvedValue(false);
 
       await expect(
-        authService.requestPasswordChange(userId, currentPassword, newPassword),
+        authService.requestPasswordChange(queriedUserId, currentPassword, newPassword),
       ).rejects.toThrow(ErrorFactory.badGateway('Failed to send password change email'));
     });
   });

@@ -8,18 +8,18 @@ jest.mock('../../utils/AISummarization', () => ({
 import { Request, Response, NextFunction } from 'express';
 import { StoryController } from '../StoryController';
 import { StoryService } from '../../services/StoryService';
-import { StoryCreateDTO, StoryUpdateDTO, StoryResponseDTO } from '../../dtos/StoryDTOs';
+import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../../dtos/StoryDTOs';
 import { AuthRequest } from '../../types/AuthTypes';
 import { UserRole } from '../../entities/User';
 import { handleResponse } from '../../utils/Response';
 import {
-  mockStoryData,
   mockStoriesArray,
   storyCreateDTOData,
   storyUpdateDTOData,
-  mockUserData,
   mockStoryResponseDTO,
 } from '../../__mocks__/data/Story';
+import { ERROR_DEFINITIONS } from '../../constants/HTTPConstants';
+import { validPaginationCases } from '../../__mocks__/data/General';
 
 jest.mock('../../services/StoryService');
 jest.mock('../../utils/Response');
@@ -84,11 +84,35 @@ describe('StoryController', () => {
         mockResponse,
         expect.any(Array),
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'Stories fetched successfully',
         }),
       );
       expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    validPaginationCases.forEach(({ desc, query }) => {
+      it(`should fetch stories successfully ${desc}`, async () => {
+        mockRequest.query = query as any;
+        const mockStoriesResponseDTO = [mockStoryResponseDTO, mockStoryResponseDTO];
+        storyService.getAllStories.mockResolvedValue(mockStoriesResponseDTO);
+
+        await storyController.getAllStories(
+          mockRequest as Request,
+          mockResponse as Response,
+          mockNext,
+        );
+
+        expect(storyService.getAllStories).toHaveBeenCalledWith(query);
+        expect(handleResponse).toHaveBeenCalledWith(
+          mockResponse,
+          mockStoriesResponseDTO,
+          expect.objectContaining({
+            status: ERROR_DEFINITIONS.OK.status,
+            message: 'Stories fetched successfully',
+          }),
+        );
+      });
     });
 
     it('should return empty array when no stories found', async () => {
@@ -107,7 +131,7 @@ describe('StoryController', () => {
         mockResponse,
         [],
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'Stories fetched successfully',
         }),
       );
@@ -160,7 +184,7 @@ describe('StoryController', () => {
         mockResponse,
         mockStoryResponseDTO,
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'Story fetched successfully',
         }),
       );
@@ -217,7 +241,7 @@ describe('StoryController', () => {
         mockResponse,
         mockStoryResponseDTO,
         expect.objectContaining({
-          status: 201,
+          status: ERROR_DEFINITIONS.CREATED.status,
           message: 'Story created successfully',
         }),
       );
@@ -272,7 +296,7 @@ describe('StoryController', () => {
         mockResponse,
         storyWithSummary,
         expect.objectContaining({
-          status: 201,
+          status: ERROR_DEFINITIONS.CREATED.status,
         }),
       );
     });
@@ -295,7 +319,7 @@ describe('StoryController', () => {
         mockResponse,
         updatedStory,
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'Story updated successfully',
         }),
       );
@@ -366,7 +390,7 @@ describe('StoryController', () => {
         mockResponse,
         null,
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'Story deleted successfully',
         }),
       );

@@ -32,6 +32,11 @@ export const userCreateDTOData: UserCreateDTO = {
   bio: 'I am a new user',
 };
 
+export const UserUpdateDTOData = {
+  name: 'Updated User',
+  bio: 'This is an updated bio',
+};
+
 // Mock User Response DTOs (for controller tests)
 export const mockUserResponseDTO: UserResponseDTO = {
   userId: '550e8400-e29b-41d4-a716-446655440001',
@@ -72,3 +77,12 @@ export const mockUsersArray: UserResponseDTO[] = [
   mockUserResponseDTO2,
   mockUserResponseDTO3,
 ];
+
+// mock user jwt payload
+export const mockUserJwtPayload = {
+  userId: '550e8400-e29b-41d4-a716-446655440001',
+  role: UserRole.USER,
+  pwdlmod: Date.now(),
+  iat: Math.floor(Date.now() / 1000),
+  exp: Math.floor(Date.now() / 1000) + 3600,
+};

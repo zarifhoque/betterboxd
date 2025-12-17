@@ -6,8 +6,15 @@ import { AuthService } from '../../services/AuthService';
 import { UserUpdateDTO } from '../../dtos/UserDTOs';
 import { AuthRequest } from '../../types/AuthTypes';
 import { UserRole } from '../../entities/User';
-import { mockUserResponseDTO, mockUsersArray } from '../../__mocks__/data/User';
+import {
+  mockUserJwtPayload,
+  mockUserResponseDTO,
+  mockUsersArray,
+  UserUpdateDTOData,
+} from '../../__mocks__/data/User';
 import { handleResponse } from '../../utils/Response';
+import { ERROR_DEFINITIONS } from '../../constants/HTTPConstants';
+import { validPaginationCases } from '../../__mocks__/data/General';
 
 jest.mock('../../services/UserService');
 jest.mock('../../services/AuthService');
@@ -37,13 +44,7 @@ describe('UserController', () => {
       params: {},
       query: {},
       body: {},
-      user: {
-        userId: '550e8400-e29b-41d4-a716-446655440001',
-        role: UserRole.USER,
-        pwdlmod: Date.now(),
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 3600,
-      },
+      user: mockUserJwtPayload,
     };
 
     mockResponse = {
@@ -57,6 +58,7 @@ describe('UserController', () => {
   });
 
   describe('getAllUsers', () => {
+    const validPaginationCasesData = validPaginationCases;
     it('should fetch all users successfully', async () => {
       const queryParams = { page: 1, itemsPerPage: 10 };
       mockRequest.query = queryParams as any;
@@ -75,6 +77,29 @@ describe('UserController', () => {
       );
     });
 
+    validPaginationCases.forEach(({ query, desc }) => {
+      it(`should fetch users successfully with pagination: ${desc}`, async () => {
+        mockRequest.query = query as any;
+        userService.getAllUsers.mockResolvedValue(mockUsersArray);
+
+        await userController.getAllUsers(
+          mockRequest as Request,
+          mockResponse as Response,
+          mockNext,
+        );
+
+        expect(userService.getAllUsers).toHaveBeenCalledWith(query);
+        expect(handleResponse).toHaveBeenCalledWith(
+          mockResponse,
+          mockUsersArray,
+          expect.objectContaining({
+            status: ERROR_DEFINITIONS.OK.status,
+            message: 'Users fetched succesfully',
+          }),
+        );
+      });
+    });
+
     it('should call next with error if service throws', async () => {
       const error = new Error('Database error');
       userService.getAllUsers.mockRejectedValue(error);
@@ -86,20 +111,20 @@ describe('UserController', () => {
   });
 
   describe('getUserById', () => {
-    const userId = '550e8400-e29b-41d4-a716-446655440001';
+    const queriedUserId = '550e8400-e29b-41d4-a716-446655440001';
 
     it('should fetch user by id successfully', async () => {
-      mockRequest.params = { id: userId };
+      mockRequest.params = { id: queriedUserId };
       userService.getUserById.mockResolvedValue(mockUserResponseDTO);
 
       await userController.getUserById(mockRequest as Request, mockResponse as Response, mockNext);
 
-      expect(userService.getUserById).toHaveBeenCalledWith(userId);
+      expect(userService.getUserById).toHaveBeenCalledWith(queriedUserId);
       expect(handleResponse).toHaveBeenCalledWith(
         mockResponse,
         mockUserResponseDTO,
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'User fetched succesfully',
         }),
       );
@@ -115,7 +140,7 @@ describe('UserController', () => {
     });
 
     it('should call next with error if user not found', async () => {
-      mockRequest.params = { id: userId };
+      mockRequest.params = { id: queriedUserId };
       const error = new Error('User not found');
       userService.getUserById.mockRejectedValue(error);
 
@@ -126,26 +151,23 @@ describe('UserController', () => {
   });
 
   describe('updateUser', () => {
-    const userId = '550e8400-e29b-41d4-a716-446655440001';
-    const updateData: UserUpdateDTO = {
-      name: 'Updated Name',
-      bio: 'Updated bio',
-    };
+    const queriedUserId = '550e8400-e29b-41d4-a716-446655440001';
+    const updateData: UserUpdateDTO = UserUpdateDTOData;
 
     it('should update user successfully', async () => {
-      mockRequest.params = { id: userId };
+      mockRequest.params = { id: queriedUserId };
       mockRequest.body = updateData;
       const updatedUser = { ...mockUserResponseDTO, ...updateData };
       userService.updateUser.mockResolvedValue(updatedUser);
 
       await userController.updateUser(mockRequest as Request, mockResponse as Response, mockNext);
 
-      expect(userService.updateUser).toHaveBeenCalledWith(userId, updateData);
+      expect(userService.updateUser).toHaveBeenCalledWith(queriedUserId, updateData);
       expect(handleResponse).toHaveBeenCalledWith(
         mockResponse,
         updatedUser,
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'User updated successfully',
         }),
       );
@@ -162,7 +184,7 @@ describe('UserController', () => {
     });
 
     it('should call next with error if update fails', async () => {
-      mockRequest.params = { id: userId };
+      mockRequest.params = { id: queriedUserId };
       mockRequest.body = updateData;
       const error = new Error('Update failed');
       userService.updateUser.mockRejectedValue(error);
@@ -174,10 +196,10 @@ describe('UserController', () => {
   });
 
   describe('deactivateUser', () => {
-    const userId = '550e8400-e29b-41d4-a716-446655440001';
+    const queriedUserId = '550e8400-e29b-41d4-a716-446655440001';
 
     it('should deactivate user successfully', async () => {
-      mockRequest.params = { id: userId };
+      mockRequest.params = { id: queriedUserId };
       userService.deactivateUser.mockResolvedValue(undefined);
 
       await userController.deactivateUser(
@@ -186,11 +208,11 @@ describe('UserController', () => {
         mockNext,
       );
 
-      expect(userService.deactivateUser).toHaveBeenCalledWith(userId);
+      expect(userService.deactivateUser).toHaveBeenCalledWith(queriedUserId);
       expect(handleResponse).toHaveBeenCalledWith(
         mockResponse,
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'User deleted successfully',
         }),
       );
@@ -210,7 +232,7 @@ describe('UserController', () => {
     });
 
     it('should call next with error if deactivation fails', async () => {
-      mockRequest.params = { id: userId };
+      mockRequest.params = { id: queriedUserId };
       const error = new Error('User not found');
       userService.deactivateUser.mockRejectedValue(error);
 
@@ -240,7 +262,7 @@ describe('UserController', () => {
         mockResponse,
         updatedUser,
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'User role updated successfully',
         }),
       );
@@ -282,7 +304,7 @@ describe('UserController', () => {
   });
 
   describe('changePasswordRequest', () => {
-    const userId = '550e8400-e29b-41d4-a716-446655440001';
+    const queriedUserId = '550e8400-e29b-41d4-a716-446655440001';
     const passwordData = {
       currentPassword: 'oldPassword123',
       newPassword: 'newPassword456',
@@ -298,7 +320,7 @@ describe('UserController', () => {
       );
 
       expect(authService.requestPasswordChange).toHaveBeenCalledWith(
-        userId,
+        queriedUserId,
         passwordData.currentPassword,
         passwordData.newPassword,
       );
@@ -348,7 +370,7 @@ describe('UserController', () => {
   });
 
   describe('getProfile', () => {
-    const userId = '550e8400-e29b-41d4-a716-446655440001';
+    const queriedUserId = '550e8400-e29b-41d4-a716-446655440001';
 
     it('should get user profile successfully', async () => {
       userService.getUserById.mockResolvedValue(mockUserResponseDTO);
@@ -359,12 +381,12 @@ describe('UserController', () => {
         mockNext,
       );
 
-      expect(userService.getUserById).toHaveBeenCalledWith(userId);
+      expect(userService.getUserById).toHaveBeenCalledWith(queriedUserId);
       expect(handleResponse).toHaveBeenCalledWith(
         mockResponse,
         mockUserResponseDTO,
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'User fetched succesfully',
         }),
       );

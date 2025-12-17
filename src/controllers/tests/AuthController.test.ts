@@ -11,6 +11,7 @@ import {
   mockUserResponseDTO,
   mockConfirmationToken,
 } from '../../__mocks__/data/Auth';
+import { ERROR_DEFINITIONS } from '../../constants/HTTPConstants';
 
 jest.mock('../../services/AuthService');
 jest.mock('../../utils/Response');
@@ -55,7 +56,7 @@ describe('AuthController', () => {
         mockResponse,
         mockUserResponseDTO,
         expect.objectContaining({
-          status: 201,
+          status: ERROR_DEFINITIONS.CREATED.status,
           message: 'User signed up successfully. Please check your email to confirm your account. ',
         }),
       );
@@ -109,7 +110,7 @@ describe('AuthController', () => {
         mockResponse,
         { token: mockLoginResponse.token, user: mockLoginResponse.user },
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'User logged in successfully',
         }),
       );
@@ -173,7 +174,7 @@ describe('AuthController', () => {
         mockResponse,
         {},
         expect.objectContaining({
-          status: 200,
+          status: ERROR_DEFINITIONS.OK.status,
           message: 'User confirmed in the backend',
         }),
       );
