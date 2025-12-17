@@ -1,7 +1,6 @@
 import {
   BadRequestError,
   UnauthorizedError,
-  ForbiddenError,
   NotFoundError,
   ConflictError,
   InternalServerError,

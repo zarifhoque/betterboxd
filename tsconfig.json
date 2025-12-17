@@ -9,11 +9,12 @@
     "strict": true,
     "moduleResolution": "node",
     "sourceMap": true,
-    "types": ["node"],
+    "types": ["node", "jest"],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true
-  }
+  },
+  "include": ["src", "tests"]
 }
