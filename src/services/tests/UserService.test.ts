@@ -1,26 +1,21 @@
 import { UserService } from '../UserService';
 import { UserRepository } from '../../repositories/UserRepository';
-import { User, UserRole } from '../../entities/User';
-import { UserCreateDTO, UserUpdateDTO } from '../../dtos/UserDTOs';
+import { UserRole } from '../../entities/User';
+import { UserUpdateDTO } from '../../dtos/UserDTOs';
 import { ErrorFactory } from '../../errors/ErrorFactory';
+import {
+  firstMockUserData,
+  secondMockUserData,
+  userCreateDTOData,
+} from '../../__mocks__/data/User';
 
 jest.mock('../../repositories/UserRepository');
 
 describe('UserService', () => {
   let userService: UserService;
   let userRepository: jest.Mocked<UserRepository>;
-
-  const mockUser: User = {
-    userId: '550e8400-e29b-41d4-a716-446655440000',
-    username: 'testuser',
-    name: 'Test User',
-    email: 'test@example.com',
-    bio: 'A test user',
-    joinDate: new Date('2025-01-01T00:00:00Z'),
-    role: UserRole.USER,
-    deletedAt: null,
-    isEmailConfirmed: false,
-  };
+  const mockUserData = firstMockUserData;
+  const mockUsersData = [firstMockUserData, secondMockUserData];
 
   beforeEach(() => {
     userRepository = new UserRepository() as jest.Mocked<UserRepository>;
@@ -29,47 +24,44 @@ describe('UserService', () => {
   });
   describe('getAllUsers', () => {
     it('should return all users as UserResponseDTO[]', async () => {
-      const mockUsers = [mockUser];
+      const mockUsers = mockUsersData;
       userRepository.getAllUsers.mockResolvedValue(mockUsers);
 
       const result = await userService.getAllUsers({});
 
-      expect(result).toEqual(mockUsers.map((u) => expect.objectContaining({ userId: u.userId })));
+      expect(result).toEqual(
+        mockUsers.map((user) => expect.objectContaining({ userId: user.userId })),
+      );
       expect(userRepository.getAllUsers).toHaveBeenCalledWith({});
     });
   });
 
   describe('getUserById', () => {
     it('should return user if found', async () => {
-      userRepository.getUserById.mockResolvedValue(mockUser);
+      const queriedUserId = mockUserData.userId;
+      userRepository.getUserById.mockResolvedValue(mockUserData);
 
-      const result = await userService.getUserById(mockUser.userId);
+      const result = await userService.getUserById(queriedUserId);
 
-      expect(result).toMatchObject(mockUser);
-      expect(userRepository.getUserById).toHaveBeenCalledWith(mockUser.userId);
+      expect(result).toMatchObject(mockUserData);
+      expect(userRepository.getUserById).toHaveBeenCalledWith(queriedUserId);
     });
 
     it('should throw not found error if user not found', async () => {
       userRepository.getUserById.mockResolvedValue(null);
 
-      await expect(userService.getUserById(mockUser.userId)).rejects.toThrow(
-        ErrorFactory.notFound(`User with the id ${mockUser.userId} not found`),
+      await expect(userService.getUserById(mockUserData.userId)).rejects.toThrow(
+        ErrorFactory.notFound(`User with the id ${mockUserData.userId} not found`),
       );
     });
   });
 
   describe('createUser', () => {
-    const createDTO: UserCreateDTO = {
-      username: mockUser.username,
-      name: mockUser.name,
-      email: mockUser.email,
-      bio: mockUser.bio,
-    };
-
+    const createDTO = userCreateDTOData;
     it('should create a new user if email and username are free', async () => {
       userRepository.getUserByEmail.mockResolvedValue(null);
       userRepository.getUserByUsername.mockResolvedValue(null);
-      userRepository.createUser.mockResolvedValue({ ...mockUser, isEmailConfirmed: false });
+      userRepository.createUser.mockResolvedValue({ ...mockUserData, isEmailConfirmed: false });
 
       const result = await userService.createUser(createDTO);
 
@@ -78,7 +70,7 @@ describe('UserService', () => {
     });
 
     it('should throw conflict if email exists', async () => {
-      userRepository.getUserByEmail.mockResolvedValue(mockUser);
+      userRepository.getUserByEmail.mockResolvedValue(mockUserData);
 
       await expect(userService.createUser(createDTO)).rejects.toThrow(
         ErrorFactory.conflict('A user with this email already exists'),
@@ -87,7 +79,7 @@ describe('UserService', () => {
 
     it('should throw conflict if username exists', async () => {
       userRepository.getUserByEmail.mockResolvedValue(null);
-      userRepository.getUserByUsername.mockResolvedValue(mockUser);
+      userRepository.getUserByUsername.mockResolvedValue(mockUserData);
 
       await expect(userService.createUser(createDTO)).rejects.toThrow(
         ErrorFactory.conflict('A user with this username already exists'),
@@ -96,49 +88,67 @@ describe('UserService', () => {
   });
 
   describe('updateUser', () => {
-    const updateDTO: UserUpdateDTO = { bio: 'Updated bio' };
+    const updateDTO: UserUpdateDTO = {
+      username: 'updatedUser',
+      name: 'Updated Name',
+      bio: 'Updated bio',
+    };
+    const queriedUserId = mockUserData.userId;
 
-    it('should update user successfully', async () => {
-      userRepository.updateUser.mockResolvedValue({ ...mockUser, ...updateDTO });
+    it('should update user successfully if exist', async () => {
+      const updatedUser = { ...mockUserData, ...updateDTO };
+      userRepository.updateUser.mockResolvedValue(updatedUser);
 
-      const result = await userService.updateUser(mockUser.userId, updateDTO);
+      const result = await userService.updateUser(queriedUserId, updateDTO);
 
-      expect(result).toMatchObject({ ...mockUser, ...updateDTO });
-      expect(userRepository.updateUser).toHaveBeenCalledWith(mockUser.userId, updateDTO);
+      expect(result).toMatchObject({
+        userId: mockUserData.userId,
+        username: updateDTO.username,
+        name: updateDTO.name,
+        bio: updateDTO.bio,
+        email: mockUserData.email,
+        role: mockUserData.role,
+        joinDate: mockUserData.joinDate,
+        isEmailConfirmed: mockUserData.isEmailConfirmed,
+      });
+
+      expect(userRepository.updateUser).toHaveBeenCalledWith(queriedUserId, updateDTO);
     });
 
     it('should throw not found if user does not exist', async () => {
       userRepository.updateUser.mockResolvedValue(null);
 
-      await expect(userService.updateUser(mockUser.userId, updateDTO)).rejects.toThrow(
-        ErrorFactory.notFound(`User with the id ${mockUser.userId} not found`),
+      await expect(userService.updateUser(mockUserData.userId, updateDTO)).rejects.toThrow(
+        ErrorFactory.notFound(`User with the id ${mockUserData.userId} not found`),
       );
     });
   });
 
   describe('deactivateUser', () => {
+    const queriedUserId = mockUserData.userId;
     it('should soft delete user', async () => {
       userRepository.softDeleteUser.mockResolvedValue(true);
 
-      await userService.deactivateUser(mockUser.userId);
+      await userService.deactivateUser(queriedUserId);
 
-      expect(userRepository.softDeleteUser).toHaveBeenCalledWith(mockUser.userId);
+      expect(userRepository.softDeleteUser).toHaveBeenCalledWith(queriedUserId);
     });
 
     it('should throw not found if user does not exist', async () => {
       userRepository.softDeleteUser.mockResolvedValue(false);
 
-      await expect(userService.deactivateUser(mockUser.userId)).rejects.toThrow(
-        ErrorFactory.notFound(`User with the id ${mockUser.userId} not found`),
+      await expect(userService.deactivateUser(queriedUserId)).rejects.toThrow(
+        ErrorFactory.notFound(`User with the id ${mockUserData.userId} not found`),
       );
     });
   });
 
   describe('doesUserExistByEmail', () => {
+    const queriedEmail = mockUserData.email;
     it('returns true if user exists', async () => {
-      userRepository.getUserByEmail.mockResolvedValue(mockUser);
+      userRepository.getUserByEmail.mockResolvedValue(mockUserData);
 
-      const exists = await userService.doesUserExistByEmail(mockUser.email);
+      const exists = await userService.doesUserExistByEmail(queriedEmail);
 
       expect(exists).toBe(true);
     });
@@ -146,17 +156,18 @@ describe('UserService', () => {
     it('returns false if user does not exist', async () => {
       userRepository.getUserByEmail.mockResolvedValue(null);
 
-      const exists = await userService.doesUserExistByEmail(mockUser.email);
+      const exists = await userService.doesUserExistByEmail(queriedEmail);
 
       expect(exists).toBe(false);
     });
   });
 
   describe('doesUserExistByUsername', () => {
+    const queriedUsername = mockUserData.username;
     it('returns true if user exists', async () => {
-      userRepository.getUserByUsername.mockResolvedValue(mockUser);
+      userRepository.getUserByUsername.mockResolvedValue(mockUserData);
 
-      const exists = await userService.doesUserExistByUsername(mockUser.username);
+      const exists = await userService.doesUserExistByUsername(queriedUsername);
 
       expect(exists).toBe(true);
     });
@@ -164,55 +175,58 @@ describe('UserService', () => {
     it('returns false if user does not exist', async () => {
       userRepository.getUserByUsername.mockResolvedValue(null);
 
-      const exists = await userService.doesUserExistByUsername(mockUser.username);
+      const exists = await userService.doesUserExistByUsername(queriedUsername);
 
       expect(exists).toBe(false);
     });
   });
 
   describe('updateUserRole', () => {
+    const newRole = UserRole.ADMIN;
+    const queriedUserId = mockUserData.userId;
     it('should update user role successfully', async () => {
-      const updatedUser = { ...mockUser, role: UserRole.ADMIN };
-      userRepository.getUserById.mockResolvedValue(mockUser);
+      const updatedUser = { ...mockUserData, role: newRole };
+      userRepository.getUserById.mockResolvedValue(mockUserData);
       userRepository.updateUser.mockResolvedValue(updatedUser);
 
-      const result = await userService.updateUserRole(mockUser.userId, UserRole.ADMIN);
-
-      expect(result.role).toBe(UserRole.ADMIN);
-      expect(userRepository.updateUser).toHaveBeenCalledWith(mockUser.userId, {
-        ...mockUser,
-        role: UserRole.ADMIN,
+      const result = await userService.updateUserRole(queriedUserId, newRole);
+      expect(result.role).toBe(newRole);
+      expect(userRepository.updateUser).toHaveBeenCalledWith(queriedUserId, {
+        ...mockUserData,
+        role: newRole,
       });
     });
 
     it('should throw not found if user does not exist', async () => {
       userRepository.getUserById.mockResolvedValue(null);
 
-      await expect(userService.updateUserRole(mockUser.userId, UserRole.ADMIN)).rejects.toThrow(
-        ErrorFactory.notFound(`User with id ${mockUser.userId} not found`),
+      await expect(userService.updateUserRole(queriedUserId, newRole)).rejects.toThrow(
+        ErrorFactory.notFound(`User with id ${queriedUserId} not found`),
       );
     });
   });
 
   describe('confirmUserEmailByEmail', () => {
+    const queriedEmail = mockUserData.email;
+    const queriedUserId = mockUserData.userId;
     it('should confirm user email if not already confirmed', async () => {
-      const unconfirmedUser = { ...mockUser, isEmailConfirmed: false };
+      const unconfirmedUser = { ...mockUserData, isEmailConfirmed: false };
       userRepository.getUserByEmail.mockResolvedValue(unconfirmedUser);
       userRepository.updateUser.mockResolvedValue({ ...unconfirmedUser, isEmailConfirmed: true });
 
-      await userService.confirmUserEmailByEmail(mockUser.email);
+      await userService.confirmUserEmailByEmail(queriedEmail);
 
-      expect(userRepository.updateUser).toHaveBeenCalledWith(mockUser.userId, {
+      expect(userRepository.updateUser).toHaveBeenCalledWith(queriedUserId, {
         ...unconfirmedUser,
         isEmailConfirmed: true,
       });
     });
 
     it('should do nothing if user email is already confirmed', async () => {
-      const confirmedUser = { ...mockUser, isEmailConfirmed: true };
+      const confirmedUser = { ...mockUserData, isEmailConfirmed: true };
       userRepository.getUserByEmail.mockResolvedValue(confirmedUser);
 
-      await userService.confirmUserEmailByEmail(mockUser.email);
+      await userService.confirmUserEmailByEmail(queriedEmail);
 
       expect(userRepository.updateUser).not.toHaveBeenCalled();
     });
@@ -220,40 +234,43 @@ describe('UserService', () => {
     it('should throw not found if email does not exist', async () => {
       userRepository.getUserByEmail.mockResolvedValue(null);
 
-      await expect(userService.confirmUserEmailByEmail(mockUser.email)).rejects.toThrow(
-        ErrorFactory.notFound(`User with email ${mockUser.email} not found`),
+      await expect(userService.confirmUserEmailByEmail(queriedEmail)).rejects.toThrow(
+        ErrorFactory.notFound(`User with email ${queriedEmail} not found`),
       );
     });
   });
   describe('findUserByEmail', () => {
+    const queriedEmail = mockUserData.email;
     it('should return user if found', async () => {
-      userRepository.getUserByEmail.mockResolvedValue(mockUser);
+      userRepository.getUserByEmail.mockResolvedValue(mockUserData);
 
-      const result = await userService.findUserByEmail(mockUser.email);
-      expect(result).toMatchObject({ userId: mockUser.userId });
+      const result = await userService.findUserByEmail(queriedEmail);
+      expect(result).toMatchObject({ userId: mockUserData.userId });
     });
 
     it('should throw not found if user does not exist', async () => {
       userRepository.getUserByEmail.mockResolvedValue(null);
 
-      await expect(userService.findUserByEmail(mockUser.email)).rejects.toThrow(
-        ErrorFactory.notFound(`User with email ${mockUser.email} not found`),
+      await expect(userService.findUserByEmail(queriedEmail)).rejects.toThrow(
+        ErrorFactory.notFound(`User with email ${queriedEmail} not found`),
       );
     });
   });
   describe('findUserByUsername', () => {
+    const queriedUsername = mockUserData.username;
+    const receivedUserId = mockUserData.userId;
     it('should return user if found', async () => {
-      userRepository.getUserByUsername.mockResolvedValue(mockUser);
+      userRepository.getUserByUsername.mockResolvedValue(mockUserData);
 
-      const result = await userService.findUserByUsername(mockUser.username);
-      expect(result).toMatchObject({ userId: mockUser.userId });
+      const result = await userService.findUserByUsername(queriedUsername);
+      expect(result).toMatchObject({ userId: receivedUserId });
     });
 
     it('should throw not found if user does not exist', async () => {
       userRepository.getUserByUsername.mockResolvedValue(null);
 
-      await expect(userService.findUserByUsername(mockUser.username)).rejects.toThrow(
-        ErrorFactory.notFound(`User with username ${mockUser.username} not found`),
+      await expect(userService.findUserByUsername(queriedUsername)).rejects.toThrow(
+        ErrorFactory.notFound(`User with username ${queriedUsername} not found`),
       );
     });
   });

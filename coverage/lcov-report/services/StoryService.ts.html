@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">23.72% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/59</span>
+                <span class='fraction'>14/59</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">21.81% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/55</span>
+                <span class='fraction'>12/55</span>
             </div>
         
             
@@ -172,21 +172,21 @@
 <a name='L107'></a><a href='#L107'>107</a>
 <a name='L108'></a><a href='#L108'>108</a>
 <a name='L109'></a><a href='#L109'>109</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -280,21 +280,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// services/StoryService.ts
-<span class="cstat-no" title="statement not covered" >import { StoryRepository } from '../repositories/StoryRepository';</span>
-<span class="cstat-no" title="statement not covered" >import { Story } from '../entities/Story';</span>
-<span class="cstat-no" title="statement not covered" >import { z } from 'zod';</span>
-<span class="cstat-no" title="statement not covered" >import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';</span>
-<span class="cstat-no" title="statement not covered" >import { plainToInstance } from 'class-transformer';</span>
-<span class="cstat-no" title="statement not covered" >import { ErrorFactory } from '../errors/ErrorFactory';</span>
+import { StoryRepository } from '../repositories/StoryRepository';
+import { Story } from '../entities/Story';
+import { z } from 'zod';
+import { StoryCreateDTO, StoryResponseDTO, StoryUpdateDTO } from '../dtos/StoryDTOs';
+import { plainToInstance } from 'class-transformer';
+import { ErrorFactory } from '../errors/ErrorFactory';
 import { StoryQueryType } from '../schemas/QuerySchema';
-<span class="cstat-no" title="statement not covered" >import { UserService } from './UserService';</span>
-<span class="cstat-no" title="statement not covered" >import { logger } from '../config/Logger';</span>
-<span class="cstat-no" title="statement not covered" >import { injectable } from 'tsyringe';</span>
-<span class="cstat-no" title="statement not covered" >import { AppDataSource } from '../database/DataSource';</span>
+import { UserService } from './UserService';
+import { logger } from '../config/Logger';
+import { injectable } from 'tsyringe';
+import { AppDataSource } from '../database/DataSource';
 import { CategoryService } from './CategoryService';
-<span class="cstat-no" title="statement not covered" >import { generateSummary } from '../utils/AISummarization';</span>
+import { generateSummary } from '../utils/AISummarization';
 @injectable()
-export <span class="cstat-no" title="statement not covered" >class <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >StoryService </span>{</span></span>
+export class StoryService {
 <span class="fstat-no" title="function not covered" >  constructor(</span>
     private <span class="cstat-no" title="statement not covered" >storyRepository: S</span>toryRepository,
     private <span class="cstat-no" title="statement not covered" >userService: U</span>serService,
@@ -394,7 +394,7 @@ export <span class="cstat-no" title="statement not covered" >class <span class="
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-17T04:22:17.136Z
+                at 2025-12-17T08:09:00.936Z
             </div>
         <script src="../prettify.js"></script>
         <script>
