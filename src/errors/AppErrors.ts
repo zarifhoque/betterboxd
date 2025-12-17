@@ -46,13 +46,6 @@ export class UnauthenticatedError extends AppError {
   }
 }
 
-export class ForbiddenError extends AppError {
-  constructor(message: string) {
-    super(message, ERROR_DEFINITIONS.FORBIDDEN.status);
-    this.name = ERROR_DEFINITIONS.FORBIDDEN.name;
-  }
-}
-
 export class InternalServerError extends AppError {
   constructor(message: string) {
     super(message, ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.status);

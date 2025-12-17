@@ -15,6 +15,8 @@ import { sendConfirmationEmail, sendPasswordChangeEmail } from '../utils/Mailer'
 import { AuthUtils } from '../utils/AuthUtils';
 import jwt from 'jsonwebtoken';
 import { passwordResetTokenExpiryMs } from '../constants/TimeConstants';
+import crypto from 'crypto';
+
 @injectable()
 export class AuthService {
   constructor(

@@ -83,6 +83,7 @@ export class UserController {
           status: ERROR_DEFINITIONS.BAD_REQUEST.status,
           message: 'Role must be provided',
         });
+        return;
       }
 
       const updatedUser = await this.userService.updateUserRole(userId, role);
